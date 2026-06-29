@@ -79,6 +79,9 @@ class _AuthScreenState extends State<AuthScreen> {
   String? _validateIdentifier(String? v) {
     final value = (v ?? '').trim();
     if (value.isEmpty) return 'Email or mobile number is required';
+    // On login we don't format-check — the backend decides if the account
+    // exists. Strict validation only matters when creating an account.
+    if (mode == AuthMode.login) return null;
     final isEmail = RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(value);
     final digits = value.replaceAll(RegExp(r'[\s()-]'), '');
     final isMobile = RegExp(r'^(\+?63|0)9\d{9}$').hasMatch(digits);
