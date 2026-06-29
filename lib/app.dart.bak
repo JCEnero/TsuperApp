@@ -1,0 +1,5350 @@
+import 'dart:ui';
+
+import 'package:flutter_map/flutter_map.dart';
+import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
+import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:latlong2/latlong.dart';
+
+class TsuperApp extends StatelessWidget {
+  const TsuperApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final base = ThemeData(
+      useMaterial3: true,
+      colorScheme: ColorScheme.fromSeed(
+        seedColor: AppColors.primary,
+        brightness: Brightness.light,
+        primary: AppColors.primary,
+        secondary: AppColors.darkNavy,
+        surface: Colors.white,
+        tertiary: AppColors.gray400,
+        error: AppColors.danger,
+      ),
+      scaffoldBackgroundColor: AppColors.background,
+      fontFamily: 'Poppins',
+    );
+
+    final textTheme = base.textTheme.copyWith(
+      displayLarge: base.textTheme.displayLarge?.copyWith(
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.4,
+      ),
+      headlineLarge: base.textTheme.headlineLarge?.copyWith(
+        fontWeight: FontWeight.w700,
+        letterSpacing: -0.3,
+      ),
+      headlineMedium: base.textTheme.headlineMedium?.copyWith(
+        fontWeight: FontWeight.w700,
+      ),
+      titleLarge: base.textTheme.titleLarge?.copyWith(
+        fontWeight: FontWeight.w700,
+      ),
+      titleMedium: base.textTheme.titleMedium?.copyWith(
+        fontWeight: FontWeight.w600,
+      ),
+      bodyLarge: base.textTheme.bodyLarge?.copyWith(height: 1.45),
+      bodyMedium: base.textTheme.bodyMedium?.copyWith(height: 1.45),
+      bodySmall: base.textTheme.bodySmall?.copyWith(height: 1.4),
+      labelLarge: base.textTheme.labelLarge?.copyWith(
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.15,
+      ),
+    );
+
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'TSUPER APP',
+      theme: base.copyWith(
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.offWhite,
+          surfaceTintColor: Colors.transparent,
+          elevation: 0,
+          centerTitle: false,
+        ),
+        textTheme: textTheme.apply(
+          bodyColor: AppColors.ink,
+          displayColor: AppColors.ink,
+          fontFamily: 'Poppins',
+        ),
+        pageTransitionsTheme: const PageTransitionsTheme(
+          builders: {
+            TargetPlatform.android: TsuperFadeSlideTransitionsBuilder(),
+            TargetPlatform.iOS: TsuperFadeSlideTransitionsBuilder(),
+            TargetPlatform.linux: TsuperFadeSlideTransitionsBuilder(),
+            TargetPlatform.macOS: TsuperFadeSlideTransitionsBuilder(),
+            TargetPlatform.windows: TsuperFadeSlideTransitionsBuilder(),
+            TargetPlatform.fuchsia: TsuperFadeSlideTransitionsBuilder(),
+          },
+        ),
+        navigationBarTheme: NavigationBarThemeData(
+          backgroundColor: Colors.transparent,
+          surfaceTintColor: Colors.transparent,
+          shadowColor: Colors.transparent,
+          height: 72,
+          indicatorColor: AppColors.primary.withValues(alpha: 0.10),
+          labelTextStyle: WidgetStatePropertyAll(
+            const TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+              fontSize: 11,
+            ),
+          ),
+        ),
+        textButtonTheme: TextButtonThemeData(
+          style: TextButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            textStyle: const TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        filledButtonTheme: FilledButtonThemeData(
+          style: FilledButton.styleFrom(
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            minimumSize: const Size.fromHeight(56),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            textStyle: const TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+            elevation: 0,
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: AppColors.primary,
+            minimumSize: const Size.fromHeight(56),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            side: const BorderSide(color: AppColors.primary, width: 1.1),
+            textStyle: const TextStyle(
+              fontFamily: 'Poppins',
+              fontWeight: FontWeight.w600,
+            ),
+            backgroundColor: Colors.white,
+            elevation: 0,
+          ),
+        ),
+        cardTheme: CardTheme(
+          color: Colors.white,
+          surfaceTintColor: Colors.white,
+          elevation: 0,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18),
+          ),
+          margin: EdgeInsets.zero,
+        ),
+        chipTheme: ChipThemeData(
+          backgroundColor: Colors.white,
+          selectedColor: AppColors.primary.withValues(alpha: 0.12),
+          disabledColor: AppColors.gray100,
+          side: const BorderSide(color: AppColors.gray200),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          labelStyle: const TextStyle(
+            color: AppColors.ink,
+            fontWeight: FontWeight.w600,
+            fontFamily: 'Poppins',
+          ),
+          secondaryLabelStyle: const TextStyle(
+            color: AppColors.primary,
+            fontWeight: FontWeight.w700,
+            fontFamily: 'Poppins',
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        ),
+        snackBarTheme: SnackBarThemeData(
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppColors.darkNavy,
+          contentTextStyle: const TextStyle(
+            color: Colors.white,
+            fontWeight: FontWeight.w500,
+            fontFamily: 'Poppins',
+          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+        ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          backgroundColor: Colors.white,
+          selectedItemColor: AppColors.primary,
+          unselectedItemColor: AppColors.gray600,
+          elevation: 0,
+          type: BottomNavigationBarType.fixed,
+        ),
+        inputDecorationTheme: InputDecorationTheme(
+          filled: true,
+          fillColor: AppColors.offWhite,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 18,
+            vertical: 16,
+          ),
+          floatingLabelBehavior: FloatingLabelBehavior.auto,
+          labelStyle: const TextStyle(color: AppColors.softInk),
+          hintStyle: const TextStyle(color: AppColors.softInk),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: AppColors.gray200),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(color: AppColors.gray200),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
+          ),
+        ),
+      ),
+      routes: AppRoutes.routes,
+      initialRoute: AppRoutes.splash,
+    );
+  }
+}
+
+class AppRoutes {
+  static const splash = '/';
+  static const onboarding = '/onboarding';
+  static const roleSelection = '/role-selection';
+  static const passenger = '/passenger';
+  static const driver = '/driver';
+  static const login = '/login';
+  static const register = '/register';
+  static const forgotPassword = '/forgot-password';
+  static const settings = '/settings';
+  static const about = '/about';
+  static const helpCenter = '/help-center';
+  static const privacy = '/privacy';
+  static const terms = '/terms';
+
+  static final routes = <String, WidgetBuilder>{
+    splash: (_) => const SplashScreen(),
+    onboarding: (_) => const OnboardingScreen(),
+    roleSelection: (_) => const RoleSelectionScreen(),
+    passenger: (_) => const PassengerShell(),
+    driver: (_) => const DriverShell(),
+    login:
+        (_) => const AuthScreen(
+          title: 'Login',
+          subtitle: 'Login UI only for Phase 1.',
+        ),
+    register:
+        (_) => const AuthScreen(
+          title: 'Register',
+          subtitle: 'Registration UI only for Phase 1.',
+        ),
+    forgotPassword:
+        (_) => const AuthScreen(
+          title: 'Forgot Password',
+          subtitle: 'Recovery UI only for Phase 1.',
+        ),
+    settings: (_) => const SettingsScreen(),
+    about:
+        (_) => const InfoScreen(
+          title: 'About',
+          body:
+              'TSUPER APP is a premium commuter experience for passengers and drivers. Phase 1 is UI only.',
+        ),
+    helpCenter:
+        (_) => const InfoScreen(
+          title: 'Help Center',
+          body: 'Help content placeholder for the TSUPER APP support area.',
+        ),
+    privacy:
+        (_) => const InfoScreen(
+          title: 'Privacy Policy',
+          body: 'Privacy policy placeholder for the Phase 1 mock build.',
+        ),
+    terms:
+        (_) => const InfoScreen(
+          title: 'Terms & Conditions',
+          body: 'Terms placeholder for the Phase 1 mock build.',
+        ),
+  };
+}
+
+class TsuperFadeSlideTransitionsBuilder extends PageTransitionsBuilder {
+  const TsuperFadeSlideTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    final fade = CurvedAnimation(parent: animation, curve: Curves.easeOutCubic);
+    final offset = Tween<Offset>(
+      begin: const Offset(0.0, 0.045),
+      end: Offset.zero,
+    ).animate(fade);
+
+    return FadeTransition(
+      opacity: fade,
+      child: SlideTransition(position: offset, child: child),
+    );
+  }
+}
+
+class AppColors {
+  static const white = Color(0xFFFFFFFF);
+  static const background = Color(0xFFF8F9FC);
+  static const offWhite = Color(0xFFFCFDFF);
+  static const gray100 = Color(0xFFF2F4F7);
+  static const gray200 = Color(0xFFE5E7EB);
+  static const gray400 = Color(0xFF9CA3AF);
+  static const gray600 = Color(0xFF374151);
+  static const primary = Color(0xFF243B7A);
+  static const darkNavy = Color(0xFF1D2F63);
+  static const secondary = darkNavy;
+  static const ink = Color(0xFF1F2937);
+  static const softInk = Color(0xFF6B7280);
+  static const accent = gray600;
+  static const success = Color(0xFF3E7B5E);
+  static const warning = gray400;
+  static const danger = Color(0xFFB14B5C);
+}
+
+class AppData {
+  static const onboardingSlides = [
+    OnboardingSlide(
+      title: 'Track jeepneys with clarity',
+      subtitle:
+          'A polished commuter flow designed around route awareness, occupancy insight, and quick decisions.',
+      icon: Symbols.route_rounded,
+    ),
+    OnboardingSlide(
+      title: 'Built for passengers and drivers',
+      subtitle:
+          'One premium UI system, two focused experiences, both ready for backend integration in Phase 2.',
+      icon: Symbols.groups_rounded,
+    ),
+    OnboardingSlide(
+      title: 'Mock data, real product feel',
+      subtitle:
+          'Every screen is complete, navigable, and styled to feel like a production app from day one.',
+      icon: Symbols.auto_awesome_rounded,
+    ),
+  ];
+
+  static const passengerNav = [
+    NavItem('Home', Symbols.home_rounded),
+    NavItem('Map', Symbols.map_rounded),
+    NavItem('Routes', Symbols.route_rounded),
+    NavItem('Notifications', Symbols.notifications_rounded),
+    NavItem('Profile', Symbols.person_rounded),
+  ];
+
+  static const driverNav = [
+    NavItem('Dashboard', Symbols.space_dashboard_rounded),
+    NavItem('Map', Symbols.map_rounded),
+    NavItem('Trips', Symbols.directions_bus_rounded),
+    NavItem('Notifications', Symbols.notifications_rounded),
+    NavItem('Profile', Symbols.person_rounded),
+  ];
+
+  static const passengerQuickActions = [
+    QuickActionData(
+      'Plan Route',
+      Symbols.route_rounded,
+      AppColors.primary,
+      'Fastest jeepney path',
+    ),
+    QuickActionData(
+      'Track Jeepney',
+      Symbols.directions_bus_rounded,
+      AppColors.accent,
+      'See mock nearby units',
+    ),
+    QuickActionData(
+      'Saved Places',
+      Symbols.bookmark_rounded,
+      AppColors.warning,
+      'Home, work, school',
+    ),
+    QuickActionData(
+      'Help Desk',
+      Symbols.support_agent_rounded,
+      AppColors.success,
+      'Ride assistance',
+    ),
+  ];
+
+  static const nearbyJeepneys = [
+    JeepneyData(
+      'JEEP-104',
+      'Baclaran - Quiapo',
+      '18',
+      'Arriving in 4 min',
+      '4 min',
+      AppColors.primary,
+    ),
+    JeepneyData(
+      'JEEP-217',
+      'Makati Loop',
+      '12',
+      'Moderate load',
+      '7 min',
+      AppColors.accent,
+    ),
+    JeepneyData(
+      'JEEP-311',
+      'Cubao - Fairview',
+      '21',
+      'Nearly full',
+      '10 min',
+      AppColors.warning,
+    ),
+  ];
+
+  static const recentTrips = [
+    TripData(
+      'Campus Run',
+      'Today • 7:25 AM',
+      '₱18',
+      'Completed',
+      AppColors.success,
+    ),
+    TripData(
+      'Market Stop',
+      'Yesterday • 4:15 PM',
+      '₱14',
+      'Completed',
+      AppColors.primary,
+    ),
+  ];
+
+  static const recommendedRoutes = [
+    RouteData(
+      'Via EDSA Express',
+      'Quezon City',
+      'Makati CBD',
+      '₱38',
+      '34 min',
+      1,
+      'Light crowd',
+      AppColors.primary,
+    ),
+    RouteData(
+      'Via Ortigas Connector',
+      'Pasig',
+      'Ortigas Center',
+      '₱24',
+      '18 min',
+      0,
+      'Moderate crowd',
+      AppColors.accent,
+    ),
+    RouteData(
+      'Night Return',
+      'BGC',
+      'Pasay',
+      '₱32',
+      '28 min',
+      1,
+      'Low crowd',
+      AppColors.warning,
+    ),
+  ];
+
+  static const passengerNotifications = [
+    NotificationData(
+      'Route Advisory',
+      'Quiapo corridor has a short delay. Consider the alternative route shown in your planner.',
+      '8 min ago',
+      NotificationKind.route,
+      AppColors.primary,
+    ),
+    NotificationData(
+      'Promo unlocked',
+      'Save 10% on your next commute with the morning pass mock promo.',
+      '1 hour ago',
+      NotificationKind.promo,
+      AppColors.warning,
+    ),
+    NotificationData(
+      'System update',
+      'Passenger occupancy visuals were refreshed for Phase 1 preview.',
+      'Today',
+      NotificationKind.system,
+      AppColors.success,
+    ),
+  ];
+
+  static const passengerSavedPlaces = [
+    SavedPlaceData(
+      'Home',
+      'Mandaluyong',
+      Symbols.home_rounded,
+      AppColors.primary,
+    ),
+    SavedPlaceData(
+      'Office',
+      'Makati CBD',
+      Symbols.work_rounded,
+      AppColors.accent,
+    ),
+    SavedPlaceData(
+      'Campus',
+      'Taft Avenue',
+      Symbols.school_rounded,
+      AppColors.warning,
+    ),
+  ];
+
+  static const passengerStats = [
+    StatData('Trips this month', '18', '+24%', Symbols.trending_up_rounded),
+    StatData('Money saved', '₱214', '+12%', Symbols.savings_rounded),
+    StatData('Favorite routes', '7', '2 new', Symbols.route_rounded),
+  ];
+
+  static const driverVehicle = 'Jeepney 02 • ZXG-421';
+  static const driverRoute = 'Cubao - Fairview Line';
+
+  static const driverStats = [
+    StatData('Trips today', '24', '+8%', Symbols.directions_bus_rounded),
+    StatData('Gross earnings', '₱2,140', '+16%', Symbols.payments_rounded),
+    StatData('Avg occupancy', '81%', '+5%', Symbols.groups_rounded),
+  ];
+
+  static const driverQuickActions = [
+    QuickActionData(
+      'Start Shift',
+      Symbols.play_circle_rounded,
+      AppColors.success,
+      'Begin the day route',
+    ),
+    QuickActionData(
+      'Passenger Log',
+      Symbols.note_alt_rounded,
+      AppColors.primary,
+      'Mock trip record',
+    ),
+    QuickActionData(
+      'Report Issue',
+      Symbols.warning_rounded,
+      AppColors.warning,
+      'Safety and route notes',
+    ),
+    QuickActionData(
+      'Earnings',
+      Symbols.finance_rounded,
+      AppColors.accent,
+      'Daily summary',
+    ),
+  ];
+
+  static const driverTrips = [
+    TripData(
+      'Morning Loop',
+      '6:00 AM - 8:15 AM',
+      '₱640',
+      'High demand',
+      AppColors.success,
+    ),
+    TripData(
+      'Midday Run',
+      '10:00 AM - 12:30 PM',
+      '₱510',
+      'Steady load',
+      AppColors.primary,
+    ),
+    TripData(
+      'Afternoon Peak',
+      '3:00 PM - 6:00 PM',
+      '₱990',
+      'Full occupancy',
+      AppColors.warning,
+    ),
+  ];
+
+  static const driverNotifications = [
+    NotificationData(
+      'Passenger alert',
+      'Demand is rising on the afternoon corridor. Consider a short extra run.',
+      '12 min ago',
+      NotificationKind.alert,
+      AppColors.warning,
+    ),
+    NotificationData(
+      'System update',
+      'Weekly trip charts are now available in the dashboard preview.',
+      '1 hour ago',
+      NotificationKind.system,
+      AppColors.success,
+    ),
+    NotificationData(
+      'Announcement',
+      'Vehicle maintenance reminder is scheduled for Friday evening.',
+      'Today',
+      NotificationKind.announcement,
+      AppColors.primary,
+    ),
+  ];
+
+  static const driverProfileItems = [
+    ProfileMenuItemData('Vehicle Details', Symbols.directions_bus_rounded),
+    ProfileMenuItemData('Assigned Route', Symbols.route_rounded),
+    ProfileMenuItemData('Settings', Symbols.settings_rounded),
+    ProfileMenuItemData('Help', Symbols.help_rounded),
+    ProfileMenuItemData('Logout', Symbols.logout_rounded),
+  ];
+
+  static const commonInfoSections = [
+    InfoSection('Preview scope', [
+      'This Phase 1 build uses only local mock data.',
+      'No GPS, permissions, backend integrations, or network calls are active.',
+      'Future backend features can be wired in without changing the navigation shell.',
+    ]),
+  ];
+
+  static const metroManilaRoutes = [
+    MetroManilaRoute(
+      id: 'qcu-sm-fairview',
+      title: 'QCU → SM Fairview',
+      fromLabel: 'QCU',
+      toLabel: 'SM Fairview',
+      routeName: 'Commonwealth Loop',
+      estimatedTravelTime: '16 min',
+      estimatedFare: '₱18',
+      center: LatLng(14.7048, 121.0495),
+      zoom: 13.4,
+      path: [
+        LatLng(14.6592, 121.0313),
+        LatLng(14.6730, 121.0372),
+        LatLng(14.6878, 121.0442),
+        LatLng(14.7019, 121.0496),
+        LatLng(14.7179, 121.0552),
+        LatLng(14.7328, 121.0579),
+      ],
+      markers: [
+        MetroManilaMapMarkerSpec(
+          id: 'qcu',
+          label: 'QCU',
+          point: LatLng(14.6592, 121.0313),
+          kind: MetroManilaMapMarkerKind.currentLocation,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'jeepney-1',
+          label: 'Jeepney 14',
+          point: LatLng(14.6878, 121.0442),
+          kind: MetroManilaMapMarkerKind.jeepney,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'stop-1',
+          label: 'Bus Stop',
+          point: LatLng(14.7019, 121.0496),
+          kind: MetroManilaMapMarkerKind.busStop,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'terminal-1',
+          label: 'SM Fairview',
+          point: LatLng(14.7328, 121.0579),
+          kind: MetroManilaMapMarkerKind.destination,
+        ),
+      ],
+    ),
+    MetroManilaRoute(
+      id: 'qcu-sm-north',
+      title: 'QCU → SM North EDSA',
+      fromLabel: 'QCU',
+      toLabel: 'SM North EDSA',
+      routeName: 'North Avenue Link',
+      estimatedTravelTime: '14 min',
+      estimatedFare: '₱16',
+      center: LatLng(14.6546, 121.0310),
+      zoom: 13.7,
+      path: [
+        LatLng(14.6592, 121.0313),
+        LatLng(14.6568, 121.0326),
+        LatLng(14.6539, 121.0319),
+        LatLng(14.6512, 121.0308),
+        LatLng(14.6489, 121.0298),
+        LatLng(14.6467, 121.0292),
+      ],
+      markers: [
+        MetroManilaMapMarkerSpec(
+          id: 'qcu',
+          label: 'QCU',
+          point: LatLng(14.6592, 121.0313),
+          kind: MetroManilaMapMarkerKind.currentLocation,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'jeepney-2',
+          label: 'Jeepney 08',
+          point: LatLng(14.6539, 121.0319),
+          kind: MetroManilaMapMarkerKind.jeepney,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'terminal-2',
+          label: 'SM North EDSA',
+          point: LatLng(14.6467, 121.0292),
+          kind: MetroManilaMapMarkerKind.destination,
+        ),
+      ],
+    ),
+    MetroManilaRoute(
+      id: 'qcu-cubao',
+      title: 'QCU → Cubao',
+      fromLabel: 'QCU',
+      toLabel: 'Cubao',
+      routeName: 'Cubao Shuttle',
+      estimatedTravelTime: '19 min',
+      estimatedFare: '₱22',
+      center: LatLng(14.6402, 121.0421),
+      zoom: 13.5,
+      path: [
+        LatLng(14.6592, 121.0313),
+        LatLng(14.6518, 121.0361),
+        LatLng(14.6451, 121.0417),
+        LatLng(14.6388, 121.0459),
+        LatLng(14.6324, 121.0487),
+        LatLng(14.6255, 121.0510),
+      ],
+      markers: [
+        MetroManilaMapMarkerSpec(
+          id: 'qcu',
+          label: 'QCU',
+          point: LatLng(14.6592, 121.0313),
+          kind: MetroManilaMapMarkerKind.currentLocation,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'jeepney-3',
+          label: 'Jeepney 21',
+          point: LatLng(14.6451, 121.0417),
+          kind: MetroManilaMapMarkerKind.jeepney,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'terminal-3',
+          label: 'Cubao',
+          point: LatLng(14.6255, 121.0510),
+          kind: MetroManilaMapMarkerKind.destination,
+        ),
+      ],
+    ),
+    MetroManilaRoute(
+      id: 'qcu-novaliches',
+      title: 'QCU → Novaliches',
+      fromLabel: 'QCU',
+      toLabel: 'Novaliches',
+      routeName: 'Novaliches Connector',
+      estimatedTravelTime: '18 min',
+      estimatedFare: '₱20',
+      center: LatLng(14.6956, 121.0387),
+      zoom: 13.4,
+      path: [
+        LatLng(14.6592, 121.0313),
+        LatLng(14.6702, 121.0331),
+        LatLng(14.6826, 121.0352),
+        LatLng(14.6941, 121.0378),
+        LatLng(14.7069, 121.0409),
+        LatLng(14.7195, 121.0438),
+      ],
+      markers: [
+        MetroManilaMapMarkerSpec(
+          id: 'qcu',
+          label: 'QCU',
+          point: LatLng(14.6592, 121.0313),
+          kind: MetroManilaMapMarkerKind.currentLocation,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'terminal-4',
+          label: 'Novaliches',
+          point: LatLng(14.7195, 121.0438),
+          kind: MetroManilaMapMarkerKind.destination,
+        ),
+        MetroManilaMapMarkerSpec(
+          id: 'stop-4',
+          label: 'Terminal Stop',
+          point: LatLng(14.6941, 121.0378),
+          kind: MetroManilaMapMarkerKind.terminal,
+        ),
+      ],
+    ),
+  ];
+}
+
+class MetroManilaRoute {
+  const MetroManilaRoute({
+    required this.id,
+    required this.title,
+    required this.fromLabel,
+    required this.toLabel,
+    required this.routeName,
+    required this.estimatedTravelTime,
+    required this.estimatedFare,
+    required this.center,
+    required this.zoom,
+    required this.path,
+    required this.markers,
+  });
+
+  final String id;
+  final String title;
+  final String fromLabel;
+  final String toLabel;
+  final String routeName;
+  final String estimatedTravelTime;
+  final String estimatedFare;
+  final LatLng center;
+  final double zoom;
+  final List<LatLng> path;
+  final List<MetroManilaMapMarkerSpec> markers;
+}
+
+class MetroManilaMapMarkerSpec {
+  const MetroManilaMapMarkerSpec({
+    required this.id,
+    required this.label,
+    required this.point,
+    required this.kind,
+  });
+
+  final String id;
+  final String label;
+  final LatLng point;
+  final MetroManilaMapMarkerKind kind;
+}
+
+enum MetroManilaMapMarkerKind { currentLocation, destination, jeepney, terminal, busStop }
+
+class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
+  @override
+  State<SplashScreen> createState() => _SplashScreenState();
+}
+
+class _SplashScreenState extends State<SplashScreen> {
+  @override
+  void initState() {
+    super.initState();
+    Future<void>.delayed(const Duration(milliseconds: 1400), () {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: Container(
+        color: AppColors.background,
+        child: Center(
+          child: Container(
+            width: 220,
+            padding: const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.gray200),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.gray600.withValues(alpha: 0.08),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: AppColors.primary.withValues(alpha: 0.08),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: const Icon(
+                    Symbols.directions_bus_rounded,
+                    color: AppColors.primary,
+                    size: 40,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Text(
+                  'TSUPER APP',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  'Phase 1 preview',
+                  textAlign: TextAlign.center,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class OnboardingScreen extends StatefulWidget {
+  const OnboardingScreen({super.key});
+
+  @override
+  State<OnboardingScreen> createState() => _OnboardingScreenState();
+}
+
+class _OnboardingScreenState extends State<OnboardingScreen> {
+  final PageController _controller = PageController();
+  int _index = 0;
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const BrandMark(),
+                  TextButton(
+                    onPressed:
+                        () => Navigator.pushReplacementNamed(
+                          context,
+                          AppRoutes.roleSelection,
+                        ),
+                    child: const Text('Skip'),
+                  ),
+                ],
+              ),
+            ),
+            Expanded(
+              child: PageView.builder(
+                controller: _controller,
+                itemCount: AppData.onboardingSlides.length,
+                onPageChanged: (value) => setState(() => _index = value),
+                itemBuilder:
+                    (context, index) => Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 24),
+                      child: OnboardingCard(
+                        slide: AppData.onboardingSlides[index],
+                      ),
+                    ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(24, 0, 24, 24),
+              child: Column(
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: List.generate(AppData.onboardingSlides.length, (
+                      dotIndex,
+                    ) {
+                      final selected = _index == dotIndex;
+                      return AnimatedContainer(
+                        duration: const Duration(milliseconds: 250),
+                        margin: const EdgeInsets.symmetric(horizontal: 4),
+                        width: selected ? 24 : 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color:
+                              selected ? AppColors.primary : AppColors.gray200,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      );
+                    }),
+                  ),
+                  const SizedBox(height: 20),
+                  PrimaryButton(
+                    text:
+                        _index == AppData.onboardingSlides.length - 1
+                            ? 'Get Started'
+                            : 'Continue',
+                    icon: Symbols.arrow_forward_rounded,
+                    onPressed: () {
+                      if (_index < AppData.onboardingSlides.length - 1) {
+                        _controller.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.easeOutCubic,
+                        );
+                      } else {
+                        Navigator.pushReplacementNamed(
+                          context,
+                          AppRoutes.roleSelection,
+                        );
+                      }
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RoleSelectionScreen extends StatefulWidget {
+  const RoleSelectionScreen({super.key});
+
+  @override
+  State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
+}
+
+class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
+  int? selectedIndex;
+
+  Future<void> _chooseRole(int index, String route) async {
+    setState(() => selectedIndex = index);
+    await Future<void>.delayed(const Duration(milliseconds: 160));
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, route);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+
+    return Scaffold(
+      body: SafeArea(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            final isWide = constraints.maxWidth >= 760;
+            final roleCardWidth =
+                isWide ? ((constraints.maxWidth - 48 - 14) / 2).clamp(280.0, 420.0) : constraints.maxWidth - 48;
+
+            return SingleChildScrollView(
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+              padding: EdgeInsets.fromLTRB(24, 20, 24, 24 + viewInsets),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 900),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      const BrandMark(),
+                      const SizedBox(height: 24),
+                      Text(
+                        'Choose your role',
+                        style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Start with a tailored commuter or driver experience.',
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: AppColors.softInk,
+                        ),
+                      ),
+                      const SizedBox(height: 20),
+                      const IllustrationPlaceholder(
+                        label: 'Role Illustration Placeholder',
+                        icon: Symbols.badge_rounded,
+                      ),
+                      const SizedBox(height: 16),
+                      Wrap(
+                        spacing: 14,
+                        runSpacing: 14,
+                        children: [
+                          SizedBox(
+                            width: roleCardWidth,
+                            height: 194,
+                            child: RoleCard(
+                              title: 'Passenger',
+                              subtitle:
+                                  'Search routes, view jeepneys, and save destinations.',
+                              icon: Symbols.person_rounded,
+                              selected: selectedIndex == 0,
+                              onTap: () => _chooseRole(0, AppRoutes.passenger),
+                            ),
+                          ),
+                          SizedBox(
+                            width: roleCardWidth,
+                            height: 194,
+                            child: RoleCard(
+                              title: 'Driver',
+                              subtitle:
+                                  'Track trips, monitor occupancy, and review shift stats.',
+                              icon: Symbols.directions_bus_rounded,
+                              selected: selectedIndex == 1,
+                              onTap: () => _chooseRole(1, AppRoutes.driver),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 18),
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: [
+                          SizedBox(
+                            width: isWide ? 150 : constraints.maxWidth - 48,
+                            child: SecondaryButton(
+                              text: 'Login',
+                              onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
+                            ),
+                          ),
+                          SizedBox(
+                            width: isWide ? 150 : constraints.maxWidth - 48,
+                            child: SecondaryButton(
+                              text: 'Register',
+                              onPressed: () => Navigator.pushNamed(context, AppRoutes.register),
+                            ),
+                          ),
+                          SizedBox(
+                            width: isWide ? 190 : constraints.maxWidth - 48,
+                            child: SecondaryButton(
+                              text: 'Forgot Password',
+                              onPressed: () => Navigator.pushNamed(context, AppRoutes.forgotPassword),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+  }
+}
+
+class FrostedNavigationBar extends StatelessWidget {
+  const FrostedNavigationBar({
+    super.key,
+    required this.selectedIndex,
+    required this.onDestinationSelected,
+    required this.destinations,
+  });
+
+  final int selectedIndex;
+  final ValueChanged<int> onDestinationSelected;
+  final List<Widget> destinations;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 9, sigmaY: 9),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.86),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.9)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gray600.withValues(alpha: 0.08),
+                blurRadius: 20,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: NavigationBar(
+            selectedIndex: selectedIndex,
+            onDestinationSelected: onDestinationSelected,
+            destinations: destinations,
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PassengerShell extends StatefulWidget {
+  const PassengerShell({super.key});
+
+  @override
+  State<PassengerShell> createState() => _PassengerShellState();
+}
+
+class _PassengerShellState extends State<PassengerShell> {
+  int index = 0;
+
+  final pages = const [
+    PassengerHomeScreen(),
+    PassengerMapScreen(),
+    PassengerRoutesScreen(),
+    PassengerNotificationsScreen(),
+    PassengerProfileScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(index: index, children: pages),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          child: FrostedNavigationBar(
+            selectedIndex: index,
+            onDestinationSelected: (value) => setState(() => index = value),
+            destinations:
+                AppData.passengerNav
+                    .map(
+                      (item) => NavigationDestination(
+                        icon: Icon(item.icon),
+                        selectedIcon: AnimatedScale(
+                          duration: const Duration(milliseconds: 180),
+                          scale: 1.05,
+                          child: Icon(item.icon),
+                        ),
+                        label: item.label,
+                      ),
+                    )
+                    .toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DriverShell extends StatefulWidget {
+  const DriverShell({super.key});
+
+  @override
+  State<DriverShell> createState() => _DriverShellState();
+}
+
+class _DriverShellState extends State<DriverShell> {
+  int index = 0;
+
+  final pages = const [
+    DriverDashboardScreen(),
+    DriverMapScreen(),
+    DriverTripsScreen(),
+    DriverNotificationsScreen(),
+    DriverProfileScreen(),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: IndexedStack(index: index, children: pages),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
+          child: FrostedNavigationBar(
+            selectedIndex: index,
+            onDestinationSelected: (value) => setState(() => index = value),
+            destinations:
+                AppData.driverNav
+                    .map(
+                      (item) => NavigationDestination(
+                        icon: Icon(item.icon),
+                        selectedIcon: AnimatedScale(
+                          duration: const Duration(milliseconds: 180),
+                          scale: 1.05,
+                          child: Icon(item.icon),
+                        ),
+                        label: item.label,
+                      ),
+                    )
+                    .toList(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class PassengerHomeScreen extends StatelessWidget {
+  const PassengerHomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Passenger Home',
+      subtitle: 'Good afternoon, Ferdinand Barral.',
+      actions: [
+        AppBarIconButton(
+          icon: Symbols.settings_rounded,
+          onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
+        ),
+      ],
+      body: ListView(
+        padding: const EdgeInsets.fromLTRB(20, 8, 20, 24),
+        children: [
+          const GreetingCard(
+            title: 'Good afternoon, Ferdinand Barral',
+            subtitle: 'Your next jeepney is just a tap away.',
+          ),
+          const SizedBox(height: 16),
+          SearchBarCard(
+            placeholder: 'Search destination, route, or jeepney...',
+          ),
+          const SizedBox(height: 16),
+          const CurrentLocationCard(),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Nearby Jeepneys',
+            actionLabel: 'See all',
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 176,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemBuilder:
+                  (context, index) =>
+                      JeepneyCard(data: AppData.nearbyJeepneys[index]),
+              separatorBuilder: (_, __) => const SizedBox(width: 14),
+              itemCount: AppData.nearbyJeepneys.length,
+            ),
+          ),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Quick Actions',
+            actionLabel: 'More',
+            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
+          ),
+          const SizedBox(height: 12),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: AppData.passengerQuickActions.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 14,
+              childAspectRatio: 1.38,
+            ),
+            itemBuilder:
+                (context, index) =>
+                    QuickActionCard(data: AppData.passengerQuickActions[index]),
+          ),
+          const SizedBox(height: 18),
+          SectionTitle(
+            title: 'Announcements',
+            actionLabel: 'View all',
+            onTap: () => Navigator.pushNamed(context, AppRoutes.helpCenter),
+          ),
+          const SizedBox(height: 12),
+          ...AppData.passengerNotifications.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: NotificationTile(item: item),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const PromoBanner(),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Recommended Routes',
+            actionLabel: 'Routes',
+            onTap: () => Navigator.pushNamed(context, AppRoutes.roleSelection),
+          ),
+          const SizedBox(height: 12),
+          ...AppData.recommendedRoutes.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: RouteCard(data: item),
+            ),
+          ),
+          const SizedBox(height: 12),
+          SectionTitle(
+            title: 'Recent Trips',
+            actionLabel: 'History',
+            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
+          ),
+          const SizedBox(height: 12),
+          ...AppData.recentTrips.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: TripTile(data: item),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PassengerMapScreen extends StatelessWidget {
+  const PassengerMapScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Passenger Map',
+      subtitle: 'Explore Metro Manila mock routes on a grayscale interactive map.',
+      body: const Padding(
+        padding: EdgeInsets.all(20),
+        child: MetroManilaMapExplorer(initialRouteId: 'qcu-sm-fairview'),
+      ),
+    );
+  }
+}
+
+class PassengerRoutesScreen extends StatelessWidget {
+  const PassengerRoutesScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Routes',
+      subtitle: 'Plan origin to destination with mock suggestions.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          const OriginDestinationCard(),
+          const SizedBox(height: 14),
+          const SwapButtonCard(),
+          const SizedBox(height: 18),
+          SectionTitle(
+            title: 'Suggested Routes',
+            actionLabel: 'Filter',
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          ...AppData.recommendedRoutes.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: RouteCard(data: item, dense: true),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const FareSummaryCard(),
+          const SizedBox(height: 16),
+          const TripMetricsCard(),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Favorite Destinations',
+            actionLabel: 'Edit',
+            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children:
+                AppData.passengerSavedPlaces
+                    .map((place) => SavedPlaceChip(data: place))
+                    .toList(),
+          ),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Recent Searches',
+            actionLabel: 'Clear',
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          const RecentSearchCard(),
+        ],
+      ),
+    );
+  }
+}
+
+class PassengerNotificationsScreen extends StatelessWidget {
+  const PassengerNotificationsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Notifications',
+      subtitle: 'Announcements, alerts, and promotions.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          ...AppData.passengerNotifications.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: NotificationTile(item: item),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const CategoryCard(
+            title: 'Route Updates',
+            icon: Symbols.route_rounded,
+          ),
+          const SizedBox(height: 12),
+          const CategoryCard(
+            title: 'System Alerts',
+            icon: Symbols.warning_rounded,
+          ),
+          const SizedBox(height: 12),
+          const CategoryCard(
+            title: 'Promotions',
+            icon: Symbols.local_offer_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PassengerProfileScreen extends StatelessWidget {
+  const PassengerProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Profile',
+      subtitle: 'Passenger account overview.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: const [
+          ProfileHeader(
+            name: 'FERDINAND BARRAL',
+            role: 'Passenger',
+            avatarLabel: 'FB',
+          ),
+          SizedBox(height: 16),
+          ProfileMenuCard(
+            items: [
+              ProfileMenuItemData('Saved Places', Symbols.bookmark_rounded),
+              ProfileMenuItemData('Trip History', Symbols.receipt_long_rounded),
+              ProfileMenuItemData('Settings', Symbols.settings_rounded),
+              ProfileMenuItemData('Help Center', Symbols.help_rounded),
+              ProfileMenuItemData('About', Symbols.info_rounded),
+            ],
+          ),
+          SizedBox(height: 16),
+          LogoutCard(),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverDashboardScreen extends StatelessWidget {
+  const DriverDashboardScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Driver Dashboard',
+      subtitle: 'Shift overview and occupancy insights.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          const GreetingCard(
+            title: 'Good day, Driver Ramon',
+            subtitle: 'Your route dashboard is ready for the shift.',
+          ),
+          const SizedBox(height: 16),
+          const DriverVehicleCard(),
+          const SizedBox(height: 16),
+          const DriverRouteCard(),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: "Today's Trips",
+            actionLabel: 'History',
+            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
+          ),
+          const SizedBox(height: 12),
+          ...AppData.driverTrips.map(
+            (trip) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: TripTile(data: trip),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const PassengerDemandCard(),
+          const SizedBox(height: 16),
+          const OccupancyCard(),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Quick Actions',
+            actionLabel: 'More',
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: AppData.driverQuickActions.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 14,
+              crossAxisSpacing: 14,
+              childAspectRatio: 1.38,
+            ),
+            itemBuilder:
+                (context, index) =>
+                    QuickActionCard(data: AppData.driverQuickActions[index]),
+          ),
+          const SizedBox(height: 16),
+          const DriverStatsGrid(),
+          const SizedBox(height: 16),
+          const MockChartCard(),
+        ],
+      ),
+    );
+  }
+}
+
+class MetroManilaMapExplorer extends StatefulWidget {
+  const MetroManilaMapExplorer({
+    super.key,
+    required this.initialRouteId,
+    this.showDriverActions = false,
+  });
+
+  final String initialRouteId;
+  final bool showDriverActions;
+
+  @override
+  State<MetroManilaMapExplorer> createState() => _MetroManilaMapExplorerState();
+}
+
+class _MetroManilaMapExplorerState extends State<MetroManilaMapExplorer>
+    with TickerProviderStateMixin {
+  static final LatLngBounds _metroManilaBounds = LatLngBounds(
+    const LatLng(14.36, 120.84),
+    const LatLng(14.81, 121.18),
+  );
+
+  late final AnimatedMapController _animatedMapController =
+      AnimatedMapController(
+        vsync: this,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeInOutCubic,
+        cancelPreviousAnimations: true,
+      );
+
+  late MetroManilaRoute _selectedRoute;
+  String? _selectedMarkerId;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedRoute = AppData.metroManilaRoutes.firstWhere(
+      (route) => route.id == widget.initialRouteId,
+      orElse: () => AppData.metroManilaRoutes.first,
+    );
+    _selectedMarkerId = _selectedRoute.markers.first.id;
+  }
+
+  @override
+  void dispose() {
+    _animatedMapController.dispose();
+    super.dispose();
+  }
+
+  MetroManilaMapMarkerSpec? get _selectedMarker {
+    for (final marker in _selectedRoute.markers) {
+      if (marker.id == _selectedMarkerId) return marker;
+    }
+    return null;
+  }
+
+  Future<void> _selectRoute(MetroManilaRoute route) async {
+    if (route.id == _selectedRoute.id) return;
+    setState(() {
+      _selectedRoute = route;
+      _selectedMarkerId = route.markers.first.id;
+    });
+    await _animatedMapController.animatedFitCamera(
+      cameraFit: CameraFit.coordinates(
+        coordinates: route.path,
+        padding: const EdgeInsets.all(72),
+      ),
+      customId: route.id,
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  Future<void> _focusMarker(MetroManilaMapMarkerSpec marker) async {
+    setState(() => _selectedMarkerId = marker.id);
+    await _animatedMapController.animateTo(
+      dest: marker.point,
+      zoom: (_selectedRoute.zoom + 0.35).clamp(11.0, 16.5),
+      customId: marker.id,
+      duration: const Duration(milliseconds: 420),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _zoomIn() {
+    _animatedMapController.animatedZoomIn(
+      customId: 'metro-map-zoom',
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  void _zoomOut() {
+    _animatedMapController.animatedZoomOut(
+      customId: 'metro-map-zoom',
+      duration: const Duration(milliseconds: 280),
+      curve: Curves.easeOutCubic,
+    );
+  }
+
+  Future<void> _fitSelectedRoute() {
+    return _animatedMapController.animatedFitCamera(
+      cameraFit: CameraFit.coordinates(
+        coordinates: _selectedRoute.path,
+        padding: const EdgeInsets.all(72),
+      ),
+      customId: 'metro-map-fit',
+      duration: const Duration(milliseconds: 500),
+      curve: Curves.easeInOutCubic,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedRoute = _selectedRoute;
+    final selectedMarker = _selectedMarker;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        SearchBarCard(
+          placeholder: 'Search QCU, SM Fairview, Cubao, or Novaliches',
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          height: 42,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            itemCount: AppData.metroManilaRoutes.length,
+            separatorBuilder: (_, __) => const SizedBox(width: 10),
+            itemBuilder: (context, index) {
+              final route = AppData.metroManilaRoutes[index];
+              final selected = route.id == selectedRoute.id;
+              return _RouteChip(
+                route: route,
+                selected: selected,
+                onTap: () => _selectRoute(route),
+              );
+            },
+          ),
+        ),
+        const SizedBox(height: 14),
+        Expanded(
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(28),
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(28),
+                border: Border.all(color: AppColors.gray200),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppColors.gray600.withValues(alpha: 0.05),
+                    blurRadius: 18,
+                    offset: const Offset(0, 8),
+                  ),
+                ],
+              ),
+              child: Stack(
+                children: [
+                  FlutterMap(
+                    mapController: _animatedMapController.mapController,
+                    options: MapOptions(
+                      initialCenter: selectedRoute.center,
+                      initialZoom: selectedRoute.zoom,
+                      minZoom: 11,
+                      maxZoom: 16.5,
+                      cameraConstraint: CameraConstraint.contain(
+                        bounds: _metroManilaBounds,
+                      ),
+                      interactionOptions: const InteractionOptions(
+                        flags: InteractiveFlag.all,
+                      ),
+                      onTap: (_, __) {
+                        setState(
+                          () => _selectedMarkerId = selectedRoute.markers.first.id,
+                        );
+                      },
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate:
+                            'https://stamen-tiles.a.ssl.fastly.net/toner-lite/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'tsuper_app',
+                        maxNativeZoom: 16,
+                      ),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 260),
+                        switchInCurve: Curves.easeOutCubic,
+                        switchOutCurve: Curves.easeInCubic,
+                        transitionBuilder: (child, animation) {
+                          return FadeTransition(opacity: animation, child: child);
+                        },
+                        child: PolylineLayer(
+                          key: ValueKey('poly-${selectedRoute.id}'),
+                          polylines: [
+                            Polyline(
+                              points: selectedRoute.path,
+                              color: AppColors.primary,
+                              strokeWidth: 6,
+                              strokeCap: StrokeCap.round,
+                              strokeJoin: StrokeJoin.round,
+                            ),
+                          ],
+                        ),
+                      ),
+                      AnimatedMarkerLayer(
+                        markers:
+                            selectedRoute.markers
+                                .map(
+                                  (marker) => AnimatedMarker(
+                                    point: marker.point,
+                                    width: 88,
+                                    height: 88,
+                                    duration: const Duration(milliseconds: 280),
+                                    curve: Curves.easeOutCubic,
+                                    builder: (context, animation) {
+                                      final selected = _selectedMarkerId == marker.id;
+                                      return GestureDetector(
+                                        onTap: () => _focusMarker(marker),
+                                        child: Opacity(
+                                          opacity: animation.value,
+                                          child: Transform.translate(
+                                            offset: Offset(
+                                              0,
+                                              (1 - animation.value) * 12,
+                                            ),
+                                            child: Transform.scale(
+                                              scale: 0.94 + (animation.value * 0.06),
+                                              child: _MetroMarkerBadge(
+                                                marker: marker,
+                                                selected: selected,
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                )
+                                .toList(),
+                      ),
+                    ],
+                  ),
+                  Positioned(
+                    left: 16,
+                    top: 16,
+                    child: _MapSurfaceTag(
+                      title: 'Metro Manila',
+                      subtitle: 'Mock grayscale map',
+                    ),
+                  ),
+                  Positioned(
+                    top: 16,
+                    right: 16,
+                    child: _MapZoomControls(
+                      onZoomIn: _zoomIn,
+                      onZoomOut: _zoomOut,
+                      onFit: _fitSelectedRoute,
+                    ),
+                  ),
+                  Positioned(
+                    left: 16,
+                    right: 16,
+                    bottom: 16,
+                    child: AnimatedSwitcher(
+                      duration: const Duration(milliseconds: 260),
+                      switchInCurve: Curves.easeOutCubic,
+                      switchOutCurve: Curves.easeInCubic,
+                      transitionBuilder: (child, animation) {
+                        return SlideTransition(
+                          position: Tween<Offset>(
+                            begin: const Offset(0, 0.08),
+                            end: Offset.zero,
+                          ).animate(animation),
+                          child: FadeTransition(opacity: animation, child: child),
+                        );
+                      },
+                      child: _MapRouteSheet(
+                        key: ValueKey('${selectedRoute.id}-${selectedMarker?.id}'),
+                        route: selectedRoute,
+                        selectedMarker: selectedMarker,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (widget.showDriverActions) ...[
+          const SizedBox(height: 12),
+          Text(
+            'Driver focus mode',
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              color: AppColors.softInk,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _RouteChip extends StatelessWidget {
+  const _RouteChip({
+    required this.route,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final MetroManilaRoute route;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(999),
+        onTap: onTap,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.primary : Colors.white,
+            borderRadius: BorderRadius.circular(999),
+            border: Border.all(
+              color: selected ? AppColors.primary : AppColors.gray200,
+            ),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                Symbols.route_rounded,
+                size: 16,
+                color: selected ? Colors.white : AppColors.gray600,
+              ),
+              const SizedBox(width: 8),
+              Text(
+                route.toLabel,
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                  color: selected ? Colors.white : AppColors.ink,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _MapZoomControls extends StatelessWidget {
+  const _MapZoomControls({
+    required this.onZoomIn,
+    required this.onZoomOut,
+    required this.onFit,
+  });
+
+  final VoidCallback onZoomIn;
+  final VoidCallback onZoomOut;
+  final VoidCallback onFit;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.06),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _MapControlButton(icon: Symbols.add_rounded, onTap: onZoomIn),
+          const SizedBox(height: 8),
+          _MapControlButton(icon: Symbols.remove_rounded, onTap: onZoomOut),
+          const SizedBox(height: 8),
+          _MapControlButton(icon: Symbols.center_focus_strong_rounded, onTap: onFit),
+        ],
+      ),
+    );
+  }
+}
+
+class _MapControlButton extends StatelessWidget {
+  const _MapControlButton({required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      borderRadius: BorderRadius.circular(14),
+      onTap: onTap,
+      child: Container(
+        width: 36,
+        height: 36,
+        decoration: BoxDecoration(
+          color: AppColors.background,
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Icon(icon, size: 18, color: AppColors.primary),
+      ),
+    );
+  }
+}
+
+class _MapSurfaceTag extends StatelessWidget {
+  const _MapSurfaceTag({required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            title,
+            style: Theme.of(context).textTheme.labelLarge?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.ink,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            subtitle,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: AppColors.softInk,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MapRouteSheet extends StatelessWidget {
+  const _MapRouteSheet({
+    super.key,
+    required this.route,
+    required this.selectedMarker,
+  });
+
+  final MetroManilaRoute route;
+  final MetroManilaMapMarkerSpec? selectedMarker;
+
+  @override
+  Widget build(BuildContext context) {
+    final selectedMarkerText = selectedMarker == null
+        ? 'Tap a marker to inspect terminals, jeepneys, or bus stops.'
+        : '${selectedMarker!.label} • ${_markerDescription(selectedMarker!.kind)}';
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  route.title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.08),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  route.routeName,
+                  style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: AppColors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(child: _MapSheetStat(label: 'From', value: route.fromLabel)),
+              const SizedBox(width: 12),
+              Expanded(child: _MapSheetStat(label: 'To', value: route.toLabel)),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Expanded(
+                child: _MapSheetStat(
+                  label: 'Travel time',
+                  value: route.estimatedTravelTime,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _MapSheetStat(
+                  label: 'Fare',
+                  value: route.estimatedFare,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            selectedMarkerText,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.softInk,
+              height: 1.45,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MapSheetStat extends StatelessWidget {
+  const _MapSheetStat({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: AppColors.softInk,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: Theme.of(context).textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w700,
+              color: AppColors.ink,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MetroMarkerBadge extends StatelessWidget {
+  const _MetroMarkerBadge({required this.marker, required this.selected});
+
+  final MetroManilaMapMarkerSpec marker;
+  final bool selected;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = _markerColor(marker.kind, selected);
+    final icon = _markerIcon(marker.kind);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: selected ? AppColors.primary : AppColors.gray200,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: selected ? 0.10 : 0.06),
+            blurRadius: selected ? 14 : 10,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: color,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 18, color: Colors.white),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            marker.label,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: AppColors.ink,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+Color _markerColor(MetroManilaMapMarkerKind kind, bool selected) {
+  if (selected) return AppColors.primary;
+  switch (kind) {
+    case MetroManilaMapMarkerKind.currentLocation:
+      return AppColors.gray600;
+    case MetroManilaMapMarkerKind.destination:
+      return AppColors.primary;
+    case MetroManilaMapMarkerKind.jeepney:
+      return AppColors.gray600;
+    case MetroManilaMapMarkerKind.terminal:
+      return AppColors.gray400;
+    case MetroManilaMapMarkerKind.busStop:
+      return AppColors.gray400;
+  }
+}
+
+IconData _markerIcon(MetroManilaMapMarkerKind kind) {
+  switch (kind) {
+    case MetroManilaMapMarkerKind.currentLocation:
+      return Symbols.my_location_rounded;
+    case MetroManilaMapMarkerKind.destination:
+      return Symbols.flag_rounded;
+    case MetroManilaMapMarkerKind.jeepney:
+      return Symbols.directions_bus_rounded;
+    case MetroManilaMapMarkerKind.terminal:
+      return Symbols.place_rounded;
+    case MetroManilaMapMarkerKind.busStop:
+      return Symbols.stop_circle_rounded;
+  }
+}
+
+String _markerDescription(MetroManilaMapMarkerKind kind) {
+  switch (kind) {
+    case MetroManilaMapMarkerKind.currentLocation:
+      return 'Current location';
+    case MetroManilaMapMarkerKind.destination:
+      return 'Destination marker';
+    case MetroManilaMapMarkerKind.jeepney:
+      return 'Mock jeepney position';
+    case MetroManilaMapMarkerKind.terminal:
+      return 'Terminal stop';
+    case MetroManilaMapMarkerKind.busStop:
+      return 'Bus stop';
+  }
+}
+
+class DriverMapScreen extends StatelessWidget {
+  const DriverMapScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Driver Map',
+      subtitle: 'Bounded Metro Manila mock view with smooth route focus.',
+      body: Padding(
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          children: [
+            const DriverStatusCard(),
+            const SizedBox(height: 16),
+            Expanded(
+              child: MetroManilaMapExplorer(
+                initialRouteId: 'qcu-cubao',
+                showDriverActions: true,
+              ),
+            ),
+            const SizedBox(height: 16),
+            Row(
+              children: const [
+                Expanded(
+                  child: PrimaryButton(
+                    text: 'Start Trip',
+                    icon: Symbols.play_arrow_rounded,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Expanded(
+                  child: DangerButton(
+                    text: 'End Trip',
+                    icon: Symbols.stop_rounded,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DriverTripsScreen extends StatelessWidget {
+  const DriverTripsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Trips',
+      subtitle: 'Shift history and earnings placeholder.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          const TripMetricsCard(),
+          const SizedBox(height: 16),
+          const EarningsCard(),
+          const SizedBox(height: 16),
+          const StatisticsOverviewCard(),
+          const SizedBox(height: 16),
+          SectionTitle(
+            title: 'Weekly Trips',
+            actionLabel: 'Export',
+            onTap: () {},
+          ),
+          const SizedBox(height: 12),
+          ...AppData.driverTrips.map(
+            (trip) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: TripTile(data: trip),
+            ),
+          ),
+          const SizedBox(height: 16),
+          SectionTitle(title: 'History', actionLabel: 'All', onTap: () {}),
+          const SizedBox(height: 12),
+          const HistoryListCard(),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverNotificationsScreen extends StatelessWidget {
+  const DriverNotificationsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Driver Notifications',
+      subtitle: 'Updates, alerts, and dispatch notices.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [
+          ...AppData.driverNotifications.map(
+            (item) => Padding(
+              padding: const EdgeInsets.only(bottom: 12),
+              child: NotificationTile(item: item),
+            ),
+          ),
+          const SizedBox(height: 8),
+          const CategoryCard(
+            title: 'Announcements',
+            icon: Symbols.campaign_rounded,
+          ),
+          const SizedBox(height: 12),
+          const CategoryCard(
+            title: 'Passenger Alerts',
+            icon: Symbols.person_search_rounded,
+          ),
+          const SizedBox(height: 12),
+          const CategoryCard(
+            title: 'System Updates',
+            icon: Symbols.system_update_alt_rounded,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverProfileScreen extends StatelessWidget {
+  const DriverProfileScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Driver Profile',
+      subtitle: 'Driver and vehicle summary.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: const [
+          ProfileHeader(
+            name: 'Ramon dela Cruz',
+            role: 'Driver',
+            avatarLabel: 'RD',
+          ),
+          SizedBox(height: 16),
+          DriverProfileDetailCard(),
+          SizedBox(height: 16),
+          ProfileMenuCard(
+            items: [
+              ProfileMenuItemData(
+                'Vehicle Details',
+                Symbols.directions_bus_rounded,
+              ),
+              ProfileMenuItemData('Assigned Route', Symbols.route_rounded),
+              ProfileMenuItemData('Settings', Symbols.settings_rounded),
+              ProfileMenuItemData('Help', Symbols.help_rounded),
+              ProfileMenuItemData('Logout', Symbols.logout_rounded),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AuthScreen extends StatelessWidget {
+  const AuthScreen({super.key, required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    final viewInsets = MediaQuery.of(context).viewInsets.bottom;
+
+    return Scaffold(
+      resizeToAvoidBottomInset: true,
+      body: SafeArea(
+        child: AnimatedPadding(
+          duration: const Duration(milliseconds: 220),
+          curve: Curves.easeOutCubic,
+          padding: EdgeInsets.only(bottom: viewInsets),
+          child: SingleChildScrollView(
+            keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
+            padding: const EdgeInsets.fromLTRB(24, 18, 24, 24),
+            child: Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Row(
+                      children: [
+                        if (Navigator.of(context).canPop())
+                          IconButton(
+                            onPressed: () => Navigator.maybePop(context),
+                            icon: const Icon(Symbols.arrow_back_rounded),
+                            tooltip: 'Back',
+                          ),
+                        if (Navigator.of(context).canPop()) const SizedBox(width: 8),
+                        const BrandMark(),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      title,
+                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      subtitle,
+                      style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppColors.softInk,
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 22),
+                    const AuthHeroCard(),
+                    const SizedBox(height: 16),
+                    AuthFormCard(mode: title),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class SettingsScreen extends StatelessWidget {
+  const SettingsScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: 'Settings',
+      subtitle: 'Phase 1 UI only.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: const [
+          SettingsGroupCard(),
+          SizedBox(height: 16),
+          SettingsToggleCard(),
+          SizedBox(height: 16),
+          SettingsLinksCard(),
+        ],
+      ),
+    );
+  }
+}
+
+class InfoScreen extends StatelessWidget {
+  const InfoScreen({super.key, required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return AppScaffold(
+      title: title,
+      subtitle: 'Shared informational page.',
+      body: ListView(
+        padding: const EdgeInsets.all(20),
+        children: [InfoCard(title: title, body: body)],
+      ),
+    );
+  }
+}
+
+class AppScaffold extends StatelessWidget {
+  const AppScaffold({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.body,
+    this.actions = const [],
+  });
+
+  final String title;
+  final String subtitle;
+  final Widget body;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        toolbarHeight: 84,
+        titleSpacing: 20,
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.softInk),
+            ),
+          ],
+        ),
+        actionsPadding: const EdgeInsets.only(right: 12),
+        actions: actions,
+      ),
+      body: body,
+    );
+  }
+}
+
+class AppBarIconButton extends StatelessWidget {
+  const AppBarIconButton({super.key, required this.icon, required this.onTap});
+
+  final IconData icon;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(onPressed: onTap, icon: Icon(icon));
+  }
+}
+
+class PrimaryButton extends StatelessWidget {
+  const PrimaryButton({
+    super.key,
+    required this.text,
+    required this.icon,
+    this.onPressed,
+  });
+
+  final String text;
+  final IconData icon;
+  final VoidCallback? onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressableScale(
+      child: FilledButton.icon(
+        onPressed: onPressed ?? () {},
+        icon: Icon(icon),
+        label: Text(text),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(56),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shadowColor: AppColors.primary.withValues(alpha: 0.2),
+        ),
+      ),
+    );
+  }
+}
+
+class SecondaryButton extends StatelessWidget {
+  const SecondaryButton({
+    super.key,
+    required this.text,
+    required this.onPressed,
+  });
+
+  final String text;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressableScale(
+      child: OutlinedButton(
+        onPressed: onPressed,
+        style: OutlinedButton.styleFrom(
+          foregroundColor: AppColors.primary,
+          minimumSize: const Size.fromHeight(50),
+          padding: const EdgeInsets.symmetric(horizontal: 18),
+          side: const BorderSide(color: AppColors.primary, width: 1.1),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          backgroundColor: Colors.white,
+        ),
+        child: Text(text),
+      ),
+    );
+  }
+}
+
+class DangerButton extends StatelessWidget {
+  const DangerButton({super.key, required this.text, required this.icon});
+
+  final String text;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return PressableScale(
+      child: FilledButton.icon(
+        onPressed: () {},
+        icon: Icon(icon),
+        label: Text(text),
+        style: FilledButton.styleFrom(
+          backgroundColor: AppColors.danger,
+          foregroundColor: Colors.white,
+          minimumSize: const Size.fromHeight(56),
+          padding: const EdgeInsets.symmetric(horizontal: 20),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        ),
+      ),
+    );
+  }
+}
+
+class PressableScale extends StatefulWidget {
+  const PressableScale({super.key, required this.child, this.scale = 0.98});
+
+  final Widget child;
+  final double scale;
+
+  @override
+  State<PressableScale> createState() => _PressableScaleState();
+}
+
+class _PressableScaleState extends State<PressableScale> {
+  bool _pressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return Listener(
+      onPointerDown: (_) => setState(() => _pressed = true),
+      onPointerUp: (_) => setState(() => _pressed = false),
+      onPointerCancel: (_) => setState(() => _pressed = false),
+      child: AnimatedScale(
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCubic,
+        scale: _pressed ? widget.scale : 1,
+        child: widget.child,
+      ),
+    );
+  }
+}
+
+class BrandMark extends StatelessWidget {
+  const BrandMark({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: AppColors.primary,
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Icon(
+            Symbols.directions_bus_rounded,
+            color: Colors.white,
+            size: 22,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          'TSUPER APP',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            letterSpacing: 0.8,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class IllustrationPlaceholder extends StatelessWidget {
+  const IllustrationPlaceholder({
+    super.key,
+    required this.label,
+    required this.icon,
+  });
+
+  final String label;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: AppColors.offWhite,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 44,
+            height: 44,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: Icon(icon, color: AppColors.primary),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              label,
+              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                color: AppColors.softInk,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class JeepneyMarker extends StatelessWidget {
+  const JeepneyMarker({super.key, required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Symbols.directions_bus_rounded,
+            color: AppColors.primary,
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OnboardingCard extends StatelessWidget {
+  const OnboardingCard({super.key, required this.slide});
+
+  final OnboardingSlide slide;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.06),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(18),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.08),
+                borderRadius: BorderRadius.circular(18),
+              ),
+              child: Icon(slide.icon, size: 72, color: AppColors.primary),
+            ),
+            const SizedBox(height: 20),
+            Text(
+              slide.title,
+              textAlign: TextAlign.center,
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              slide.subtitle,
+              textAlign: TextAlign.center,
+              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                color: AppColors.softInk,
+                height: 1.55,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class RoleCard extends StatelessWidget {
+  const RoleCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedScale(
+      scale: selected ? 1.02 : 1.0,
+      duration: const Duration(milliseconds: 180),
+      curve: Curves.easeOutCubic,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(24),
+          onTap: onTap,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 180),
+            curve: Curves.easeOutCubic,
+            decoration: BoxDecoration(
+              color: selected ? AppColors.primary.withValues(alpha: 0.06) : Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: selected ? AppColors.primary : AppColors.gray200,
+                width: selected ? 1.4 : 1,
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.gray600.withValues(
+                    alpha: selected ? 0.08 : 0.05,
+                  ),
+                  blurRadius: selected ? 18 : 14,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      if (selected)
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: AppColors.primary,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'ACTIVE',
+                            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                              color: Colors.white,
+                              letterSpacing: 0.5,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        )
+                      else
+                        const SizedBox.shrink(),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color:
+                          selected
+                              ? AppColors.primary.withValues(alpha: 0.08)
+                              : AppColors.gray100,
+                      borderRadius: BorderRadius.circular(16),
+                    ),
+                    child: Icon(
+                      icon,
+                      size: 24,
+                      color: selected ? AppColors.primary : AppColors.gray600,
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    title,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      color: selected ? AppColors.darkNavy : AppColors.ink,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    subtitle,
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: AppColors.softInk,
+                      height: 1.45,
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Text(
+                        selected ? 'Selected' : 'Select',
+                        style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                          color: AppColors.primary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      const Icon(
+                        Symbols.arrow_forward_rounded,
+                        color: AppColors.primary,
+                        size: 16,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class GreetingCard extends StatelessWidget {
+  const GreetingCard({super.key, required this.title, required this.subtitle});
+
+  final String title;
+  final String subtitle;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(22),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: AppColors.ink,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  subtitle,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(
+              Symbols.bolt_rounded,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class SectionTitle extends StatelessWidget {
+  const SectionTitle({
+    super.key,
+    required this.title,
+    required this.actionLabel,
+    required this.onTap,
+  });
+
+  final String title;
+  final String actionLabel;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ),
+        TextButton(onPressed: onTap, child: Text(actionLabel)),
+      ],
+    );
+  }
+}
+
+class SearchBarCard extends StatelessWidget {
+  const SearchBarCard({super.key, required this.placeholder});
+
+  final String placeholder;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Symbols.search_rounded, color: AppColors.softInk),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              placeholder,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+            ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(14),
+            ),
+            child: const Icon(
+              Symbols.tune_rounded,
+              size: 18,
+              color: AppColors.primary,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class CurrentLocationCard extends StatelessWidget {
+  const CurrentLocationCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Icon(
+              Symbols.near_me_rounded,
+              color: AppColors.primary,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Current Location',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.labelLarge?.copyWith(color: AppColors.softInk),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Brgy. Bagong Pag-asa, Quezon City',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Symbols.chevron_right_rounded, color: AppColors.gray400),
+        ],
+      ),
+    );
+  }
+}
+
+class GlassCard extends StatelessWidget {
+  const GlassCard({
+    super.key,
+    required this.child,
+    this.padding = const EdgeInsets.all(18),
+    this.onTap,
+  });
+
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final content = ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 7, sigmaY: 7),
+        child: Container(
+          width: double.infinity,
+          padding: padding,
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.84),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.92)),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.gray600.withValues(alpha: 0.05),
+                blurRadius: 22,
+                offset: const Offset(0, 10),
+              ),
+            ],
+          ),
+          child: child,
+        ),
+      ),
+    );
+
+    if (onTap == null) return content;
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: onTap,
+        child: content,
+      ),
+    );
+  }
+}
+
+class QuickActionCard extends StatelessWidget {
+  const QuickActionCard({super.key, required this.data});
+
+  final QuickActionData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      onTap: () {},
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: data.color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(data.icon, color: data.color),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            data.label,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            data.subtitle,
+            textAlign: TextAlign.center,
+            style: Theme.of(
+              context,
+            ).textTheme.bodySmall?.copyWith(color: AppColors.softInk),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class NotificationTile extends StatelessWidget {
+  const NotificationTile({super.key, required this.item});
+
+  final NotificationData item;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: item.color.withValues(alpha: 0.14),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(_notificationIcon(item.kind), color: item.color),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item.title,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    Text(
+                      item.time,
+                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                        color: AppColors.softInk,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  item.message,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                    color: AppColors.softInk,
+                    height: 1.45,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PromoBanner extends StatelessWidget {
+  const PromoBanner({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.gray200),
+      ),
+      child: Row(
+        children: [
+          const Icon(
+            Symbols.local_offer_rounded,
+            color: AppColors.primary,
+            size: 28,
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Ride Smarter',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.ink,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Save destinations and unlock a better route view.',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class RouteCard extends StatelessWidget {
+  const RouteCard({super.key, required this.data, this.dense = false});
+
+  final RouteData data;
+  final bool dense;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      padding: EdgeInsets.all(dense ? 16 : 18),
+      child: Row(
+        children: [
+          Container(
+            width: 52,
+            height: 52,
+            decoration: BoxDecoration(
+              color: data.color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(Symbols.route_rounded, color: data.color),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        data.title,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    Text(
+                      data.fare,
+                      style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.primary,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '${data.origin} to ${data.destination}',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+                const SizedBox(height: 10),
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: [
+                    _MiniInfo(
+                      label: data.duration,
+                      icon: Symbols.schedule_rounded,
+                    ),
+                    _MiniInfo(
+                      label: '${data.transfers} transfer',
+                      icon: Symbols.sync_alt_rounded,
+                    ),
+                    _MiniInfo(
+                      label: data.traffic,
+                      icon: Symbols.traffic_rounded,
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class TripTile extends StatelessWidget {
+  const TripTile({super.key, required this.data});
+
+  final TripData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: data.color.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(Symbols.directions_bus_rounded, color: data.color),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        data.title,
+                        style: Theme.of(context).textTheme.titleMedium
+                            ?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    Text(
+                      data.status,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                        color: data.color,
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  data.subtitle,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Text(
+            data.amount,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfileHeader extends StatelessWidget {
+  const ProfileHeader({
+    super.key,
+    required this.name,
+    required this.role,
+    required this.avatarLabel,
+  });
+
+  final String name;
+  final String role;
+  final String avatarLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 28,
+            backgroundColor: AppColors.primary,
+            child: Text(
+              avatarLabel,
+              style: const TextStyle(
+                color: Colors.white,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  role,
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+          const Icon(Symbols.chevron_right_rounded, color: AppColors.gray400),
+        ],
+      ),
+    );
+  }
+}
+
+class ProfileMenuCard extends StatelessWidget {
+  const ProfileMenuCard({super.key, required this.items});
+
+  final List<ProfileMenuItemData> items;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        children: [
+          for (var i = 0; i < items.length; i++) ...[
+            _ProfileMenuRow(item: items[i]),
+            if (i != items.length - 1) const Divider(height: 1),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class DriverProfileDetailCard extends StatelessWidget {
+  const DriverProfileDetailCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Driver Information',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 12),
+          const _ProfileDetailRow(label: 'License No.', value: 'N01-204-889'),
+          const Divider(height: 20),
+          const _ProfileDetailRow(
+            label: 'Vehicle',
+            value: 'Toyota Jeepney 28B',
+          ),
+          const Divider(height: 20),
+          const _ProfileDetailRow(
+            label: 'Assigned Route',
+            value: 'Cubao - Fairview Line',
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ProfileDetailRow extends StatelessWidget {
+  const _ProfileDetailRow({required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Expanded(
+          child: Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          value,
+          style: Theme.of(
+            context,
+          ).textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+        ),
+      ],
+    );
+  }
+}
+
+class _ProfileMenuRow extends StatelessWidget {
+  const _ProfileMenuRow({required this.item});
+
+  final ProfileMenuItemData item;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Container(
+        padding: const EdgeInsets.all(10),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(14),
+        ),
+        child: Icon(item.icon, color: AppColors.primary),
+      ),
+      title: Text(
+        item.label,
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      ),
+      trailing: const Icon(
+        Symbols.chevron_right_rounded,
+        color: AppColors.gray400,
+      ),
+      onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
+    );
+  }
+}
+
+class LogoutCard extends StatelessWidget {
+  const LogoutCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: AppColors.danger.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Icon(Symbols.logout_rounded, color: AppColors.danger),
+        ),
+        title: Text(
+          'Logout',
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+            fontWeight: FontWeight.w700,
+            color: AppColors.danger,
+          ),
+        ),
+        subtitle: const Text('UI only - no auth flow implemented.'),
+        onTap: () => Navigator.pushNamed(context, AppRoutes.roleSelection),
+      ),
+    );
+  }
+}
+
+class DriverVehicleCard extends StatelessWidget {
+  const DriverVehicleCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: const Icon(
+              Symbols.directions_bus_rounded,
+              color: AppColors.primary,
+              size: 30,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Vehicle 28B',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Toyota Jeepney · Plate ABC-1234',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+                const SizedBox(height: 8),
+                const StatusPill(
+                  label: 'Active Shift',
+                  color: AppColors.success,
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverRouteCard extends StatelessWidget {
+  const DriverRouteCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Assigned Route',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 10),
+          Row(
+            children: [
+              const StatusPill(label: 'Route 2', color: AppColors.primary),
+              const SizedBox(width: 10),
+              Text(
+                AppData.driverRoute,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class PassengerDemandCard extends StatelessWidget {
+  const PassengerDemandCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          const Icon(Symbols.people_rounded, color: AppColors.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Passenger Demand',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Peak load expected in 20 minutes along the current route.',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OccupancyCard extends StatelessWidget {
+  const OccupancyCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                'Occupancy',
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+              const Spacer(),
+              const StatusPill(label: '76%', color: AppColors.warning),
+            ],
+          ),
+          const SizedBox(height: 14),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(999),
+            child: const LinearProgressIndicator(
+              value: 0.76,
+              minHeight: 12,
+              backgroundColor: AppColors.gray200,
+              valueColor: AlwaysStoppedAnimation(AppColors.primary),
+            ),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            '13 passengers on board, 4 seats remaining.',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverStatsGrid extends StatelessWidget {
+  const DriverStatsGrid({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: AppData.driverStats.length,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        mainAxisSpacing: 14,
+        crossAxisSpacing: 14,
+        childAspectRatio: 1.2,
+      ),
+      itemBuilder:
+          (context, index) => StatCard(data: AppData.driverStats[index]),
+    );
+  }
+}
+
+class StatCard extends StatelessWidget {
+  const StatCard({super.key, required this.data});
+
+  final StatData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Icon(data.icon, color: AppColors.primary),
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                data.value,
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                data.label,
+                style: Theme.of(
+                  context,
+                ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MockChartCard extends StatelessWidget {
+  const MockChartCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final values = [0.35, 0.56, 0.72, 0.61, 0.81, 0.92, 0.68];
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            'Mock Weekly Trend',
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 16),
+          SizedBox(
+            height: 160,
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                for (final value in values)
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      child: Container(
+                        height: 140 * value,
+                        decoration: BoxDecoration(
+                          color: AppColors.primary.withValues(alpha: 0.88),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverStatusCard extends StatelessWidget {
+  const DriverStatusCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          const StatusPill(label: 'On Duty', color: AppColors.success),
+          const SizedBox(width: 12),
+          Text(
+            'Route 2 active',
+            style: Theme.of(
+              context,
+            ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+          ),
+          const Spacer(),
+          IconButton(
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.settings),
+            icon: const Icon(Symbols.info_rounded),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class EarningsCard extends StatelessWidget {
+  const EarningsCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.success.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: const Icon(
+              Symbols.payments_rounded,
+              color: AppColors.success,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Earnings Placeholder',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  '₱3,450 collected from mocked trip summaries.',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class StatisticsOverviewCard extends StatelessWidget {
+  const StatisticsOverviewCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: const [
+          Expanded(child: MiniStat(label: 'Trips', value: '42')),
+          SizedBox(width: 12),
+          Expanded(child: MiniStat(label: 'Avg Occupancy', value: '76%')),
+          SizedBox(width: 12),
+          Expanded(child: MiniStat(label: 'Completion', value: '98%')),
+        ],
+      ),
+    );
+  }
+}
+
+class HistoryListCard extends StatelessWidget {
+  const HistoryListCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    const rows = [
+      ('Route 1', 'Mon 8:00 AM', '₱180'),
+      ('Route 2', 'Tue 1:20 PM', '₱220'),
+      ('Route 3', 'Wed 5:10 PM', '₱195'),
+    ];
+    return GlassCard(
+      child: Column(
+        children: [
+          for (var i = 0; i < rows.length; i++) ...[
+            ListTile(
+              contentPadding: EdgeInsets.zero,
+              leading: const Icon(
+                Symbols.history_rounded,
+                color: AppColors.primary,
+              ),
+              title: Text(rows[i].$1),
+              subtitle: Text(rows[i].$2),
+              trailing: Text(
+                rows[i].$3,
+                style: const TextStyle(fontWeight: FontWeight.w700),
+              ),
+            ),
+            if (i != rows.length - 1) const Divider(height: 1),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsGroupCard extends StatelessWidget {
+  const SettingsGroupCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        children: const [
+          SettingsRow(label: 'Account', icon: Symbols.person_rounded),
+          Divider(height: 1),
+          SettingsRow(
+            label: 'Notifications',
+            icon: Symbols.notifications_rounded,
+          ),
+          Divider(height: 1),
+          SettingsRow(label: 'Appearance', icon: Symbols.palette_rounded),
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsToggleCard extends StatelessWidget {
+  const SettingsToggleCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        children: const [
+          ToggleRow(label: 'Dark Mode Ready', value: true),
+          Divider(height: 1),
+          ToggleRow(label: 'Compact Cards', value: false),
+        ],
+      ),
+    );
+  }
+}
+
+class SettingsLinksCard extends StatelessWidget {
+  const SettingsLinksCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        children: [
+          SettingsRow(
+            label: 'About',
+            icon: Symbols.info_rounded,
+            onTap: () => Navigator.pushNamed(context, AppRoutes.about),
+          ),
+          const Divider(height: 1),
+          SettingsRow(
+            label: 'Help Center',
+            icon: Symbols.help_rounded,
+            onTap: () => Navigator.pushNamed(context, AppRoutes.helpCenter),
+          ),
+          const Divider(height: 1),
+          SettingsRow(
+            label: 'Privacy Policy',
+            icon: Symbols.privacy_tip_rounded,
+            onTap: () => Navigator.pushNamed(context, AppRoutes.privacy),
+          ),
+          const Divider(height: 1),
+          SettingsRow(
+            label: 'Terms & Conditions',
+            icon: Symbols.gavel_rounded,
+            onTap: () => Navigator.pushNamed(context, AppRoutes.terms),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class InfoCard extends StatelessWidget {
+  const InfoCard({super.key, required this.title, required this.body});
+
+  final String title;
+  final String body;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          const SizedBox(height: 12),
+          Text(
+            body,
+            style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+              color: AppColors.softInk,
+              height: 1.6,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AuthHeroCard extends StatelessWidget {
+  const AuthHeroCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.06),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: AppColors.primary.withValues(alpha: 0.08),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: const Icon(
+              Symbols.lock_rounded,
+              color: AppColors.primary,
+              size: 24,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            'Secure access placeholder',
+            style: Theme.of(context).textTheme.titleLarge?.copyWith(
+              color: AppColors.ink,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            'Phase 1 keeps authentication visual only, with no backend logic or account state.',
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: AppColors.softInk,
+              height: 1.5,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class AuthFormCard extends StatelessWidget {
+  const AuthFormCard({super.key, required this.mode});
+
+  final String mode;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          if (mode == 'Register') ...[
+            const _TextFieldPlaceholder(label: 'Full name'),
+            const SizedBox(height: 12),
+          ],
+          const _TextFieldPlaceholder(label: 'Email or mobile number'),
+          const SizedBox(height: 12),
+          if (mode != 'Forgot Password') ...[
+            const _TextFieldPlaceholder(label: 'Password'),
+            const SizedBox(height: 8),
+          ],
+          if (mode == 'Register') ...[
+            const _TextFieldPlaceholder(label: 'Confirm password'),
+            const SizedBox(height: 8),
+          ],
+          if (mode == 'Login')
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton(
+                onPressed:
+                    () =>
+                        Navigator.pushNamed(context, AppRoutes.forgotPassword),
+                child: const Text('Forgot Password?'),
+              ),
+            ),
+          if (mode == 'Forgot Password') ...[
+            const SizedBox(height: 6),
+            Text(
+              'We will send a reset link to the email address above.',
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                color: AppColors.softInk,
+                height: 1.45,
+              ),
+            ),
+            const SizedBox(height: 14),
+          ] else ...[
+            const SizedBox(height: 8),
+          ],
+          PrimaryButton(
+            text:
+                mode == 'Forgot Password'
+                    ? 'Send Reset Link'
+                    : mode == 'Register'
+                    ? 'Create Account'
+                    : 'Login',
+            icon: Symbols.arrow_forward_rounded,
+            onPressed:
+                () => Navigator.pushReplacementNamed(
+                  context,
+                  AppRoutes.roleSelection,
+                ),
+          ),
+          if (mode == 'Register') ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.center,
+              child: TextButton(
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
+                child: const Text('Already have an account? Login'),
+              ),
+            ),
+          ],
+          if (mode == 'Forgot Password') ...[
+            const SizedBox(height: 8),
+            Align(
+              alignment: Alignment.center,
+              child: TextButton(
+                onPressed: () => Navigator.pushNamed(context, AppRoutes.login),
+                child: const Text('Back to Login'),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+class _TextFieldPlaceholder extends StatelessWidget {
+  const _TextFieldPlaceholder({required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      decoration: InputDecoration(
+        labelText: label,
+        filled: true,
+        fillColor: Colors.white,
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: BorderSide(color: AppColors.gray200),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(16),
+          borderSide: const BorderSide(color: AppColors.primary, width: 1.2),
+        ),
+      ),
+    );
+  }
+}
+
+class CategoryCard extends StatelessWidget {
+  const CategoryCard({super.key, required this.title, required this.icon});
+
+  final String title;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          Icon(icon, color: AppColors.primary),
+          const SizedBox(width: 12),
+          Text(
+            title,
+            style: Theme.of(
+              context,
+            ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class MapHeader extends StatelessWidget {
+  const MapHeader({super.key, required this.searchHint});
+
+  final String searchHint;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          const Icon(Symbols.search_rounded, color: AppColors.softInk),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              searchHint,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+            ),
+          ),
+          const Icon(Symbols.filter_alt_rounded, color: AppColors.primary),
+        ],
+      ),
+    );
+  }
+}
+
+class FilterChipsRow extends StatelessWidget {
+  const FilterChipsRow({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final chips = ['All', 'Nearby', 'Open', 'Crowded'];
+    return SizedBox(
+      height: 40,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemBuilder:
+            (context, index) => FilterChip(
+              label: Text(chips[index]),
+              selected: index == 0,
+              onSelected: (_) {},
+            ),
+        separatorBuilder: (_, __) => const SizedBox(width: 10),
+        itemCount: chips.length,
+      ),
+    );
+  }
+}
+
+class BottomMapCard extends StatelessWidget {
+  const BottomMapCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: [
+          const Icon(Symbols.info_rounded, color: AppColors.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'Map placeholder ready',
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Future Google Maps integration can replace this layer without changing the UI structure.',
+                  style: Theme.of(
+                    context,
+                  ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class OriginDestinationCard extends StatelessWidget {
+  const OriginDestinationCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        children: const [
+          RouteField(label: 'Origin', value: 'Brgy. Bagong Pag-asa'),
+          SizedBox(height: 12),
+          RouteField(label: 'Destination', value: 'Cubao Gateway'),
+        ],
+      ),
+    );
+  }
+}
+
+class SwapButtonCard extends StatelessWidget {
+  const SwapButtonCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        width: 52,
+        height: 52,
+        decoration: BoxDecoration(
+          color: AppColors.primary,
+          borderRadius: BorderRadius.circular(18),
+        ),
+        child: const Icon(Symbols.swap_vert_rounded, color: Colors.white),
+      ),
+    );
+  }
+}
+
+class FareSummaryCard extends StatelessWidget {
+  const FareSummaryCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: const [
+          Expanded(child: MiniStat(label: 'Fare', value: '₱18')),
+          SizedBox(width: 12),
+          Expanded(child: MiniStat(label: 'Estimate', value: '12 min')),
+        ],
+      ),
+    );
+  }
+}
+
+class TripMetricsCard extends StatelessWidget {
+  const TripMetricsCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Row(
+        children: const [
+          Expanded(child: MiniStat(label: 'Distance', value: '6.2 km')),
+          SizedBox(width: 12),
+          Expanded(child: MiniStat(label: 'Transfer', value: '1 stop')),
+          SizedBox(width: 12),
+          Expanded(child: MiniStat(label: 'Wait', value: '4 min')),
+        ],
+      ),
+    );
+  }
+}
+
+class RecentSearchCard extends StatelessWidget {
+  const RecentSearchCard({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GlassCard(
+      child: Column(
+        children: const [
+          RecentSearchRow(label: 'Makati CBD'),
+          Divider(height: 1),
+          RecentSearchRow(label: 'Quezon Memorial Circle'),
+          Divider(height: 1),
+          RecentSearchRow(label: 'Quiapo Market'),
+        ],
+      ),
+    );
+  }
+}
+
+class SavedPlaceChip extends StatelessWidget {
+  const SavedPlaceChip({super.key, required this.data});
+
+  final SavedPlaceData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(data.label),
+      avatar: Icon(data.icon, size: 18, color: AppColors.primary),
+      backgroundColor: Colors.white,
+      side: const BorderSide(color: AppColors.gray200),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(999)),
+    );
+  }
+}
+
+class JeepneyCard extends StatelessWidget {
+  const JeepneyCard({super.key, required this.data});
+
+  final JeepneyData data;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 220,
+      child: GlassCard(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: data.color.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(18),
+                  ),
+                  child: Icon(
+                    Symbols.directions_bus_rounded,
+                    color: data.color,
+                  ),
+                ),
+                const Spacer(),
+                StatusPill(label: data.eta, color: data.color),
+              ],
+            ),
+            const SizedBox(height: 14),
+            Text(
+              data.unit,
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              data.route,
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+            ),
+            const Spacer(),
+            Text(
+              '${data.occupancy} passengers',
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              data.status,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.softInk),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class PassengerMapMarker extends StatelessWidget {
+  const PassengerMapMarker({super.key, required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.08),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const Icon(
+            Symbols.directions_bus_rounded,
+            color: AppColors.primary,
+            size: 18,
+          ),
+          const SizedBox(width: 8),
+          Text(
+            label,
+            style: Theme.of(
+              context,
+            ).textTheme.labelLarge?.copyWith(fontWeight: FontWeight.w700),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class DriverMarker extends StatelessWidget {
+  const DriverMarker({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: AppColors.gray200),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.gray600.withValues(alpha: 0.10),
+            blurRadius: 20,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Symbols.location_on_rounded, color: AppColors.gray600),
+          SizedBox(width: 8),
+          Text('Jeepney live marker'),
+        ],
+      ),
+    );
+  }
+}
+
+class PlaceholderMap extends StatelessWidget {
+  const PlaceholderMap({super.key, required this.mode});
+
+  final MapMode mode;
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(30),
+      child: DecoratedBox(
+        decoration: const BoxDecoration(color: AppColors.background),
+        child: Stack(
+          children: [
+            Positioned.fill(child: CustomPaint(painter: MapGridPainter())),
+            Positioned(
+              left: 28,
+              top: 48,
+              right: 28,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Illustrated route map',
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Text(
+                    mode == MapMode.passenger
+                        ? 'Passenger view with route markers and commute hints.'
+                        : 'Driver view with trip position and status overlays.',
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
+                  ),
+                ],
+              ),
+            ),
+            Center(
+              child: Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.12),
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: AppColors.primary.withValues(alpha: 0.22),
+                    width: 3,
+                  ),
+                ),
+                child: const Icon(
+                  Symbols.route_rounded,
+                  color: AppColors.primary,
+                  size: 46,
+                ),
+              ),
+            ),
+            Positioned(
+              left: 24,
+              bottom: 24,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.gray200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.gray600.withValues(alpha: 0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  'Route layers',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+            Positioned(
+              right: 24,
+              top: 24,
+              child: Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 10,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(18),
+                  border: Border.all(color: AppColors.gray200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.gray600.withValues(alpha: 0.06),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
+                    ),
+                  ],
+                ),
+                child: const Text(
+                  'Mock map',
+                  style: TextStyle(fontWeight: FontWeight.w600),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class MapGridPainter extends CustomPainter {
+  const MapGridPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final linePaint =
+        Paint()
+          ..color = AppColors.primary.withValues(alpha: 0.06)
+          ..strokeWidth = 1;
+
+    for (var x = 0.0; x <= size.width; x += 30) {
+      canvas.drawLine(Offset(x, 0), Offset(x, size.height), linePaint);
+    }
+    for (var y = 0.0; y <= size.height; y += 30) {
+      canvas.drawLine(Offset(0, y), Offset(size.width, y), linePaint);
+    }
+
+    final roadPaint =
+        Paint()
+          ..color = AppColors.softInk.withValues(alpha: 0.16)
+          ..strokeWidth = 16
+          ..strokeCap = StrokeCap.round;
+
+    canvas.drawLine(
+      Offset(size.width * 0.1, size.height * 0.68),
+      Offset(size.width * 0.9, size.height * 0.36),
+      roadPaint,
+    );
+    canvas.drawLine(
+      Offset(size.width * 0.2, size.height * 0.22),
+      Offset(size.width * 0.82, size.height * 0.82),
+      roadPaint,
+    );
+  }
+
+  @override
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class RouteField extends StatelessWidget {
+  const RouteField({super.key, required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: AppColors.primary.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(14),
+          ),
+          child: const Icon(
+            Symbols.trip_origin_rounded,
+            color: AppColors.primary,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: Theme.of(
+                  context,
+                ).textTheme.labelMedium?.copyWith(color: AppColors.softInk),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                value,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class StatusPill extends StatelessWidget {
+  const StatusPill({super.key, required this.label, required this.color});
+
+  final String label;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.12),
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelMedium?.copyWith(
+          color: color,
+          fontWeight: FontWeight.w700,
+        ),
+      ),
+    );
+  }
+}
+
+class MiniStat extends StatelessWidget {
+  const MiniStat({super.key, required this.label, required this.value});
+
+  final String label;
+  final String value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          value,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w700),
+        ),
+        const SizedBox(height: 4),
+        Text(
+          label,
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.softInk),
+        ),
+      ],
+    );
+  }
+}
+
+class SettingsRow extends StatelessWidget {
+  const SettingsRow({
+    super.key,
+    required this.label,
+    required this.icon,
+    this.onTap,
+  });
+
+  final String label;
+  final IconData icon;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: Icon(icon, color: AppColors.primary),
+      title: Text(
+        label,
+        style: Theme.of(
+          context,
+        ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
+      ),
+      trailing: const Icon(
+        Symbols.chevron_right_rounded,
+        color: AppColors.gray400,
+      ),
+      onTap: onTap ?? () => Navigator.pushNamed(context, AppRoutes.about),
+    );
+  }
+}
+
+class ToggleRow extends StatelessWidget {
+  const ToggleRow({super.key, required this.label, required this.value});
+
+  final String label;
+  final bool value;
+
+  @override
+  Widget build(BuildContext context) {
+    return SwitchListTile(
+      contentPadding: EdgeInsets.zero,
+      title: Text(label),
+      value: value,
+      onChanged: (_) {},
+    );
+  }
+}
+
+class RecentSearchRow extends StatelessWidget {
+  const RecentSearchRow({super.key, required this.label});
+
+  final String label;
+
+  @override
+  Widget build(BuildContext context) {
+    return ListTile(
+      contentPadding: EdgeInsets.zero,
+      leading: const Icon(Symbols.history_rounded, color: AppColors.primary),
+      title: Text(label),
+      trailing: const Icon(
+        Symbols.north_east_rounded,
+        color: AppColors.gray400,
+      ),
+      onTap: () {},
+    );
+  }
+}
+
+class _MiniInfo extends StatelessWidget {
+  const _MiniInfo({required this.label, required this.icon});
+
+  final String label;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: AppColors.background,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 14, color: AppColors.primary),
+          const SizedBox(width: 6),
+          Text(
+            label,
+            style: Theme.of(context).textTheme.labelMedium?.copyWith(
+              color: AppColors.gray600,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+IconData _notificationIcon(NotificationKind kind) {
+  switch (kind) {
+    case NotificationKind.announcement:
+      return Symbols.campaign_rounded;
+    case NotificationKind.route:
+      return Symbols.route_rounded;
+    case NotificationKind.alert:
+      return Symbols.warning_rounded;
+    case NotificationKind.promo:
+      return Symbols.local_offer_rounded;
+    case NotificationKind.system:
+      return Symbols.system_update_alt_rounded;
+  }
+}
+
+enum NotificationKind { announcement, route, alert, promo, system }
+
+enum MapMode { passenger, driver }
+
+class OnboardingSlide {
+  const OnboardingSlide({
+    required this.title,
+    required this.subtitle,
+    required this.icon,
+  });
+
+  final String title;
+  final String subtitle;
+  final IconData icon;
+}
+
+class NavItem {
+  const NavItem(this.label, this.icon);
+
+  final String label;
+  final IconData icon;
+}
+
+class QuickActionData {
+  const QuickActionData(this.label, this.icon, this.color, this.subtitle);
+
+  final String label;
+  final IconData icon;
+  final Color color;
+  final String subtitle;
+}
+
+class JeepneyData {
+  const JeepneyData(
+    this.unit,
+    this.route,
+    this.occupancy,
+    this.status,
+    this.eta,
+    this.color,
+  );
+
+  final String unit;
+  final String route;
+  final String occupancy;
+  final String status;
+  final String eta;
+  final Color color;
+}
+
+class RouteData {
+  const RouteData(
+    this.title,
+    this.origin,
+    this.destination,
+    this.fare,
+    this.duration,
+    this.transfers,
+    this.traffic,
+    this.color,
+  );
+
+  final String title;
+  final String origin;
+  final String destination;
+  final String fare;
+  final String duration;
+  final int transfers;
+  final String traffic;
+  final Color color;
+}
+
+class NotificationData {
+  const NotificationData(
+    this.title,
+    this.message,
+    this.time,
+    this.kind,
+    this.color,
+  );
+
+  final String title;
+  final String message;
+  final String time;
+  final NotificationKind kind;
+  final Color color;
+}
+
+class SavedPlaceData {
+  const SavedPlaceData(this.label, this.subtitle, this.icon, this.color);
+
+  final String label;
+  final String subtitle;
+  final IconData icon;
+  final Color color;
+}
+
+class TripData {
+  const TripData(
+    this.title,
+    this.subtitle,
+    this.amount,
+    this.status,
+    this.color,
+  );
+
+  final String title;
+  final String subtitle;
+  final String amount;
+  final String status;
+  final Color color;
+}
+
+class StatData {
+  const StatData(this.label, this.value, this.delta, this.icon);
+
+  final String label;
+  final String value;
+  final String delta;
+  final IconData icon;
+}
+
+class ProfileMenuItemData {
+  const ProfileMenuItemData(this.label, this.icon);
+
+  final String label;
+  final IconData icon;
+}
+
+class InfoSection {
+  const InfoSection(this.title, this.items);
+
+  final String title;
+  final List<String> items;
+}
