@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/navigation/app_routes.dart';
+import '../../core/services/authentication_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,6 +13,7 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
+  final _authService = AuthenticationService();
   late final AnimationController _ctrl = AnimationController(
     vsync: this,
     duration: const Duration(milliseconds: 900),
@@ -28,10 +30,25 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(const Duration(milliseconds: 2200), () {
-      if (!mounted) return;
+    _checkAuthAndNavigate();
+  }
+
+  Future<void> _checkAuthAndNavigate() async {
+    // Wait for animation
+    await Future<void>.delayed(const Duration(milliseconds: 1500));
+
+    if (!mounted) return;
+
+    // Check if user is already logged in
+    final session = _authService.currentSession;
+
+    if (session != null) {
+      // User is logged in, navigate to role selection
+      Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
+    } else {
+      // User is not logged in, navigate to onboarding
       Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
-    });
+    }
   }
 
   @override
