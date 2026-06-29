@@ -129,7 +129,7 @@ class DangerButton extends StatelessWidget {
         icon: Icon(icon, size: 18),
         label: Text(text),
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.danger,
+          backgroundColor: AppColors.stop,
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(52),
           padding: const EdgeInsets.symmetric(horizontal: 20),

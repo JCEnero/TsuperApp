@@ -27,21 +27,48 @@ class DriverMapScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     Container(
-                      width: 7,
-                      height: 7,
-                      decoration: const BoxDecoration(
-                        color: AppColors.success,
-                        shape: BoxShape.circle,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 6,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.onDutyTint,
+                        borderRadius: BorderRadius.circular(999),
+                      ),
+                      child: const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          SizedBox(
+                            width: 7,
+                            height: 7,
+                            child: DecoratedBox(
+                              decoration: BoxDecoration(
+                                color: AppColors.onDuty,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 6),
+                          Text(
+                            'On Duty',
+                            style: TextStyle(
+                              fontFamily: 'Poppins',
+                              fontSize: 12,
+                              fontWeight: FontWeight.w700,
+                              color: AppColors.onDuty,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 10),
                     const Text(
-                      'On Duty · Route 2 active',
+                      'Route 2 active',
                       style: TextStyle(
                         fontFamily: 'Poppins',
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: AppColors.ink,
+                        color: AppColors.softInk,
                       ),
                     ),
                     const Spacer(),

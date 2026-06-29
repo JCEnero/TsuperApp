@@ -38,7 +38,14 @@ class TripTile extends StatelessWidget {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        color: data.color,
+                        gradient: LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [
+                            Color.lerp(data.color, Colors.white, 0.22)!,
+                            data.color,
+                          ],
+                        ),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(
@@ -89,20 +96,20 @@ class TripTile extends StatelessWidget {
                         const SizedBox(height: 5),
                         Container(
                           padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
+                            horizontal: 9,
+                            vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: data.color,
+                            color: data.color.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
                             data.status,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontFamily: 'Poppins',
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: Colors.white,
+                              color: data.color,
                             ),
                           ),
                         ),

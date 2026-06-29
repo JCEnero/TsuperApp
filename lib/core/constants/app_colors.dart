@@ -21,4 +21,15 @@ class AppColors {
   static const background = surface;
   static const accent = gray600;
   static const offWhite = Color(0xFFFCFDFF);
+
+  // Blue ramp — for the polished blue/white experience.
+  static const blueDeep = Color(0xFF18255B); // gradient end / deep shade
+  static const blueBright = Color(0xFF4C6EF5); // lively accent blue
+  static const blueSky = Color(0xFF7DA0FF); // soft highlight blue
+  static const blueTint = Color(0xFFEDF1FB); // very light blue surface
+
+  // Status accents tuned to sit beside the blue palette.
+  static const onDuty = Color(0xFF12B886); // teal-emerald, analogous to blue
+  static const onDutyTint = Color(0xFFE6F7F0); // light green pill background
+  static const stop = Color(0xFFE8505B); // warm coral-red for destructive
 }

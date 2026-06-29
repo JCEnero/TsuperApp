@@ -111,8 +111,8 @@ class DriverProfileScreen extends StatelessWidget {
                   child: MenuRow(
                     label: 'Log out',
                     icon: Symbols.logout_rounded,
-                    iconColor: AppColors.danger,
-                    textColor: AppColors.danger,
+                    iconColor: AppColors.stop,
+                    textColor: AppColors.stop,
                     onTap:
                         () => Navigator.pushNamed(
                           context,

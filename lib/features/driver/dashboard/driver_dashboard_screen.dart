@@ -111,6 +111,37 @@ class _DriverHeader extends StatelessWidget {
       ),
       child: Row(
         children: [
+          Container(
+            width: 46,
+            height: 46,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.blueBright, AppColors.primary],
+              ),
+              borderRadius: BorderRadius.circular(14),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
+            ),
+            child: const Center(
+              child: Text(
+                'RD',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
           const Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,9 +157,11 @@ class _DriverHeader extends StatelessWidget {
                 SizedBox(height: 2),
                 Text(
                   'Ramon dela Cruz',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    fontSize: 21,
+                    fontSize: 20,
                     fontWeight: FontWeight.w800,
                     color: AppColors.ink,
                   ),
@@ -139,7 +172,7 @@ class _DriverHeader extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.success.withOpacity(0.1),
+              color: AppColors.onDutyTint,
               borderRadius: BorderRadius.circular(999),
             ),
             child: Row(
@@ -149,7 +182,7 @@ class _DriverHeader extends StatelessWidget {
                   width: 7,
                   height: 7,
                   decoration: const BoxDecoration(
-                    color: AppColors.success,
+                    color: AppColors.onDuty,
                     shape: BoxShape.circle,
                   ),
                 ),
@@ -160,7 +193,7 @@ class _DriverHeader extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontSize: 12,
                     fontWeight: FontWeight.w700,
-                    color: AppColors.success,
+                    color: AppColors.onDuty,
                   ),
                 ),
               ],
@@ -178,102 +211,179 @@ class _DriverHeader extends StatelessWidget {
 }
 
 class _NavyEarningsCard extends StatelessWidget {
+  Widget _glow(double size, Color color) => Container(
+    width: size,
+    height: size,
+    decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+  );
+
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(22),
       decoration: BoxDecoration(
-        color: AppColors.primary,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                "Today's Earnings",
-                style: TextStyle(
-                  fontFamily: 'Poppins',
-                  fontSize: 13,
-                  color: Colors.white.withOpacity(0.7),
-                ),
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 4,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(999),
-                ),
-                child: const Text(
-                  'Shift active',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 11,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          const Text(
-            '₱2,140',
-            style: TextStyle(
-              fontFamily: 'Poppins',
-              fontSize: 34,
-              fontWeight: FontWeight.w800,
-              color: Colors.white,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 12),
-          const Wrap(
-            spacing: 8,
-            children: [
-              EarningsPill(
-                label: '24 trips',
-                icon: Symbols.directions_bus_rounded,
-              ),
-              EarningsPill(
-                label: '81% occupancy',
-                icon: Symbols.people_rounded,
-              ),
-            ],
+        borderRadius: BorderRadius.circular(22),
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.blueBright, AppColors.primary, AppColors.blueDeep],
+          stops: [0.0, 0.55, 1.0],
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.35),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(22),
+        child: Stack(
+          children: [
+            Positioned(
+              top: -34,
+              right: -24,
+              child: _glow(130, Colors.white.withOpacity(0.10)),
+            ),
+            Positioned(
+              bottom: -46,
+              left: -16,
+              child: _glow(140, AppColors.blueSky.withOpacity(0.20)),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Icon(
+                        Symbols.account_balance_wallet_rounded,
+                        size: 16,
+                        color: Colors.white.withOpacity(0.85),
+                      ),
+                      const SizedBox(width: 7),
+                      Text(
+                        "Today's Earnings",
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500,
+                          color: Colors.white.withOpacity(0.85),
+                        ),
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 5,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            SizedBox(
+                              width: 6,
+                              height: 6,
+                              child: DecoratedBox(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 6),
+                            Text(
+                              'Shift active',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  const Text(
+                    '₱2,140',
+                    style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 36,
+                      fontWeight: FontWeight.w800,
+                      color: Colors.white,
+                      letterSpacing: -0.5,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Icon(
+                        Symbols.trending_up_rounded,
+                        size: 15,
+                        color: Colors.white.withOpacity(0.9),
+                      ),
+                      const SizedBox(width: 5),
+                      Text(
+                        '+16% vs yesterday',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withOpacity(0.9),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  const Wrap(
+                    spacing: 8,
+                    children: [
+                      EarningsPill(
+                        label: '24 trips',
+                        icon: Symbols.directions_bus_rounded,
+                      ),
+                      EarningsPill(
+                        label: '81% occupancy',
+                        icon: Symbols.people_rounded,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
 
 class _StatsRow extends StatelessWidget {
-  static const _colors = [
-    AppColors.primary,
-    AppColors.success,
-    AppColors.warning,
-  ];
-
   @override
   Widget build(BuildContext context) {
-    return Row(
-      children: List.generate(
-        AppData.driverStats.length,
-        (i) => Expanded(
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: List.generate(AppData.driverStats.length, (i) {
+        final s = AppData.driverStats[i];
+        return Expanded(
           child: Padding(
             padding: EdgeInsets.only(
               left: i == 0 ? 0 : 5,
               right: i == AppData.driverStats.length - 1 ? 0 : 5,
             ),
             child: Container(
+              padding: const EdgeInsets.all(13),
               decoration: BoxDecoration(
                 color: Colors.white,
-                borderRadius: BorderRadius.circular(14),
+                borderRadius: BorderRadius.circular(16),
                 border: Border.all(color: AppColors.gray200),
                 boxShadow: [
                   BoxShadow(
@@ -283,66 +393,75 @@ class _StatsRow extends StatelessWidget {
                   ),
                 ],
               ),
-              clipBehavior: Clip.antiAlias,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Container(height: 3, color: _colors[i]),
-                  Padding(
-                    padding: const EdgeInsets.all(11),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 28,
-                          height: 28,
-                          decoration: BoxDecoration(
-                            color: _colors[i],
-                            shape: BoxShape.circle,
-                          ),
-                          child: Icon(
-                            AppData.driverStats[i].icon,
-                            size: 13,
-                            color: Colors.white,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          AppData.driverStats[i].value,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 15,
-                            fontWeight: FontWeight.w800,
-                            color: AppColors.ink,
-                          ),
-                        ),
-                        Text(
-                          AppData.driverStats[i].label,
-                          style: const TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 9.5,
-                            color: AppColors.softInk,
-                            height: 1.3,
-                          ),
-                        ),
-                        const SizedBox(height: 3),
-                        Text(
-                          AppData.driverStats[i].change,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 10,
-                            fontWeight: FontWeight.w700,
-                            color: _colors[i],
-                          ),
+                  Container(
+                    width: 36,
+                    height: 36,
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [AppColors.blueBright, AppColors.primary],
+                      ),
+                      borderRadius: BorderRadius.circular(11),
+                      boxShadow: [
+                        BoxShadow(
+                          color: AppColors.primary.withOpacity(0.25),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
+                    child: Icon(s.icon, size: 18, color: Colors.white),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    s.value,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: AppColors.ink,
+                    ),
+                  ),
+                  const SizedBox(height: 1),
+                  Text(
+                    s.label,
+                    style: const TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 10.5,
+                      color: AppColors.softInk,
+                      height: 1.25,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      const Icon(
+                        Symbols.trending_up_rounded,
+                        size: 14,
+                        color: AppColors.blueBright,
+                      ),
+                      const SizedBox(width: 3),
+                      Text(
+                        s.change,
+                        style: const TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.blueBright,
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
           ),
-        ),
+        );
+      }),
       ),
     );
   }
@@ -358,8 +477,19 @@ class _VehicleCard extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.blueBright, AppColors.primary],
+              ),
               borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.25),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
             child: const Icon(
               Symbols.directions_bus_rounded,
@@ -394,19 +524,35 @@ class _VehicleCard extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.success,
+              color: AppColors.onDutyTint,
               borderRadius: BorderRadius.circular(999),
             ),
-            child: const Text(
-              'Active',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: Colors.white,
-              ),
+            child: const Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(
+                  width: 7,
+                  height: 7,
+                  child: DecoratedBox(
+                    decoration: BoxDecoration(
+                      color: AppColors.onDuty,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+                SizedBox(width: 6),
+                Text(
+                  'Active',
+                  style: TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                    color: AppColors.onDuty,
+                  ),
+                ),
+              ],
             ),
           ),
         ],
@@ -425,7 +571,11 @@ class _RouteCard2 extends StatelessWidget {
             width: 40,
             height: 40,
             decoration: const BoxDecoration(
-              color: AppColors.darkNavy,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.blueBright, AppColors.primary],
+              ),
               shape: BoxShape.circle,
             ),
             child: const Icon(
@@ -462,9 +612,9 @@ class _RouteCard2 extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+            padding: const EdgeInsets.symmetric(horizontal: 11, vertical: 6),
             decoration: BoxDecoration(
-              color: AppColors.primary,
+              color: AppColors.primary.withOpacity(0.10),
               borderRadius: BorderRadius.circular(999),
             ),
             child: const Text(
@@ -473,7 +623,7 @@ class _RouteCard2 extends StatelessWidget {
                 fontFamily: 'Poppins',
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.primary,
               ),
             ),
           ),
@@ -495,13 +645,17 @@ class _OccCard extends StatelessWidget {
               Container(
                 width: 36,
                 height: 36,
-                decoration: const BoxDecoration(
-                  color: AppColors.warning,
-                  shape: BoxShape.circle,
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                    colors: [AppColors.blueBright, AppColors.primary],
+                  ),
+                  borderRadius: BorderRadius.circular(11),
                 ),
                 child: const Icon(
                   Symbols.people_rounded,
-                  size: 17,
+                  size: 18,
                   color: Colors.white,
                 ),
               ),
@@ -519,10 +673,10 @@ class _OccCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 10,
-                  vertical: 4,
+                  vertical: 5,
                 ),
                 decoration: BoxDecoration(
-                  color: AppColors.warning,
+                  color: AppColors.primary.withOpacity(0.10),
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: const Text(
@@ -531,7 +685,7 @@ class _OccCard extends StatelessWidget {
                     fontFamily: 'Poppins',
                     fontSize: 11,
                     fontWeight: FontWeight.w800,
-                    color: Colors.white,
+                    color: AppColors.primary,
                   ),
                 ),
               ),
@@ -540,11 +694,20 @@ class _OccCard extends StatelessWidget {
           const SizedBox(height: 14),
           ClipRRect(
             borderRadius: BorderRadius.circular(999),
-            child: const LinearProgressIndicator(
-              value: 0.76,
-              minHeight: 10,
-              backgroundColor: AppColors.gray200,
-              valueColor: AlwaysStoppedAnimation(AppColors.warning),
+            child: Container(
+              height: 12,
+              color: AppColors.gray200,
+              child: FractionallySizedBox(
+                alignment: Alignment.centerLeft,
+                widthFactor: 0.76,
+                child: Container(
+                  decoration: const BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [AppColors.blueBright, AppColors.primary],
+                    ),
+                  ),
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 8),

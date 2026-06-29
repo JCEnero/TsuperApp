@@ -24,48 +24,114 @@ class DriverTripsScreen extends StatelessWidget {
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
         children: [
           Container(
-            padding: const EdgeInsets.all(22),
             decoration: BoxDecoration(
-              color: AppColors.primary,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Total Earnings',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 13,
-                    color: Colors.white.withOpacity(0.7),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                const Text(
-                  '₱3,450',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 34,
-                    fontWeight: FontWeight.w800,
-                    color: Colors.white,
-                    letterSpacing: -0.5,
-                  ),
-                ),
-                const SizedBox(height: 12),
-                const Wrap(
-                  spacing: 8,
-                  children: [
-                    EarningsPill(
-                      label: 'Today ₱2,140',
-                      icon: Symbols.today_rounded,
-                    ),
-                    EarningsPill(
-                      label: 'This week',
-                      icon: Symbols.date_range_rounded,
-                    ),
-                  ],
+              borderRadius: BorderRadius.circular(22),
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  AppColors.blueBright,
+                  AppColors.primary,
+                  AppColors.blueDeep,
+                ],
+                stops: [0.0, 0.55, 1.0],
+              ),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.35),
+                  blurRadius: 24,
+                  offset: const Offset(0, 12),
                 ),
               ],
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(22),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: -34,
+                    right: -24,
+                    child: _glow(130, Colors.white.withOpacity(0.10)),
+                  ),
+                  Positioned(
+                    bottom: -46,
+                    left: -16,
+                    child: _glow(140, AppColors.blueSky.withOpacity(0.20)),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(22),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Icon(
+                              Symbols.account_balance_wallet_rounded,
+                              size: 16,
+                              color: Colors.white.withOpacity(0.85),
+                            ),
+                            const SizedBox(width: 7),
+                            Text(
+                              'Total Earnings',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                                fontWeight: FontWeight.w500,
+                                color: Colors.white.withOpacity(0.85),
+                              ),
+                            ),
+                            const Spacer(),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 5,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.18),
+                                borderRadius: BorderRadius.circular(999),
+                              ),
+                              child: const Text(
+                                'This week',
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 12),
+                        const Text(
+                          '₱3,450',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 36,
+                            fontWeight: FontWeight.w800,
+                            color: Colors.white,
+                            letterSpacing: -0.5,
+                          ),
+                        ),
+                        const SizedBox(height: 16),
+                        const Wrap(
+                          spacing: 8,
+                          children: [
+                            EarningsPill(
+                              label: 'Today ₱2,140',
+                              icon: Symbols.today_rounded,
+                            ),
+                            EarningsPill(
+                              label: 'This week',
+                              icon: Symbols.date_range_rounded,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
           const SizedBox(height: 14),
@@ -76,16 +142,14 @@ class DriverTripsScreen extends StatelessWidget {
                   label: 'Trips',
                   value: '42',
                   icon: Symbols.directions_bus_rounded,
-                  accent: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 10),
               Expanded(
                 child: _SmallStat(
-                  label: 'Avg Occupancy',
+                  label: 'Occupancy',
                   value: '76%',
                   icon: Symbols.people_rounded,
-                  accent: AppColors.success,
                 ),
               ),
               const SizedBox(width: 10),
@@ -94,7 +158,6 @@ class DriverTripsScreen extends StatelessWidget {
                   label: 'Completion',
                   value: '98%',
                   icon: Symbols.check_circle_rounded,
-                  accent: AppColors.gray600,
                 ),
               ),
             ],
@@ -135,18 +198,17 @@ class _SmallStat extends StatelessWidget {
     required this.label,
     required this.value,
     required this.icon,
-    this.accent = AppColors.primary,
   });
   final String label, value;
   final IconData icon;
-  final Color accent;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: const EdgeInsets.all(13),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(color: AppColors.gray200),
         boxShadow: [
           BoxShadow(
@@ -156,45 +218,47 @@ class _SmallStat extends StatelessWidget {
           ),
         ],
       ),
-      clipBehavior: Clip.antiAlias,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(height: 3, color: accent),
-          Padding(
-            padding: const EdgeInsets.all(11),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Container(
-                  width: 28,
-                  height: 28,
-                  decoration: BoxDecoration(
-                    color: accent,
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(icon, size: 13, color: Colors.white),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  value,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.ink,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  label,
-                  style: const TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 10,
-                    color: AppColors.softInk,
-                  ),
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.blueBright, AppColors.primary],
+              ),
+              borderRadius: BorderRadius.circular(11),
+              boxShadow: [
+                BoxShadow(
+                  color: AppColors.primary.withOpacity(0.25),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
                 ),
               ],
+            ),
+            child: Icon(icon, size: 18, color: Colors.white),
+          ),
+          const SizedBox(height: 10),
+          Text(
+            value,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              color: AppColors.ink,
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 10,
+              color: AppColors.softInk,
+              height: 1.25,
             ),
           ),
         ],
@@ -215,7 +279,11 @@ class _HistRow extends StatelessWidget {
         width: 36,
         height: 36,
         decoration: const BoxDecoration(
-          color: AppColors.primary,
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [AppColors.blueBright, AppColors.primary],
+          ),
           shape: BoxShape.circle,
         ),
         child: const Icon(
@@ -260,3 +328,10 @@ class _HistRow extends StatelessWidget {
     );
   }
 }
+
+// Decorative soft circle used inside gradient hero panels.
+Widget _glow(double size, Color color) => Container(
+  width: size,
+  height: size,
+  decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+);

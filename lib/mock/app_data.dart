@@ -210,7 +210,7 @@ class AppData {
     QuickActionData(
       'Start Shift',
       Symbols.play_circle_rounded,
-      AppColors.success,
+      AppColors.primary,
       'Begin the day route',
     ),
     QuickActionData(
@@ -222,13 +222,13 @@ class AppData {
     QuickActionData(
       'Report Issue',
       Symbols.warning_rounded,
-      AppColors.warning,
+      AppColors.primary,
       'Safety and route notes',
     ),
     QuickActionData(
       'Earnings',
       Symbols.finance_rounded,
-      AppColors.gray600,
+      AppColors.primary,
       'Daily summary',
     ),
   ];
@@ -239,7 +239,7 @@ class AppData {
       '6:00 AM – 8:15 AM',
       '₱640',
       'High demand',
-      AppColors.success,
+      AppColors.primary,
     ),
     TripData(
       'Midday Run',
@@ -263,14 +263,14 @@ class AppData {
       'Demand is rising on the afternoon corridor. Consider a short extra run.',
       '12 min ago',
       NotificationKind.alert,
-      AppColors.warning,
+      AppColors.blueBright,
     ),
     NotificationData(
       'System update',
       'Weekly trip charts are now available in the dashboard preview.',
       '1 hour ago',
       NotificationKind.system,
-      AppColors.success,
+      AppColors.onDuty,
     ),
     NotificationData(
       'Announcement',
