@@ -34,6 +34,7 @@ class _AuthScreenState extends State<AuthScreen> {
   String _password0 = '';
 
   UserRole? _role;
+  UserRole _loginRole = UserRole.passenger;
 
   AuthMode get mode => widget.mode;
 
@@ -42,6 +43,7 @@ class _AuthScreenState extends State<AuthScreen> {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is UserRole) _role = args;
+    _loginRole = AppSession.instance.role ?? _role ?? UserRole.passenger;
   }
 
   @override
@@ -133,7 +135,7 @@ class _AuthScreenState extends State<AuthScreen> {
     // Register captures the chosen role; login resolves it from the account.
     final UserRole role = mode == AuthMode.register
         ? (_role ?? UserRole.passenger)
-        : AppSession.instance.resolveRoleForLogin();
+        : _loginRole;
     AppSession.instance.role = role;
     Navigator.pushNamedAndRemoveUntil(context, role.homeRoute, (r) => false);
   }
@@ -205,6 +207,13 @@ class _AuthScreenState extends State<AuthScreen> {
                       if (_role != null && mode != AuthMode.forgot) ...[
                         const SizedBox(height: 14),
                         _RoleBadge(role: _role!),
+                      ],
+                      if (mode == AuthMode.login) ...[
+                        const SizedBox(height: 18),
+                        _RoleToggle(
+                          selected: _loginRole,
+                          onChanged: (r) => setState(() => _loginRole = r),
+                        ),
                       ],
                       const SizedBox(height: 28),
 
@@ -569,6 +578,105 @@ class _RoleBadge extends StatelessWidget {
               ),
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+// Temporary role chooser for the login screen while there is no backend.
+// Lets you preview either shell; remove once real auth returns the role.
+class _RoleToggle extends StatelessWidget {
+  const _RoleToggle({required this.selected, required this.onChanged});
+  final UserRole selected;
+  final ValueChanged<UserRole> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          'Sign in as',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.softInk,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(4),
+          decoration: BoxDecoration(
+            color: AppColors.gray100,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: AppColors.gray200, width: 1),
+          ),
+          child: Row(
+            children: [
+              _segment(UserRole.passenger, 'Passenger', Symbols.person_rounded),
+              _segment(
+                UserRole.driver,
+                'Driver',
+                Symbols.directions_bus_rounded,
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Preview mode — pick a role until sign-in is connected.',
+          style: Theme.of(
+            context,
+          ).textTheme.bodySmall?.copyWith(color: AppColors.muted),
+        ),
+      ],
+    );
+  }
+
+  Widget _segment(UserRole role, String label, IconData icon) {
+    final isSelected = role == selected;
+    return Expanded(
+      child: GestureDetector(
+        onTap: () => onChanged(role),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOutCubic,
+          padding: const EdgeInsets.symmetric(vertical: 11),
+          decoration: BoxDecoration(
+            color: isSelected ? AppColors.primary : Colors.transparent,
+            borderRadius: BorderRadius.circular(10),
+            boxShadow: isSelected
+                ? [
+                    BoxShadow(
+                      color: AppColors.primary.withOpacity(0.25),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ]
+                : null,
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                icon,
+                size: 17,
+                color: isSelected ? Colors.white : AppColors.softInk,
+              ),
+              const SizedBox(width: 6),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: isSelected ? Colors.white : AppColors.softInk,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
