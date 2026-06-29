@@ -230,7 +230,7 @@ ThemeData buildAppTheme() {
       ),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
     ),
-    cardTheme: const CardTheme(
+    cardTheme: const CardThemeData(
       color: Colors.white,
       surfaceTintColor: Colors.white,
       elevation: 0,

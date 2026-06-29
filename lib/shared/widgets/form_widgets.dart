@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 
@@ -142,24 +143,78 @@ class _ToggleRowState extends State<ToggleRow> {
   }
 }
 
-class AppFormField extends StatelessWidget {
+class AppFormField extends StatefulWidget {
   const AppFormField({
     super.key,
     required this.label,
     required this.icon,
     this.obscure = false,
+    this.controller,
+    this.validator,
+    this.keyboardType,
+    this.textInputAction,
+    this.textCapitalization = TextCapitalization.none,
+    this.inputFormatters,
+    this.onChanged,
+    this.onFieldSubmitted,
+    this.hint,
   });
   final String label;
   final IconData icon;
   final bool obscure;
+  final TextEditingController? controller;
+  final String? Function(String?)? validator;
+  final TextInputType? keyboardType;
+  final TextInputAction? textInputAction;
+  final TextCapitalization textCapitalization;
+  final List<TextInputFormatter>? inputFormatters;
+  final void Function(String)? onChanged;
+  final void Function(String)? onFieldSubmitted;
+  final String? hint;
+
+  @override
+  State<AppFormField> createState() => _AppFormFieldState();
+}
+
+class _AppFormFieldState extends State<AppFormField> {
+  late bool _obscured = widget.obscure;
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      obscureText: obscure,
+    return TextFormField(
+      controller: widget.controller,
+      obscureText: _obscured,
+      validator: widget.validator,
+      keyboardType: widget.keyboardType,
+      textInputAction: widget.textInputAction,
+      textCapitalization: widget.textCapitalization,
+      inputFormatters: widget.inputFormatters,
+      onChanged: widget.onChanged,
+      onFieldSubmitted: widget.onFieldSubmitted,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      style: const TextStyle(
+        fontFamily: 'Poppins',
+        fontSize: 14,
+        color: AppColors.ink,
+      ),
       decoration: InputDecoration(
-        labelText: label,
-        prefixIcon: Icon(icon, size: 19, color: AppColors.muted),
+        labelText: widget.label,
+        hintText: widget.hint,
+        prefixIcon: Icon(widget.icon, size: 19, color: AppColors.muted),
+        suffixIcon: widget.obscure
+            ? IconButton(
+                splashRadius: 20,
+                tooltip: _obscured ? 'Show password' : 'Hide password',
+                icon: Icon(
+                  _obscured
+                      ? Symbols.visibility_rounded
+                      : Symbols.visibility_off_rounded,
+                  size: 20,
+                  color: AppColors.muted,
+                ),
+                onPressed: () => setState(() => _obscured = !_obscured),
+              )
+            : null,
         filled: true,
         fillColor: AppColors.gray100,
         border: OutlineInputBorder(
@@ -174,11 +229,20 @@ class AppFormField extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
           borderSide: const BorderSide(color: AppColors.primary, width: 1.5),
         ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: const BorderSide(color: AppColors.danger, width: 1.5),
+        ),
         labelStyle: const TextStyle(
           fontFamily: 'Poppins',
           color: AppColors.softInk,
           fontSize: 14,
         ),
+        errorStyle: const TextStyle(fontFamily: 'Poppins', fontSize: 12),
       ),
     );
   }

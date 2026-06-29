@@ -3,6 +3,21 @@
 
 enum AuthMode { login, register, forgot }
 
+enum UserRole { passenger, driver }
+
+extension UserRoleX on UserRole {
+  String get label => switch (this) {
+    UserRole.passenger => 'Passenger',
+    UserRole.driver => 'Driver',
+  };
+
+  /// The home route a user of this role lands on after authenticating.
+  String get homeRoute => switch (this) {
+    UserRole.passenger => AppRoutes.passenger,
+    UserRole.driver => AppRoutes.driver,
+  };
+}
+
 class AppRoutes {
   static const splash = '/';
   static const onboarding = '/onboarding';

@@ -16,11 +16,25 @@ class RoleSelectionScreen extends StatefulWidget {
 class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
   int? _sel;
 
-  Future<void> _pick(int i, String route) async {
-    setState(() => _sel = i);
-    await Future<void>.delayed(const Duration(milliseconds: 200));
-    if (!mounted) return;
-    Navigator.pushReplacementNamed(context, route);
+  UserRole? get _role => switch (_sel) {
+    0 => UserRole.passenger,
+    1 => UserRole.driver,
+    _ => null,
+  };
+
+  void _select(int i) => setState(() => _sel = i);
+
+  void _continue(String authRoute) {
+    final role = _role;
+    if (role == null) {
+      ScaffoldMessenger.of(context)
+        ..hideCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Please select your role to continue.')),
+        );
+      return;
+    }
+    Navigator.pushNamed(context, authRoute, arguments: role);
   }
 
   @override
@@ -57,7 +71,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                     icon: Symbols.person_rounded,
                     badge: 'Commuter',
                     selected: _sel == 0,
-                    onTap: () => _pick(0, AppRoutes.passenger),
+                    onTap: () => _select(0),
                   ),
                   const SizedBox(height: 14),
                   _RoleCard(
@@ -67,10 +81,14 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                     icon: Symbols.directions_bus_rounded,
                     badge: 'Operator',
                     selected: _sel == 1,
-                    onTap: () => _pick(1, AppRoutes.driver),
+                    onTap: () => _select(1),
                   ),
                   const SizedBox(height: 32),
-                  const _LabeledDivider(label: 'Already have an account?'),
+                  _LabeledDivider(
+                    label: _role == null
+                        ? 'Select a role to continue'
+                        : 'Continue as ${_role!.label}',
+                  ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
@@ -78,9 +96,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                         child: PrimaryButton(
                           text: 'Log In',
                           icon: Symbols.login_rounded,
-                          onPressed:
-                              () =>
-                                  Navigator.pushNamed(context, AppRoutes.login),
+                          onPressed: () => _continue(AppRoutes.login),
                         ),
                       ),
                       const SizedBox(width: 12),
@@ -88,11 +104,7 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                         child: OutlineButton(
                           text: 'Register',
                           icon: Symbols.person_add_rounded,
-                          onPressed:
-                              () => Navigator.pushNamed(
-                                context,
-                                AppRoutes.register,
-                              ),
+                          onPressed: () => _continue(AppRoutes.register),
                         ),
                       ),
                     ],
