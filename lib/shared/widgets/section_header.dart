@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 
 class SectionHeader extends StatelessWidget {
@@ -15,6 +16,19 @@ class SectionHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Row(
       children: [
+        Container(
+          width: 4,
+          height: 18,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [AppColors.blueBright, AppColors.primary],
+            ),
+            borderRadius: BorderRadius.circular(999),
+          ),
+        ),
+        const SizedBox(width: 10),
         Expanded(
           child: Text(
             title,
@@ -29,14 +43,24 @@ class SectionHeader extends StatelessWidget {
         if (action.isNotEmpty)
           GestureDetector(
             onTap: onTap,
-            child: Text(
-              action,
-              style: const TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-                color: AppColors.primary,
-              ),
+            behavior: HitTestBehavior.opaque,
+            child: Row(
+              children: [
+                Text(
+                  action,
+                  style: const TextStyle(
+                    fontFamily: 'Poppins',
+                    fontSize: 13,
+                    fontWeight: FontWeight.w600,
+                    color: AppColors.primary,
+                  ),
+                ),
+                const Icon(
+                  Symbols.chevron_right_rounded,
+                  size: 16,
+                  color: AppColors.primary,
+                ),
+              ],
             ),
           ),
       ],

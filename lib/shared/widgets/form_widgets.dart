@@ -48,35 +48,38 @@ class RecentRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        padding: const EdgeInsets.all(7),
-        decoration: BoxDecoration(
-          color: AppColors.gray100,
-          borderRadius: BorderRadius.circular(9),
+    return Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: AppColors.gray100,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: const Icon(
+            Symbols.history_rounded,
+            size: 15,
+            color: AppColors.primary,
+          ),
         ),
-        child: const Icon(
-          Symbols.history_rounded,
-          size: 15,
-          color: AppColors.primary,
+        title: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
         ),
-      ),
-      title: Text(
-        label,
-        style: const TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: AppColors.ink,
+        trailing: const Icon(
+          Symbols.north_east_rounded,
+          size: 14,
+          color: AppColors.muted,
         ),
+        onTap: () {},
       ),
-      trailing: const Icon(
-        Symbols.north_east_rounded,
-        size: 14,
-        color: AppColors.muted,
-      ),
-      onTap: () {},
     );
   }
 }

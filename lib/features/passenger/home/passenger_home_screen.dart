@@ -22,11 +22,9 @@ class PassengerHomeScreen extends StatelessWidget {
         slivers: [
           SliverToBoxAdapter(child: _HomeHeader()),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                const AppSearchBar(placeholder: 'Where to?'),
-                const SizedBox(height: 14),
                 SizedBox(
                   height: 36,
                   child: ListView.separated(
@@ -126,65 +124,114 @@ class PassengerHomeScreen extends StatelessWidget {
 class _HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
     return Container(
-      color: Colors.white,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 14,
-        left: 20,
-        right: 20,
-        bottom: 16,
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Good morning 👋',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 13,
-                    color: AppColors.softInk,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Ferdinand Barral',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 21,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.ink,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Center(
-                child: Text(
-                  'FB',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.blueBright, AppColors.primary, AppColors.blueDeep],
+          stops: [0.0, 0.6, 1.0],
+        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withOpacity(0.28),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        child: Stack(
+          children: [
+            Positioned(
+              top: -36,
+              right: -28,
+              child: _glow(140, Colors.white.withOpacity(0.10)),
+            ),
+            Positioned(
+              bottom: -28,
+              left: -18,
+              child: _glow(120, AppColors.blueSky.withOpacity(0.18)),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, top + 16, 20, 22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Good morning 👋',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                                color: Colors.white.withOpacity(0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            const Text(
+                              'Ferdinand Barral',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 21,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () =>
+                            Navigator.pushNamed(context, AppRoutes.settings),
+                        child: Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.25),
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'FB',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  const AppSearchBar(placeholder: 'Where to?'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+Widget _glow(double size, Color color) => Container(
+  width: size,
+  height: size,
+  decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+);

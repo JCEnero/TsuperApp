@@ -273,55 +273,58 @@ class _HistRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        width: 36,
-        height: 36,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [AppColors.blueBright, AppColors.primary],
+    return Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Container(
+          width: 36,
+          height: 36,
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: [AppColors.blueBright, AppColors.primary],
+            ),
+            shape: BoxShape.circle,
           ),
-          shape: BoxShape.circle,
+          child: const Icon(
+            Symbols.history_rounded,
+            size: 16,
+            color: Colors.white,
+          ),
         ),
-        child: const Icon(
-          Symbols.history_rounded,
-          size: 16,
-          color: Colors.white,
-        ),
-      ),
-      title: Text(
-        route,
-        style: const TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: AppColors.ink,
-        ),
-      ),
-      subtitle: Text(
-        time,
-        style: const TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 11,
-          color: AppColors.softInk,
-        ),
-      ),
-      trailing: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-        decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.08),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          amt,
+        title: Text(
+          route,
           style: const TextStyle(
             fontFamily: 'Poppins',
             fontSize: 13,
-            fontWeight: FontWeight.w800,
-            color: AppColors.primary,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
+        ),
+        subtitle: Text(
+          time,
+          style: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 11,
+            color: AppColors.softInk,
+          ),
+        ),
+        trailing: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+          decoration: BoxDecoration(
+            color: AppColors.primary.withOpacity(0.08),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            amt,
+            style: const TextStyle(
+              fontFamily: 'Poppins',
+              fontSize: 13,
+              fontWeight: FontWeight.w800,
+              color: AppColors.primary,
+            ),
           ),
         ),
       ),

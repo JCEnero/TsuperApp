@@ -31,7 +31,14 @@ class JeepCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             decoration: BoxDecoration(
-              color: data.color,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [
+                  Color.lerp(data.color, Colors.white, 0.18)!,
+                  data.color,
+                ],
+              ),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(15),
               ),
