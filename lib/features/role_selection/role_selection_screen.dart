@@ -4,38 +4,16 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../shared/widgets/word_mark.dart';
-import '../../shared/widgets/app_buttons.dart';
 import '../../shared/widgets/tap_scale.dart';
 
-class RoleSelectionScreen extends StatefulWidget {
+class RoleSelectionScreen extends StatelessWidget {
   const RoleSelectionScreen({super.key});
-  @override
-  State<RoleSelectionScreen> createState() => _RoleSelectionScreenState();
-}
 
-class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
-  int? _sel;
+  void _register(BuildContext context, UserRole role) =>
+      Navigator.pushNamed(context, AppRoutes.register, arguments: role);
 
-  UserRole? get _role => switch (_sel) {
-    0 => UserRole.passenger,
-    1 => UserRole.driver,
-    _ => null,
-  };
-
-  void _select(int i) => setState(() => _sel = i);
-
-  void _continue(String authRoute) {
-    final role = _role;
-    if (role == null) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('Please select your role to continue.')),
-        );
-      return;
-    }
-    Navigator.pushNamed(context, authRoute, arguments: role);
-  }
+  void _login(BuildContext context) =>
+      Navigator.pushNamed(context, AppRoutes.login);
 
   @override
   Widget build(BuildContext context) {
@@ -51,14 +29,14 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const WordMark(),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 36),
                   Text(
-                    'Who are you?',
+                    'Get started',
                     style: Theme.of(context).textTheme.headlineMedium,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Select your role to enter your personalized experience.',
+                    'Choose how you’ll use TSUPER to get an experience tailored to you.',
                     style: Theme.of(
                       context,
                     ).textTheme.bodyMedium?.copyWith(color: AppColors.softInk),
@@ -67,56 +45,33 @@ class _RoleSelectionScreenState extends State<RoleSelectionScreen> {
                   _RoleCard(
                     title: 'Passenger',
                     subtitle:
-                        'Search routes, track nearby jeepneys, and manage your commute.',
+                        'Search routes, track nearby jeepneys, and manage your daily commute.',
                     icon: Symbols.person_rounded,
                     badge: 'Commuter',
-                    selected: _sel == 0,
-                    onTap: () => _select(0),
+                    accent: AppColors.primary,
+                    onTap: () => _register(context, UserRole.passenger),
                   ),
-                  const SizedBox(height: 14),
+                  const SizedBox(height: 16),
                   _RoleCard(
                     title: 'Driver',
                     subtitle:
-                        'Track trips, manage occupancy, and review shift earnings.',
+                        'Track trips, manage occupancy, and review your shift earnings.',
                     icon: Symbols.directions_bus_rounded,
                     badge: 'Operator',
-                    selected: _sel == 1,
-                    onTap: () => _select(1),
+                    accent: const Color(0xFFB8860B),
+                    onTap: () => _register(context, UserRole.driver),
                   ),
-                  const SizedBox(height: 32),
-                  _LabeledDivider(
-                    label: _role == null
-                        ? 'Select a role to continue'
-                        : 'Continue as ${_role!.label}',
-                  ),
+                  const SizedBox(height: 28),
+                  const _LabeledDivider(label: 'Already have an account?'),
                   const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: PrimaryButton(
-                          text: 'Log In',
-                          icon: Symbols.login_rounded,
-                          onPressed: () => _continue(AppRoutes.login),
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: OutlineButton(
-                          text: 'Register',
-                          icon: Symbols.person_add_rounded,
-                          onPressed: () => _continue(AppRoutes.register),
-                        ),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 8),
+                  _LoginPill(onTap: () => _login(context)),
+                  const SizedBox(height: 12),
                   Center(
                     child: TextButton(
-                      onPressed:
-                          () => Navigator.pushNamed(
-                            context,
-                            AppRoutes.forgotPassword,
-                          ),
+                      onPressed: () => Navigator.pushNamed(
+                        context,
+                        AppRoutes.forgotPassword,
+                      ),
                       child: const Text('Forgot password?'),
                     ),
                   ),
@@ -136,41 +91,29 @@ class _RoleCard extends StatelessWidget {
     required this.subtitle,
     required this.icon,
     required this.badge,
-    required this.selected,
+    required this.accent,
     required this.onTap,
   });
   final String title, subtitle, badge;
   final IconData icon;
-  final bool selected;
+  final Color accent;
   final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
     return TapScale(
       onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        curve: Curves.easeOutCubic,
+      child: Container(
         decoration: BoxDecoration(
-          color: selected ? AppColors.primary : Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: selected ? AppColors.primary : AppColors.gray200,
-            width: selected ? 0 : 1.5,
-          ),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(color: AppColors.gray200, width: 1.4),
           boxShadow: [
-            if (selected)
-              BoxShadow(
-                color: AppColors.primary.withOpacity(0.25),
-                blurRadius: 24,
-                offset: const Offset(0, 8),
-              )
-            else
-              BoxShadow(
-                color: Colors.black.withOpacity(0.04),
-                blurRadius: 16,
-                offset: const Offset(0, 4),
-              ),
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
           ],
         ),
         child: Padding(
@@ -181,31 +124,33 @@ class _RoleCard extends StatelessWidget {
               Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
+                    width: 54,
+                    height: 54,
                     decoration: BoxDecoration(
-                      color:
-                          selected
-                              ? Colors.white.withOpacity(0.18)
-                              : AppColors.gray100,
-                      borderRadius: BorderRadius.circular(12),
+                      gradient: LinearGradient(
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                        colors: [accent, Color.lerp(accent, Colors.black, 0.22)!],
+                      ),
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: accent.withOpacity(0.28),
+                          blurRadius: 14,
+                          offset: const Offset(0, 6),
+                        ),
+                      ],
                     ),
-                    child: Icon(
-                      icon,
-                      size: 22,
-                      color: selected ? Colors.white : AppColors.primary,
-                    ),
+                    child: Icon(icon, size: 26, color: Colors.white),
                   ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 4,
+                      vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color:
-                          selected
-                              ? Colors.white.withOpacity(0.18)
-                              : AppColors.primary.withOpacity(0.08),
+                      color: accent.withOpacity(0.10),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Text(
@@ -214,7 +159,7 @@ class _RoleCard extends StatelessWidget {
                         fontFamily: 'Poppins',
                         fontSize: 11,
                         fontWeight: FontWeight.w700,
-                        color: selected ? Colors.white : AppColors.primary,
+                        color: accent,
                         letterSpacing: 0.4,
                       ),
                     ),
@@ -224,48 +169,89 @@ class _RoleCard extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 title,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
-                  color: selected ? Colors.white : AppColors.ink,
+                  color: AppColors.ink,
                 ),
               ),
               const SizedBox(height: 6),
               Text(
                 subtitle,
-                style: TextStyle(
+                style: const TextStyle(
                   fontFamily: 'Poppins',
                   fontSize: 13,
                   height: 1.5,
-                  color:
-                      selected
-                          ? Colors.white.withOpacity(0.8)
-                          : AppColors.softInk,
+                  color: AppColors.softInk,
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 16),
               Row(
                 children: [
                   Text(
-                    selected ? 'Selected ✓' : 'Select',
+                    'Sign up as $title',
                     style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 13,
                       fontWeight: FontWeight.w700,
-                      color: selected ? Colors.white : AppColors.primary,
+                      color: accent,
                     ),
                   ),
-                  const SizedBox(width: 4),
-                  Icon(
-                    Symbols.arrow_forward_rounded,
-                    size: 14,
-                    color: selected ? Colors.white : AppColors.primary,
+                  const SizedBox(width: 6),
+                  Container(
+                    width: 26,
+                    height: 26,
+                    decoration: BoxDecoration(
+                      color: accent.withOpacity(0.10),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      Symbols.arrow_forward_rounded,
+                      size: 15,
+                      color: accent,
+                    ),
                   ),
                 ],
               ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+}
+
+class _LoginPill extends StatelessWidget {
+  const _LoginPill({required this.onTap});
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return TapScale(
+      onTap: onTap,
+      child: Container(
+        height: 54,
+        decoration: BoxDecoration(
+          color: AppColors.gray100,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: AppColors.gray200, width: 1.2),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Symbols.login_rounded, size: 18, color: AppColors.primary),
+            const SizedBox(width: 8),
+            const Text(
+              'Log in to your account',
+              style: TextStyle(
+                fontFamily: 'Poppins',
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                color: AppColors.primary,
+              ),
+            ),
+          ],
         ),
       ),
     );

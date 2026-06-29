@@ -4,6 +4,7 @@ import 'package:flutter/gestures.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/navigation/app_routes.dart';
+import '../../core/auth/app_session.dart';
 import '../../shared/widgets/word_mark.dart';
 import '../../shared/widgets/app_buttons.dart';
 import '../../shared/widgets/form_widgets.dart';
@@ -129,17 +130,19 @@ class _AuthScreenState extends State<AuthScreen> {
 
     // Auth success. A real backend call would send a structured payload here,
     // e.g. { role, firstName, lastName, suffix, identifier, password }.
-    // Land the user in the shell matching the role they picked.
-    final target = (_role ?? UserRole.passenger).homeRoute;
-    Navigator.pushNamedAndRemoveUntil(context, target, (r) => false);
+    // Register captures the chosen role; login resolves it from the account.
+    final UserRole role = mode == AuthMode.register
+        ? (_role ?? UserRole.passenger)
+        : AppSession.instance.resolveRoleForLogin();
+    AppSession.instance.role = role;
+    Navigator.pushNamedAndRemoveUntil(context, role.homeRoute, (r) => false);
   }
 
-  void _switchMode(AuthMode target) {
-    final route = target == AuthMode.register
-        ? AppRoutes.register
-        : AppRoutes.login;
-    Navigator.pushReplacementNamed(context, route, arguments: _role);
-  }
+  // Login has no role gate — tapping "Register" sends users to role selection
+  // so they pick a role first. Registering users can jump straight to login.
+  void _toRegister() =>
+      Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
+  void _toLogin() => Navigator.pushReplacementNamed(context, AppRoutes.login);
 
   @override
   Widget build(BuildContext context) {
@@ -327,7 +330,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       if (mode == AuthMode.login)
                         Center(
                           child: GestureDetector(
-                            onTap: () => _switchMode(AuthMode.register),
+                            onTap: () => _toRegister(),
                             child: RichText(
                               text: const TextSpan(
                                 style: TextStyle(
@@ -354,7 +357,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       if (mode == AuthMode.register)
                         Center(
                           child: GestureDetector(
-                            onTap: () => _switchMode(AuthMode.login),
+                            onTap: () => _toLogin(),
                             child: RichText(
                               text: const TextSpan(
                                 style: TextStyle(
