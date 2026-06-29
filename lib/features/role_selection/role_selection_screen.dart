@@ -58,7 +58,7 @@ class RoleSelectionScreen extends StatelessWidget {
                         'Track trips, manage occupancy, and review your shift earnings.',
                     icon: Symbols.directions_bus_rounded,
                     badge: 'Operator',
-                    accent: const Color(0xFFB8860B),
+                    accent: AppColors.blueBright,
                     onTap: () => _register(context, UserRole.driver),
                   ),
                   const SizedBox(height: 28),
@@ -130,7 +130,10 @@ class _RoleCard extends StatelessWidget {
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
-                        colors: [accent, Color.lerp(accent, Colors.black, 0.22)!],
+                        colors: [
+                          Color.lerp(accent, Colors.white, 0.25)!,
+                          accent,
+                        ],
                       ),
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
@@ -222,36 +225,67 @@ class _RoleCard extends StatelessWidget {
   }
 }
 
-class _LoginPill extends StatelessWidget {
+class _LoginPill extends StatefulWidget {
   const _LoginPill({required this.onTap});
   final VoidCallback onTap;
 
   @override
+  State<_LoginPill> createState() => _LoginPillState();
+}
+
+class _LoginPillState extends State<_LoginPill> {
+  bool _pressed = false;
+
+  void _set(bool v) => setState(() => _pressed = v);
+
+  @override
   Widget build(BuildContext context) {
-    return TapScale(
-      onTap: onTap,
-      child: Container(
-        height: 54,
-        decoration: BoxDecoration(
-          color: AppColors.gray100,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: AppColors.gray200, width: 1.2),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Symbols.login_rounded, size: 18, color: AppColors.primary),
-            const SizedBox(width: 8),
-            const Text(
-              'Log in to your account',
-              style: TextStyle(
-                fontFamily: 'Poppins',
-                fontSize: 14,
-                fontWeight: FontWeight.w700,
-                color: AppColors.primary,
-              ),
+    return GestureDetector(
+      onTapDown: (_) => _set(true),
+      onTapUp: (_) => _set(false),
+      onTapCancel: () => _set(false),
+      onTap: widget.onTap,
+      child: AnimatedScale(
+        scale: _pressed ? 0.97 : 1,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          curve: Curves.easeOut,
+          height: 56,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+              colors: _pressed
+                  ? const [AppColors.primary, AppColors.blueDeep]
+                  : const [AppColors.blueBright, AppColors.primary],
             ),
-          ],
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: AppColors.primary.withOpacity(_pressed ? 0.18 : 0.32),
+                blurRadius: _pressed ? 10 : 20,
+                offset: Offset(0, _pressed ? 4 : 9),
+              ),
+            ],
+          ),
+          child: const Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Symbols.login_rounded, size: 19, color: Colors.white),
+              SizedBox(width: 9),
+              Text(
+                'Log in to your account',
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: 14,
+                  fontWeight: FontWeight.w700,
+                  color: Colors.white,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
