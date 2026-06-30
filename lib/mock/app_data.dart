@@ -7,22 +7,22 @@ import '../models/models.dart';
 class AppData {
   static const onboardingSlides = [
     OnboardingSlide(
-      title: 'Track jeepneys with clarity',
+      title: 'Track Nearby Jeepneys',
       subtitle:
-          'A polished commuter flow designed around route awareness, occupancy insight, and quick decisions.',
-      icon: Symbols.route_rounded,
+          'See real-time locations of jeepneys on your route. Know exactly when your ride arrives.',
+      imageAsset: 'assets/images/onboarding/tracking.png',
     ),
     OnboardingSlide(
-      title: 'Built for passengers and drivers',
+      title: 'Smart Route Planning',
       subtitle:
-          'One premium UI system, two focused experiences, both ready for backend integration in Phase 2.',
-      icon: Symbols.groups_rounded,
+          'Find the fastest routes with estimated travel times, fares, and transfer points.',
+      imageAsset: 'assets/images/onboarding/routes.png',
     ),
     OnboardingSlide(
-      title: 'Mock data, real product feel',
+      title: 'Travel with Confidence',
       subtitle:
-          'Every screen is complete, navigable, and styled to feel like a production app from day one.',
-      icon: Symbols.auto_awesome_rounded,
+          'Check occupancy levels, save favorite destinations, and enjoy better daily commutes.',
+      imageAsset: 'assets/images/onboarding/confidence.png',
     ),
   ];
 

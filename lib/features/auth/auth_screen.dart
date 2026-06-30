@@ -6,7 +6,7 @@ import '../../core/constants/app_colors.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../core/services/authentication_service.dart';
 import '../../core/config/supabase/supabase_constants.dart';
-import '../../shared/widgets/word_mark.dart';
+import '../../shared/widgets/app_logo.dart';
 import '../../shared/widgets/app_buttons.dart';
 import '../../shared/widgets/form_widgets.dart';
 
@@ -306,7 +306,7 @@ class _AuthScreenState extends State<AuthScreen> {
                             ),
                             const SizedBox(width: 12),
                           ],
-                          const WordMark(),
+                          const AppLogo(size: AppLogoSize.small),
                         ],
                       ),
                       const SizedBox(height: 32),
@@ -848,7 +848,7 @@ class _PasswordStrength extends StatelessWidget {
     return switch (score) {
       0 || 1 => (1, 'Weak', AppColors.danger),
       2 => (2, 'Fair', AppColors.warning),
-      3 => (3, 'Good', const Color(0xFF3B82F6)),
+      3 => (3, 'Good', const Color(0xFF1A2A5F)),
       _ => (4, 'Strong', AppColors.success),
     };
   }

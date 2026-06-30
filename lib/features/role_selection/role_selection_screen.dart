@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/navigation/app_routes.dart';
-import '../../shared/widgets/word_mark.dart';
+import '../../shared/widgets/app_logo.dart';
 import '../../shared/widgets/tap_scale.dart';
 
 class RoleSelectionScreen extends StatelessWidget {
@@ -28,7 +28,7 @@ class RoleSelectionScreen extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const WordMark(),
+                  const AppLogo(size: AppLogoSize.medium),
                   const SizedBox(height: 36),
                   Text(
                     'Get started',

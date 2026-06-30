@@ -1,11 +1,9 @@
-import 'package:flutter/material.dart';
-
 class OnboardingSlide {
   const OnboardingSlide({
     required this.title,
     required this.subtitle,
-    required this.icon,
+    required this.imageAsset,
   });
   final String title, subtitle;
-  final IconData icon;
+  final String imageAsset;
 }

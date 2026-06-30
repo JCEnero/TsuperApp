@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 
 class AppColors {
-  static const primary = Color(0xFF243B7A);
-  static const darkNavy = Color(0xFF1D2F63);
+  static const primary = Color(0xFF1A2A5F);
+  static const darkNavy = Color(0xFF0F1A3A);
   static const secondary = darkNavy;
   static const surface = Color(0xFFF8F9FC);
   static const white = Color(0xFFFFFFFF);
@@ -27,7 +27,7 @@ class AppColors {
   static const blueDeep = darkNavy; // gradient end / deep shade
   static const blueBright = primary; // unified navy accent
   static const blueSky = primary; // avoid light blue decorative accents
-  static const blueTint = Color(0xFFEDF1FB); // very light blue surface
+  static const blueTint = Color(0xFFD0D8E8); // darker blue tint surface
 
   // Status accents tuned to sit beside the blue palette.
   static const onDuty = Color(0xFF12B886); // teal-emerald, analogous to blue
