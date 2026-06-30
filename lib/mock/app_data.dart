@@ -52,19 +52,19 @@ class AppData {
     QuickActionData(
       'Track Jeepney',
       Symbols.directions_bus_rounded,
-      AppColors.gray600,
+      AppColors.primary,
       'See mock nearby units',
     ),
     QuickActionData(
       'Saved Places',
       Symbols.bookmark_rounded,
-      AppColors.warning,
+      AppColors.primary,
       'Home, work, school',
     ),
     QuickActionData(
       'Help Desk',
       Symbols.support_agent_rounded,
-      AppColors.success,
+      AppColors.primary,
       'Ride assistance',
     ),
   ];
@@ -84,7 +84,7 @@ class AppData {
       '12',
       'Moderate load',
       '7 min',
-      AppColors.gray600,
+      AppColors.blueBright,
     ),
     JeepneyData(
       'JEEP-311',
@@ -92,7 +92,7 @@ class AppData {
       '21',
       'Nearly full',
       '10 min',
-      AppColors.warning,
+      AppColors.blueBright,
     ),
   ];
 
@@ -102,14 +102,14 @@ class AppData {
       'Today • 7:25 AM',
       '₱18',
       'Completed',
-      AppColors.success,
+      AppColors.onDuty,
     ),
     TripData(
       'Market Stop',
       'Yesterday • 4:15 PM',
       '₱14',
       'Completed',
-      AppColors.primary,
+      AppColors.onDuty,
     ),
   ];
 
@@ -132,7 +132,7 @@ class AppData {
       '18 min',
       0,
       'Moderate crowd',
-      AppColors.gray600,
+      AppColors.blueBright,
     ),
     RouteData(
       'Night Return',
@@ -142,7 +142,7 @@ class AppData {
       '28 min',
       1,
       'Low crowd',
-      AppColors.warning,
+      AppColors.blueBright,
     ),
   ];
 
@@ -159,14 +159,14 @@ class AppData {
       'Save 10% on your next commute with the morning pass mock promo.',
       '1 hour ago',
       NotificationKind.promo,
-      AppColors.warning,
+      AppColors.blueBright,
     ),
     NotificationData(
       'System update',
       'Passenger occupancy visuals were refreshed for Phase 1 preview.',
       'Today',
       NotificationKind.system,
-      AppColors.success,
+      AppColors.onDuty,
     ),
   ];
 
@@ -181,13 +181,13 @@ class AppData {
       'Office',
       'Makati CBD',
       Symbols.work_rounded,
-      AppColors.gray600,
+      AppColors.blueBright,
     ),
     SavedPlaceData(
       'Campus',
       'Taft Avenue',
       Symbols.school_rounded,
-      AppColors.warning,
+      AppColors.blueBright,
     ),
   ];
 
@@ -210,7 +210,7 @@ class AppData {
     QuickActionData(
       'Start Shift',
       Symbols.play_circle_rounded,
-      AppColors.success,
+      AppColors.primary,
       'Begin the day route',
     ),
     QuickActionData(
@@ -222,13 +222,13 @@ class AppData {
     QuickActionData(
       'Report Issue',
       Symbols.warning_rounded,
-      AppColors.warning,
+      AppColors.primary,
       'Safety and route notes',
     ),
     QuickActionData(
       'Earnings',
       Symbols.finance_rounded,
-      AppColors.gray600,
+      AppColors.primary,
       'Daily summary',
     ),
   ];
@@ -239,7 +239,7 @@ class AppData {
       '6:00 AM – 8:15 AM',
       '₱640',
       'High demand',
-      AppColors.success,
+      AppColors.primary,
     ),
     TripData(
       'Midday Run',
@@ -263,14 +263,14 @@ class AppData {
       'Demand is rising on the afternoon corridor. Consider a short extra run.',
       '12 min ago',
       NotificationKind.alert,
-      AppColors.warning,
+      AppColors.blueBright,
     ),
     NotificationData(
       'System update',
       'Weekly trip charts are now available in the dashboard preview.',
       '1 hour ago',
       NotificationKind.system,
-      AppColors.success,
+      AppColors.onDuty,
     ),
     NotificationData(
       'Announcement',

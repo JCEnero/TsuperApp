@@ -29,7 +29,11 @@ class AppSearchBar extends StatelessWidget {
             width: 34,
             height: 34,
             decoration: const BoxDecoration(
-              color: AppColors.primary,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors: [AppColors.blueBright, AppColors.primary],
+              ),
               shape: BoxShape.circle,
             ),
             child: const Icon(

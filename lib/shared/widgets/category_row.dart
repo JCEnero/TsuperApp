@@ -21,7 +21,11 @@ class CategoryRow extends StatelessWidget {
               width: 36,
               height: 36,
               decoration: const BoxDecoration(
-                color: AppColors.primary,
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                  colors: [AppColors.blueBright, AppColors.primary],
+                ),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, size: 17, color: Colors.white),

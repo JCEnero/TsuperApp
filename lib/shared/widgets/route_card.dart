@@ -5,9 +5,9 @@ import '../../core/constants/app_colors.dart';
 import '../../models/route_data.dart';
 
 Color trafficColor(String t) {
-  if (t.contains('Light') || t.contains('Low')) return AppColors.success;
-  if (t.contains('Heavy') || t.contains('Full')) return AppColors.danger;
-  return AppColors.warning;
+  if (t.contains('Light') || t.contains('Low')) return AppColors.onDuty;
+  if (t.contains('Heavy') || t.contains('Full')) return AppColors.stop;
+  return AppColors.blueBright;
 }
 
 class RouteTag extends StatelessWidget {
@@ -89,7 +89,14 @@ class RouteCard extends StatelessWidget {
                           width: 38,
                           height: 38,
                           decoration: BoxDecoration(
-                            color: data.color,
+                            gradient: LinearGradient(
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                              colors: [
+                                Color.lerp(data.color, Colors.white, 0.22)!,
+                                data.color,
+                              ],
+                            ),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(

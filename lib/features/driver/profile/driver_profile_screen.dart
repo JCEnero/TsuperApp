@@ -130,6 +130,13 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                   child: MenuRow(
                     label: 'Log out',
                     icon: Symbols.logout_rounded,
+                    iconColor: AppColors.stop,
+                    textColor: AppColors.stop,
+                    onTap:
+                        () => Navigator.pushNamed(
+                          context,
+                          AppRoutes.roleSelection,
+                        ),
                     iconColor: AppColors.danger,
                     textColor: AppColors.danger,
                     onTap: _handleLogout,
