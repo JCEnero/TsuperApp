@@ -18,6 +18,12 @@ class DriverProfileScreen extends StatefulWidget {
 class _DriverProfileScreenState extends State<DriverProfileScreen> {
   final _authService = AuthenticationService();
 
+  void _showInfo(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _handleLogout() async {
     await _authService.signOut();
     if (mounted) {
@@ -94,13 +100,17 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                       MenuRow(
                         label: 'Vehicle Details',
                         icon: Symbols.directions_bus_rounded,
-                        onTap: () {},
+                        onTap:
+                            () => _showInfo(
+                              'Vehicle details are synced locally.',
+                            ),
                       ),
                       const Divider(height: 1),
                       MenuRow(
                         label: 'Assigned Route',
                         icon: Symbols.route_rounded,
-                        onTap: () {},
+                        onTap:
+                            () => _showInfo('Assigned route details loaded.'),
                       ),
                       const Divider(height: 1),
                       MenuRow(
@@ -130,13 +140,6 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                   child: MenuRow(
                     label: 'Log out',
                     icon: Symbols.logout_rounded,
-                    iconColor: AppColors.stop,
-                    textColor: AppColors.stop,
-                    onTap:
-                        () => Navigator.pushNamed(
-                          context,
-                          AppRoutes.roleSelection,
-                        ),
                     iconColor: AppColors.danger,
                     textColor: AppColors.danger,
                     onTap: _handleLogout,

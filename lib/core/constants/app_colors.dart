@@ -14,23 +14,23 @@ class AppColors {
   static const ink = Color(0xFF111827);
   static const softInk = Color(0xFF6B7280);
   static const muted = Color(0xFF9CA3AF);
-  static const success = Color(0xFF3E7B5E);
+  static const success = Color(0xFF2E7D32);
   static const warning = Color(0xFFF59E0B);
-  static const danger = Color(0xFFB14B5C);
-  static const error = Color(0xFFB14B5C);
+  static const danger = Color(0xFFB42318);
+  static const error = Color(0xFFB42318);
   // Aliases
   static const background = surface;
-  static const accent = gray600;
+  static const accent = primary;
   static const offWhite = Color(0xFFFCFDFF);
 
   // Blue ramp — for the polished blue/white experience.
-  static const blueDeep = Color(0xFF18255B); // gradient end / deep shade
-  static const blueBright = Color(0xFF4C6EF5); // lively accent blue
-  static const blueSky = Color(0xFF7DA0FF); // soft highlight blue
+  static const blueDeep = darkNavy; // gradient end / deep shade
+  static const blueBright = primary; // unified navy accent
+  static const blueSky = primary; // avoid light blue decorative accents
   static const blueTint = Color(0xFFEDF1FB); // very light blue surface
 
   // Status accents tuned to sit beside the blue palette.
   static const onDuty = Color(0xFF12B886); // teal-emerald, analogous to blue
-  static const onDutyTint = Color(0xFFE6F7F0); // light green pill background
+  static const onDutyTint = gray100; // neutral status background
   static const stop = Color(0xFFE8505B); // warm coral-red for destructive
 }

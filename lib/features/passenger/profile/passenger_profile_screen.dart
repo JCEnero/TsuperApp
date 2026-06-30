@@ -17,6 +17,12 @@ class PassengerProfileScreen extends StatefulWidget {
 class _PassengerProfileScreenState extends State<PassengerProfileScreen> {
   final _authService = AuthenticationService();
 
+  void _showInfo(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   Future<void> _handleLogout() async {
     await _authService.signOut();
     if (mounted) {
@@ -54,13 +60,16 @@ class _PassengerProfileScreenState extends State<PassengerProfileScreen> {
                       MenuRow(
                         label: 'Saved Places',
                         icon: Symbols.bookmark_rounded,
-                        onTap: () {},
+                        onTap: () => _showInfo('Saved places loaded.'),
                       ),
                       const Divider(height: 1),
                       MenuRow(
                         label: 'Trip History',
                         icon: Symbols.receipt_long_rounded,
-                        onTap: () {},
+                        onTap:
+                            () => _showInfo(
+                              'Trip history is available in Routes.',
+                            ),
                       ),
                       const Divider(height: 1),
                       MenuRow(

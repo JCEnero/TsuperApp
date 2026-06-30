@@ -84,7 +84,7 @@ class AppData {
       '12',
       'Moderate load',
       '7 min',
-      AppColors.blueBright,
+      AppColors.primary,
     ),
     JeepneyData(
       'JEEP-311',
@@ -92,7 +92,7 @@ class AppData {
       '21',
       'Nearly full',
       '10 min',
-      AppColors.blueBright,
+      AppColors.primary,
     ),
   ];
 
@@ -102,14 +102,14 @@ class AppData {
       'Today • 7:25 AM',
       '₱18',
       'Completed',
-      AppColors.onDuty,
+      AppColors.primary,
     ),
     TripData(
       'Market Stop',
       'Yesterday • 4:15 PM',
       '₱14',
       'Completed',
-      AppColors.onDuty,
+      AppColors.primary,
     ),
   ];
 
@@ -132,7 +132,7 @@ class AppData {
       '18 min',
       0,
       'Moderate crowd',
-      AppColors.blueBright,
+      AppColors.primary,
     ),
     RouteData(
       'Night Return',
@@ -142,7 +142,7 @@ class AppData {
       '28 min',
       1,
       'Low crowd',
-      AppColors.blueBright,
+      AppColors.primary,
     ),
   ];
 
@@ -159,14 +159,14 @@ class AppData {
       'Save 10% on your next commute with the morning pass mock promo.',
       '1 hour ago',
       NotificationKind.promo,
-      AppColors.blueBright,
+      AppColors.primary,
     ),
     NotificationData(
       'System update',
       'Passenger occupancy visuals were refreshed for Phase 1 preview.',
       'Today',
       NotificationKind.system,
-      AppColors.onDuty,
+      AppColors.primary,
     ),
   ];
 
@@ -181,13 +181,13 @@ class AppData {
       'Office',
       'Makati CBD',
       Symbols.work_rounded,
-      AppColors.blueBright,
+      AppColors.primary,
     ),
     SavedPlaceData(
       'Campus',
       'Taft Avenue',
       Symbols.school_rounded,
-      AppColors.blueBright,
+      AppColors.primary,
     ),
   ];
 
@@ -202,7 +202,7 @@ class AppData {
 
   static const driverStats = [
     StatData('Trips today', '24', '+8%', Symbols.directions_bus_rounded),
-    StatData('Gross earnings', '₱2,140', '+16%', Symbols.payments_rounded),
+    StatData('Distance covered', '42.7 km', '+6%', Symbols.route_rounded),
     StatData('Avg occupancy', '81%', '+5%', Symbols.groups_rounded),
   ];
 
@@ -226,10 +226,10 @@ class AppData {
       'Safety and route notes',
     ),
     QuickActionData(
-      'Earnings',
+      'Route Status',
       Symbols.finance_rounded,
       AppColors.primary,
-      'Daily summary',
+      'Progress snapshot',
     ),
   ];
 
@@ -253,7 +253,7 @@ class AppData {
       '3:00 PM – 6:00 PM',
       '₱990',
       'Full occupancy',
-      AppColors.warning,
+      AppColors.primary,
     ),
   ];
 
@@ -263,14 +263,14 @@ class AppData {
       'Demand is rising on the afternoon corridor. Consider a short extra run.',
       '12 min ago',
       NotificationKind.alert,
-      AppColors.blueBright,
+      AppColors.primary,
     ),
     NotificationData(
       'System update',
       'Weekly trip charts are now available in the dashboard preview.',
       '1 hour ago',
       NotificationKind.system,
-      AppColors.onDuty,
+      AppColors.primary,
     ),
     NotificationData(
       'Announcement',

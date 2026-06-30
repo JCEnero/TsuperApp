@@ -6,14 +6,27 @@ import '../../models/quick_action_data.dart';
 import 'tap_scale.dart';
 
 class QuickActionCard extends StatelessWidget {
-  const QuickActionCard({super.key, required this.data});
+  const QuickActionCard({
+    super.key,
+    required this.data,
+    this.onTap,
+    this.useNavyGradient = false,
+  });
   final QuickActionData data;
+  final VoidCallback? onTap;
+  final bool useNavyGradient;
 
   @override
   Widget build(BuildContext context) {
-    final lighter = Color.lerp(data.color, Colors.white, 0.22)!;
+    final accent = useNavyGradient ? AppColors.primary : data.color;
     return TapScale(
-      onTap: () {},
+      onTap:
+          onTap ??
+          () {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('${data.label} opened.')));
+          },
       child: Container(
         padding: const EdgeInsets.fromLTRB(14, 14, 14, 12),
         decoration: BoxDecoration(
@@ -22,7 +35,7 @@ class QuickActionCard extends StatelessWidget {
           border: Border.all(color: AppColors.gray200),
           boxShadow: [
             BoxShadow(
-              color: data.color.withOpacity(0.10),
+              color: accent.withOpacity(0.10),
               blurRadius: 18,
               offset: const Offset(0, 8),
             ),
@@ -37,21 +50,18 @@ class QuickActionCard extends StatelessWidget {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topLeft,
-                      end: Alignment.bottomRight,
-                      colors: [lighter, data.color],
-                    ),
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(14),
+                    border: Border.all(color: AppColors.gray200),
                     boxShadow: [
                       BoxShadow(
-                        color: data.color.withOpacity(0.30),
+                        color: Colors.black.withOpacity(0.08),
                         blurRadius: 8,
-                        offset: const Offset(0, 4),
+                        offset: const Offset(0, 2),
                       ),
                     ],
                   ),
-                  child: Icon(data.icon, color: Colors.white, size: 22),
+                  child: Icon(data.icon, color: AppColors.primary, size: 22),
                 ),
                 const Spacer(),
                 Icon(

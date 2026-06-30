@@ -12,13 +12,24 @@ import '../widgets/driver_widgets.dart';
 class DriverTripsScreen extends StatelessWidget {
   const DriverTripsScreen({super.key});
 
+  void _showInfo(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surface,
       appBar: AppBar(
-        title: const Text('Trips & Earnings'),
-        actions: [AppIconButton(icon: Symbols.download_rounded, onTap: () {})],
+        title: const Text('Trips & Operations'),
+        actions: [
+          AppIconButton(
+            icon: Symbols.download_rounded,
+            onTap: () => _showInfo(context, 'Trip summary exported locally.'),
+          ),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -66,13 +77,13 @@ class DriverTripsScreen extends StatelessWidget {
                         Row(
                           children: [
                             Icon(
-                              Symbols.account_balance_wallet_rounded,
+                              Symbols.route_rounded,
                               size: 16,
                               color: Colors.white.withOpacity(0.85),
                             ),
                             const SizedBox(width: 7),
                             Text(
-                              'Total Earnings',
+                              'Today\'s Operations',
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 13,
@@ -91,7 +102,7 @@ class DriverTripsScreen extends StatelessWidget {
                                 borderRadius: BorderRadius.circular(999),
                               ),
                               child: const Text(
-                                'This week',
+                                'Route 2',
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
                                   fontSize: 11,
@@ -104,10 +115,10 @@ class DriverTripsScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          '₱3,450',
+                          '18 trips completed',
                           style: TextStyle(
                             fontFamily: 'Poppins',
-                            fontSize: 36,
+                            fontSize: 32,
                             fontWeight: FontWeight.w800,
                             color: Colors.white,
                             letterSpacing: -0.5,
@@ -117,12 +128,12 @@ class DriverTripsScreen extends StatelessWidget {
                         const Wrap(
                           spacing: 8,
                           children: [
-                            EarningsPill(
-                              label: 'Today ₱2,140',
+                            StatusPill(
+                              label: '5h 18m online',
                               icon: Symbols.today_rounded,
                             ),
-                            EarningsPill(
-                              label: 'This week',
+                            StatusPill(
+                              label: '42.7 km traveled',
                               icon: Symbols.date_range_rounded,
                             ),
                           ],
@@ -165,7 +176,11 @@ class DriverTripsScreen extends StatelessWidget {
           const SizedBox(height: 18),
           const WeeklyChartCard(),
           const SizedBox(height: 18),
-          SectionHeader(title: "Today's Trips", action: 'Export', onTap: () {}),
+          SectionHeader(
+            title: "Today's Trips",
+            action: 'Export',
+            onTap: () => _showInfo(context, 'Today\'s trips exported.'),
+          ),
           const SizedBox(height: 10),
           ...AppData.driverTrips.map(
             (t) => Padding(
@@ -174,7 +189,11 @@ class DriverTripsScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 18),
-          SectionHeader(title: 'History', action: 'All', onTap: () {}),
+          SectionHeader(
+            title: 'History',
+            action: 'All',
+            onTap: () => _showInfo(context, 'Showing full trip history.'),
+          ),
           const SizedBox(height: 10),
           AppCard(
             child: const Column(
@@ -225,21 +244,18 @@ class _SmallStat extends StatelessWidget {
             width: 36,
             height: 36,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.blueBright, AppColors.primary],
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(11),
+              border: Border.all(color: AppColors.gray200),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.25),
+                  color: Colors.black.withOpacity(0.08),
                   blurRadius: 8,
-                  offset: const Offset(0, 4),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
-            child: Icon(icon, size: 18, color: Colors.white),
+            child: Icon(icon, size: 18, color: AppColors.primary),
           ),
           const SizedBox(height: 10),
           Text(
@@ -280,18 +296,22 @@ class _HistRow extends StatelessWidget {
         leading: Container(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [AppColors.blueBright, AppColors.primary],
-            ),
+          decoration: BoxDecoration(
+            color: Colors.white,
             shape: BoxShape.circle,
+            border: Border.all(color: AppColors.gray200),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.08),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
           ),
           child: const Icon(
             Symbols.history_rounded,
             size: 16,
-            color: Colors.white,
+            color: AppColors.primary,
           ),
         ),
         title: Text(

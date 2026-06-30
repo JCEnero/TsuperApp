@@ -43,8 +43,9 @@ class RouteFilterChip extends StatelessWidget {
 }
 
 class RecentRow extends StatelessWidget {
-  const RecentRow({super.key, required this.label});
+  const RecentRow({super.key, required this.label, this.onTap});
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -78,7 +79,13 @@ class RecentRow extends StatelessWidget {
           size: 14,
           color: AppColors.muted,
         ),
-        onTap: () {},
+        onTap:
+            onTap ??
+            () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Loaded $label route.')));
+            },
       ),
     );
   }

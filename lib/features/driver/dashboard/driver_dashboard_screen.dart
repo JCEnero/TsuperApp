@@ -4,16 +4,52 @@ import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/navigation/app_routes.dart';
 import '../../../mock/app_data.dart';
+import '../../../shared/widgets/app_buttons.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_icon_button.dart';
-import '../../../shared/widgets/section_header.dart';
 import '../../../shared/widgets/quick_action_card.dart';
+import '../../../shared/widgets/section_header.dart';
 import '../../../shared/widgets/trip_tile.dart';
-import '../../../shared/widgets/app_buttons.dart';
 import '../widgets/driver_widgets.dart';
 
 class DriverDashboardScreen extends StatelessWidget {
   const DriverDashboardScreen({super.key});
+
+  void _showInfo(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _onQuickActionTap(BuildContext context, String label) {
+    _showInfo(context, '$label ready.');
+  }
+
+  void _confirmEndTrip(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('End active trip?'),
+            content: const Text(
+              'This will mark the current trip as completed.',
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              FilledButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _showInfo(context, 'Trip ended successfully.');
+                },
+                child: const Text('End Trip'),
+              ),
+            ],
+          ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,20 +62,21 @@ class DriverDashboardScreen extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 0, 20, 32),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                _NavyEarningsCard(),
+                const _RouteProgressCard(),
                 const SizedBox(height: 12),
-                _StatsRow(),
+                const _StatsRow(),
                 const SizedBox(height: 18),
-                _VehicleCard(),
+                const _VehicleCard(),
                 const SizedBox(height: 10),
-                _RouteCard2(),
+                const _RouteCard2(),
                 const SizedBox(height: 18),
-                _OccCard(),
+                const _OccCard(),
                 const SizedBox(height: 18),
                 SectionHeader(
                   title: 'Quick Actions',
                   action: 'More',
-                  onTap: () {},
+                  onTap:
+                      () => _showInfo(context, 'Quick actions are up to date.'),
                 ),
                 const SizedBox(height: 10),
                 GridView.builder(
@@ -52,15 +89,23 @@ class DriverDashboardScreen extends StatelessWidget {
                     crossAxisSpacing: 10,
                     childAspectRatio: 1.5,
                   ),
-                  itemBuilder:
-                      (_, i) =>
-                          QuickActionCard(data: AppData.driverQuickActions[i]),
+                  itemBuilder: (_, i) {
+                    final action = AppData.driverQuickActions[i];
+                    return QuickActionCard(
+                      data: action,
+                      onTap: () => _onQuickActionTap(context, action.label),
+                    );
+                  },
                 ),
                 const SizedBox(height: 18),
                 SectionHeader(
                   title: "Today's Trips",
                   action: 'History',
-                  onTap: () {},
+                  onTap:
+                      () => _showInfo(
+                        context,
+                        'Trip history synced from local logs.',
+                      ),
                 ),
                 const SizedBox(height: 10),
                 ...AppData.driverTrips.map(
@@ -73,18 +118,22 @@ class DriverDashboardScreen extends StatelessWidget {
                 const WeeklyChartCard(),
                 const SizedBox(height: 14),
                 Row(
-                  children: const [
+                  children: [
                     Expanded(
                       child: PrimaryButton(
                         text: 'Start Trip',
                         icon: Symbols.play_arrow_rounded,
+                        onPressed:
+                            () =>
+                                _showInfo(context, 'Trip started for Route 2.'),
                       ),
                     ),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: DangerButton(
                         text: 'End Trip',
                         icon: Symbols.stop_rounded,
+                        onPressed: () => _confirmEndTrip(context),
                       ),
                     ),
                   ],
@@ -210,7 +259,9 @@ class _DriverHeader extends StatelessWidget {
   }
 }
 
-class _NavyEarningsCard extends StatelessWidget {
+class _RouteProgressCard extends StatelessWidget {
+  const _RouteProgressCard();
+
   Widget _glow(double size, Color color) => Container(
     width: size,
     height: size,
@@ -258,18 +309,18 @@ class _NavyEarningsCard extends StatelessWidget {
                   Row(
                     children: [
                       Icon(
-                        Symbols.account_balance_wallet_rounded,
+                        Symbols.route_rounded,
                         size: 16,
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withOpacity(0.88),
                       ),
                       const SizedBox(width: 7),
                       Text(
-                        "Today's Earnings",
+                        'Active Route Progress',
                         style: TextStyle(
                           fontFamily: 'Poppins',
                           fontSize: 13,
-                          fontWeight: FontWeight.w500,
-                          color: Colors.white.withOpacity(0.85),
+                          fontWeight: FontWeight.w600,
+                          color: Colors.white.withOpacity(0.88),
                         ),
                       ),
                       const Spacer(),
@@ -282,76 +333,58 @@ class _NavyEarningsCard extends StatelessWidget {
                           color: Colors.white.withOpacity(0.18),
                           borderRadius: BorderRadius.circular(999),
                         ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            SizedBox(
-                              width: 6,
-                              height: 6,
-                              child: DecoratedBox(
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Text(
-                              'Shift active',
-                              style: TextStyle(
-                                fontFamily: 'Poppins',
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
+                        child: const Text(
+                          'Route 2',
+                          style: TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.white,
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: 14),
                   const Text(
-                    '₱2,140',
+                    '76% completed',
                     style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 36,
+                      fontSize: 33,
                       fontWeight: FontWeight.w800,
                       color: Colors.white,
                       letterSpacing: -0.5,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Icon(
-                        Symbols.trending_up_rounded,
-                        size: 15,
-                        color: Colors.white.withOpacity(0.9),
+                  const SizedBox(height: 8),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(999),
+                    child: Container(
+                      height: 8,
+                      color: Colors.white.withOpacity(0.20),
+                      child: FractionallySizedBox(
+                        alignment: Alignment.centerLeft,
+                        widthFactor: 0.76,
+                        child: Container(color: Colors.white),
                       ),
-                      const SizedBox(width: 5),
-                      Text(
-                        '+16% vs yesterday',
-                        style: TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.white.withOpacity(0.9),
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
                   const Wrap(
                     spacing: 8,
+                    runSpacing: 8,
                     children: [
-                      EarningsPill(
-                        label: '24 trips',
+                      StatusPill(
+                        label: '24 trips today',
                         icon: Symbols.directions_bus_rounded,
                       ),
-                      EarningsPill(
-                        label: '81% occupancy',
-                        icon: Symbols.people_rounded,
+                      StatusPill(
+                        label: '42.7 km covered',
+                        icon: Symbols.distance_rounded,
+                      ),
+                      StatusPill(
+                        label: '5h 18m online',
+                        icon: Symbols.schedule_rounded,
                       ),
                     ],
                   ),
@@ -366,108 +399,109 @@ class _NavyEarningsCard extends StatelessWidget {
 }
 
 class _StatsRow extends StatelessWidget {
+  const _StatsRow();
+
   @override
   Widget build(BuildContext context) {
     return IntrinsicHeight(
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: List.generate(AppData.driverStats.length, (i) {
-        final s = AppData.driverStats[i];
-        return Expanded(
-          child: Padding(
-            padding: EdgeInsets.only(
-              left: i == 0 ? 0 : 5,
-              right: i == AppData.driverStats.length - 1 ? 0 : 5,
-            ),
-            child: Container(
-              padding: const EdgeInsets.all(13),
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: AppColors.gray200),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.025),
-                    blurRadius: 8,
-                    offset: const Offset(0, 3),
-                  ),
-                ],
+          final s = AppData.driverStats[i];
+          return Expanded(
+            child: Padding(
+              padding: EdgeInsets.only(
+                left: i == 0 ? 0 : 5,
+                right: i == AppData.driverStats.length - 1 ? 0 : 5,
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      gradient: const LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.bottomRight,
-                        colors: [AppColors.blueBright, AppColors.primary],
+              child: Container(
+                padding: const EdgeInsets.all(13),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.gray200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.025),
+                      blurRadius: 8,
+                      offset: const Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Container(
+                      width: 36,
+                      height: 36,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(11),
+                        border: Border.all(color: AppColors.gray200),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
-                      borderRadius: BorderRadius.circular(11),
-                      boxShadow: [
-                        BoxShadow(
-                          color: AppColors.primary.withOpacity(0.25),
-                          blurRadius: 8,
-                          offset: const Offset(0, 4),
+                      child: Icon(s.icon, size: 18, color: AppColors.primary),
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      s.value,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        color: AppColors.ink,
+                      ),
+                    ),
+                    const SizedBox(height: 1),
+                    Text(
+                      s.label,
+                      style: const TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 10.5,
+                        color: AppColors.softInk,
+                        height: 1.25,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(
+                          Symbols.trending_up_rounded,
+                          size: 14,
+                          color: AppColors.blueBright,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          s.change,
+                          style: const TextStyle(
+                            fontFamily: 'Poppins',
+                            fontSize: 11,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.blueBright,
+                          ),
                         ),
                       ],
                     ),
-                    child: Icon(s.icon, size: 18, color: Colors.white),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    s.value,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 18,
-                      fontWeight: FontWeight.w800,
-                      color: AppColors.ink,
-                    ),
-                  ),
-                  const SizedBox(height: 1),
-                  Text(
-                    s.label,
-                    style: const TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 10.5,
-                      color: AppColors.softInk,
-                      height: 1.25,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Row(
-                    children: [
-                      const Icon(
-                        Symbols.trending_up_rounded,
-                        size: 14,
-                        color: AppColors.blueBright,
-                      ),
-                      const SizedBox(width: 3),
-                      Text(
-                        s.change,
-                        style: const TextStyle(
-                          fontFamily: 'Poppins',
-                          fontSize: 11,
-                          fontWeight: FontWeight.w700,
-                          color: AppColors.blueBright,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
-          ),
-        );
-      }),
+          );
+        }),
       ),
     );
   }
 }
 
 class _VehicleCard extends StatelessWidget {
+  const _VehicleCard();
+
   @override
   Widget build(BuildContext context) {
     return AppCard(
@@ -477,23 +511,20 @@ class _VehicleCard extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.blueBright, AppColors.primary],
-              ),
+              color: Colors.white,
               borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: AppColors.gray200),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withOpacity(0.25),
+                  color: Colors.black.withOpacity(0.08),
                   blurRadius: 10,
-                  offset: const Offset(0, 5),
+                  offset: const Offset(0, 2),
                 ),
               ],
             ),
             child: const Icon(
               Symbols.directions_bus_rounded,
-              color: Colors.white,
+              color: AppColors.primary,
               size: 27,
             ),
           ),
@@ -562,6 +593,8 @@ class _VehicleCard extends StatelessWidget {
 }
 
 class _RouteCard2 extends StatelessWidget {
+  const _RouteCard2();
+
   @override
   Widget build(BuildContext context) {
     return AppCard(
@@ -570,18 +603,22 @@ class _RouteCard2 extends StatelessWidget {
           Container(
             width: 40,
             height: 40,
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-                colors: [AppColors.blueBright, AppColors.primary],
-              ),
+            decoration: BoxDecoration(
+              color: Colors.white,
               shape: BoxShape.circle,
+              border: Border.all(color: AppColors.gray200),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 8,
+                  offset: const Offset(0, 2),
+                ),
+              ],
             ),
             child: const Icon(
               Symbols.route_rounded,
               size: 19,
-              color: Colors.white,
+              color: AppColors.primary,
             ),
           ),
           const SizedBox(width: 12),
@@ -634,6 +671,8 @@ class _RouteCard2 extends StatelessWidget {
 }
 
 class _OccCard extends StatelessWidget {
+  const _OccCard();
+
   @override
   Widget build(BuildContext context) {
     return AppCard(
@@ -646,17 +685,21 @@ class _OccCard extends StatelessWidget {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  gradient: const LinearGradient(
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                    colors: [AppColors.blueBright, AppColors.primary],
-                  ),
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(11),
+                  border: Border.all(color: AppColors.gray200),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.08),
+                      blurRadius: 8,
+                      offset: const Offset(0, 2),
+                    ),
+                  ],
                 ),
                 child: const Icon(
                   Symbols.people_rounded,
                   size: 18,
-                  color: Colors.white,
+                  color: AppColors.primary,
                 ),
               ),
               const SizedBox(width: 12),

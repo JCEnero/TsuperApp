@@ -68,10 +68,11 @@ class RoleSelectionScreen extends StatelessWidget {
                   const SizedBox(height: 12),
                   Center(
                     child: TextButton(
-                      onPressed: () => Navigator.pushNamed(
-                        context,
-                        AppRoutes.forgotPassword,
-                      ),
+                      onPressed:
+                          () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.forgotPassword,
+                          ),
                       child: const Text('Forgot password?'),
                     ),
                   ),
@@ -257,9 +258,10 @@ class _LoginPillState extends State<_LoginPill> {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: _pressed
-                  ? const [AppColors.primary, AppColors.blueDeep]
-                  : const [AppColors.blueBright, AppColors.primary],
+              colors:
+                  _pressed
+                      ? const [AppColors.primary, AppColors.blueDeep]
+                      : const [AppColors.blueBright, AppColors.primary],
             ),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [

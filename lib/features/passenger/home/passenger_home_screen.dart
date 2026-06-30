@@ -14,6 +14,31 @@ import '../../../shared/widgets/promo_banner.dart';
 class PassengerHomeScreen extends StatelessWidget {
   const PassengerHomeScreen({super.key});
 
+  void _showInfo(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _onQuickActionTap(BuildContext context, String label) {
+    switch (label) {
+      case 'Plan Route':
+        _showInfo(context, 'Open the Routes tab to plan a trip.');
+        break;
+      case 'Track Jeepney':
+        _showInfo(context, 'Open the Map tab to track nearby jeepneys.');
+        break;
+      case 'Saved Places':
+        _showInfo(context, 'Saved places loaded.');
+        break;
+      case 'Help Desk':
+        Navigator.pushNamed(context, AppRoutes.helpCenter);
+        break;
+      default:
+        _showInfo(context, '$label ready.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -40,7 +65,7 @@ class PassengerHomeScreen extends StatelessWidget {
                 SectionHeader(
                   title: 'Nearby Jeepneys',
                   action: 'See all',
-                  onTap: () {},
+                  onTap: () => _showInfo(context, 'Showing all nearby units.'),
                 ),
                 const SizedBox(height: 10),
               ]),
@@ -55,7 +80,10 @@ class PassengerHomeScreen extends StatelessWidget {
                 itemCount: AppData.nearbyJeepneys.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder:
-                    (_, i) => JeepCard(data: AppData.nearbyJeepneys[i]),
+                    (_, i) => JeepCard(
+                      data: AppData.nearbyJeepneys[i],
+                      useNavyGradient: true,
+                    ),
               ),
             ),
           ),
@@ -79,35 +107,44 @@ class PassengerHomeScreen extends StatelessWidget {
                     crossAxisSpacing: 10,
                     childAspectRatio: 1.5,
                   ),
-                  itemBuilder:
-                      (_, i) => QuickActionCard(
-                        data: AppData.passengerQuickActions[i],
-                      ),
+                  itemBuilder: (_, i) {
+                    final action = AppData.passengerQuickActions[i];
+                    return QuickActionCard(
+                      data: action,
+                      useNavyGradient: true,
+                      onTap: () => _onQuickActionTap(context, action.label),
+                    );
+                  },
                 ),
                 const SizedBox(height: 22),
                 SectionHeader(
                   title: 'Suggested Routes',
                   action: 'All',
-                  onTap: () {},
+                  onTap:
+                      () => _showInfo(
+                        context,
+                        'Showing all suggested routes for today.',
+                      ),
                 ),
                 const SizedBox(height: 10),
                 ...AppData.recommendedRoutes.map(
                   (r) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: RouteCard(data: r),
+                    child: RouteCard(data: r, useNavyGradient: true),
                   ),
                 ),
                 const SizedBox(height: 22),
                 SectionHeader(
                   title: 'Recent Trips',
                   action: 'History',
-                  onTap: () {},
+                  onTap:
+                      () => _showInfo(context, 'Recent trip history loaded.'),
                 ),
                 const SizedBox(height: 10),
                 ...AppData.recentTrips.map(
                   (t) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: TripTile(data: t),
+                    child: TripTile(data: t, useNavyGradient: true),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -136,7 +173,7 @@ class _HomeHeader extends StatelessWidget {
         borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
         boxShadow: [
           BoxShadow(
-            color: AppColors.primary.withOpacity(0.28),
+            color: AppColors.primary.withValues(alpha: 0.28),
             blurRadius: 22,
             offset: const Offset(0, 10),
           ),
@@ -149,12 +186,12 @@ class _HomeHeader extends StatelessWidget {
             Positioned(
               top: -36,
               right: -28,
-              child: _glow(140, Colors.white.withOpacity(0.10)),
+              child: _glow(140, Colors.white.withValues(alpha: 0.10)),
             ),
             Positioned(
               bottom: -28,
               left: -18,
-              child: _glow(120, AppColors.blueSky.withOpacity(0.18)),
+              child: _glow(120, AppColors.blueSky.withValues(alpha: 0.18)),
             ),
             Padding(
               padding: EdgeInsets.fromLTRB(20, top + 16, 20, 22),
@@ -172,7 +209,7 @@ class _HomeHeader extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 fontSize: 13,
-                                color: Colors.white.withOpacity(0.8),
+                                color: Colors.white.withValues(alpha: 0.8),
                               ),
                             ),
                             const SizedBox(height: 3),
@@ -191,16 +228,19 @@ class _HomeHeader extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () =>
-                            Navigator.pushNamed(context, AppRoutes.settings),
+                        onTap:
+                            () => Navigator.pushNamed(
+                              context,
+                              AppRoutes.settings,
+                            ),
                         child: Container(
                           width: 46,
                           height: 46,
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.18),
+                            color: Colors.white.withValues(alpha: 0.18),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.25),
+                              color: Colors.white.withValues(alpha: 0.25),
                             ),
                           ),
                           child: const Center(

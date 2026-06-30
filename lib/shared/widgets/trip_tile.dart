@@ -5,11 +5,13 @@ import '../../core/constants/app_colors.dart';
 import '../../models/trip_data.dart';
 
 class TripTile extends StatelessWidget {
-  const TripTile({super.key, required this.data});
+  const TripTile({super.key, required this.data, this.useNavyGradient = false});
   final TripData data;
+  final bool useNavyGradient;
 
   @override
   Widget build(BuildContext context) {
+    final accent = useNavyGradient ? AppColors.primary : data.color;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -28,7 +30,7 @@ class TripTile extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(width: 4, color: data.color),
+            Container(width: 4, color: accent),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(14),
@@ -38,20 +40,20 @@ class TripTile extends StatelessWidget {
                       width: 42,
                       height: 42,
                       decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topLeft,
-                          end: Alignment.bottomRight,
-                          colors: [
-                            Color.lerp(data.color, Colors.white, 0.22)!,
-                            data.color,
-                          ],
-                        ),
+                        color: Colors.white,
                         shape: BoxShape.circle,
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: const Icon(
                         Symbols.directions_bus_rounded,
                         size: 20,
-                        color: Colors.white,
+                        color: AppColors.primary,
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -100,7 +102,7 @@ class TripTile extends StatelessWidget {
                             vertical: 4,
                           ),
                           decoration: BoxDecoration(
-                            color: data.color.withOpacity(0.12),
+                            color: accent.withOpacity(0.12),
                             borderRadius: BorderRadius.circular(999),
                           ),
                           child: Text(
@@ -109,7 +111,7 @@ class TripTile extends StatelessWidget {
                               fontFamily: 'Poppins',
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
-                              color: data.color,
+                              color: accent,
                             ),
                           ),
                         ),

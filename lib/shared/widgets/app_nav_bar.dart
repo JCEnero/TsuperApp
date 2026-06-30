@@ -49,16 +49,17 @@ class AppNavBar extends StatelessWidget {
                         width: active ? 44 : 36,
                         height: active ? 32 : 28,
                         decoration: BoxDecoration(
-                          gradient: active
-                              ? const LinearGradient(
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                  colors: [
-                                    AppColors.blueBright,
-                                    AppColors.primary,
-                                  ],
-                                )
-                              : null,
+                          gradient:
+                              active
+                                  ? const LinearGradient(
+                                    begin: Alignment.topLeft,
+                                    end: Alignment.bottomRight,
+                                    colors: [
+                                      AppColors.blueBright,
+                                      AppColors.primary,
+                                    ],
+                                  )
+                                  : null,
                           borderRadius: BorderRadius.circular(999),
                         ),
                         child: Icon(
