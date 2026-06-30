@@ -17,6 +17,7 @@ class AppColors {
   static const success = Color(0xFF3E7B5E);
   static const warning = Color(0xFFF59E0B);
   static const danger = Color(0xFFB14B5C);
+  static const error = Color(0xFFB14B5C);
   // Aliases
   static const background = surface;
   static const accent = gray600;

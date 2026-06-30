@@ -2,13 +2,32 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/navigation/app_routes.dart';
+import '../../../core/services/authentication_service.dart';
 import '../../../shared/widgets/hero_banner.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/menu_row.dart';
 import '../../../shared/widgets/form_widgets.dart';
 
-class DriverProfileScreen extends StatelessWidget {
+class DriverProfileScreen extends StatefulWidget {
   const DriverProfileScreen({super.key});
+
+  @override
+  State<DriverProfileScreen> createState() => _DriverProfileScreenState();
+}
+
+class _DriverProfileScreenState extends State<DriverProfileScreen> {
+  final _authService = AuthenticationService();
+
+  Future<void> _handleLogout() async {
+    await _authService.signOut();
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.login,
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,6 +137,9 @@ class DriverProfileScreen extends StatelessWidget {
                           context,
                           AppRoutes.roleSelection,
                         ),
+                    iconColor: AppColors.danger,
+                    textColor: AppColors.danger,
+                    onTap: _handleLogout,
                   ),
                 ),
               ]),

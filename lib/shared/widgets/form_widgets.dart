@@ -204,20 +204,21 @@ class _AppFormFieldState extends State<AppFormField> {
         labelText: widget.label,
         hintText: widget.hint,
         prefixIcon: Icon(widget.icon, size: 19, color: AppColors.muted),
-        suffixIcon: widget.obscure
-            ? IconButton(
-                splashRadius: 20,
-                tooltip: _obscured ? 'Show password' : 'Hide password',
-                icon: Icon(
-                  _obscured
-                      ? Symbols.visibility_rounded
-                      : Symbols.visibility_off_rounded,
-                  size: 20,
-                  color: AppColors.muted,
-                ),
-                onPressed: () => setState(() => _obscured = !_obscured),
-              )
-            : null,
+        suffixIcon:
+            widget.obscure
+                ? IconButton(
+                  splashRadius: 20,
+                  tooltip: _obscured ? 'Show password' : 'Hide password',
+                  icon: Icon(
+                    _obscured
+                        ? Symbols.visibility_rounded
+                        : Symbols.visibility_off_rounded,
+                    size: 20,
+                    color: AppColors.muted,
+                  ),
+                  onPressed: () => setState(() => _obscured = !_obscured),
+                )
+                : null,
         filled: true,
         fillColor: AppColors.gray100,
         border: OutlineInputBorder(

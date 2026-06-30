@@ -4,7 +4,8 @@ import 'package:flutter/gestures.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/navigation/app_routes.dart';
-import '../../core/auth/app_session.dart';
+import '../../core/services/authentication_service.dart';
+import '../../core/config/supabase/supabase_constants.dart';
 import '../../shared/widgets/word_mark.dart';
 import '../../shared/widgets/app_buttons.dart';
 import '../../shared/widgets/form_widgets.dart';
@@ -36,6 +37,10 @@ class _AuthScreenState extends State<AuthScreen> {
   UserRole? _role;
   UserRole _loginRole = UserRole.passenger;
 
+  final _authService = AuthenticationService();
+  bool _isLoading = false;
+  String? _errorMessage;
+
   AuthMode get mode => widget.mode;
 
   @override
@@ -43,7 +48,6 @@ class _AuthScreenState extends State<AuthScreen> {
     super.didChangeDependencies();
     final args = ModalRoute.of(context)?.settings.arguments;
     if (args is UserRole) _role = args;
-    _loginRole = AppSession.instance.role ?? _role ?? UserRole.passenger;
   }
 
   @override
@@ -61,27 +65,37 @@ class _AuthScreenState extends State<AuthScreen> {
     AuthMode.register => 'Create account',
     AuthMode.forgot => 'Reset password',
   };
+
   String get _sub => switch (mode) {
     AuthMode.login => 'Sign in to your TSUPER account.',
     AuthMode.register => 'Start your premium commute experience.',
     AuthMode.forgot => 'Enter your email to receive a reset link.',
   };
 
+  String _friendlyError(Object e) {
+    final raw = e.toString();
+    return raw.startsWith('Exception: ') ? raw.substring(11) : raw;
+  }
+
   // ── Validators ─────────────────────────────────────────────────────────────
   String? _validateName(String? v, String field) {
     final value = (v ?? '').trim();
     if (value.isEmpty) return '$field is required';
     if (value.length < 2) return '$field is too short';
-    if (!RegExp(r"^[A-Za-zÀ-ÿ' .-]+$").hasMatch(value)) return 'Use letters only';
+    if (!RegExp(r"^[A-Za-zÀ-ÿ' .-]+$").hasMatch(value)) {
+      return 'Use letters only';
+    }
     return null;
   }
 
   String? _validateIdentifier(String? v) {
     final value = (v ?? '').trim();
     if (value.isEmpty) return 'Email or mobile number is required';
-    // On login we don't format-check — the backend decides if the account
-    // exists. Strict validation only matters when creating an account.
-    if (mode == AuthMode.login) return null;
+
+    if (mode == AuthMode.login) {
+      return null;
+    }
+
     final isEmail = RegExp(r'^[\w.+-]+@[\w-]+\.[\w.-]+$').hasMatch(value);
     final digits = value.replaceAll(RegExp(r'[\s()-]'), '');
     final isMobile = RegExp(r'^(\+?63|0)9\d{9}$').hasMatch(digits);
@@ -92,7 +106,7 @@ class _AuthScreenState extends State<AuthScreen> {
   String? _validatePassword(String? v) {
     final value = v ?? '';
     if (value.isEmpty) return 'Password is required';
-    if (mode == AuthMode.login) return null; // don't reveal rules on login
+    if (mode == AuthMode.login) return null;
     if (value.length < 8) return 'At least 8 characters';
     if (!RegExp(r'[A-Z]').hasMatch(value)) return 'Add an uppercase letter';
     if (!RegExp(r'[a-z]').hasMatch(value)) return 'Add a lowercase letter';
@@ -110,44 +124,144 @@ class _AuthScreenState extends State<AuthScreen> {
     return null;
   }
 
-  // ── Submit ─────────────────────────────────────────────────────────────────
-  void _submit() {
+  void _toRegister() =>
+      Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
+  void _toLogin() => Navigator.pushReplacementNamed(context, AppRoutes.login);
+
+  Future<void> _handleLogin() async {
+    final identifier = _identifier.text.trim();
+    final password = _password.text;
+
+    if (identifier.isEmpty || password.isEmpty) {
+      throw Exception('Please fill in all fields');
+    }
+
+    await _authService.signIn(email: identifier, password: password);
+
+    var role = _loginRole;
+    final user = _authService.currentUser;
+    if (user != null) {
+      final profile = await _authService.getUserProfile(user.id);
+      final roleStr = profile?.role;
+      if (roleStr == SupabaseConstants.roleDriver) {
+        role = UserRole.driver;
+      } else if (roleStr == SupabaseConstants.rolePassenger) {
+        role = UserRole.passenger;
+      }
+    }
+
+    if (!mounted) return;
+    Navigator.pushNamedAndRemoveUntil(context, role.homeRoute, (r) => false);
+  }
+
+  Future<void> _handleRegister() async {
+    final firstName = _firstName.text.trim();
+    final lastName = _lastName.text.trim();
+    final identifier = _identifier.text.trim();
+    final password = _password.text;
+
+    if (firstName.isEmpty ||
+        lastName.isEmpty ||
+        identifier.isEmpty ||
+        password.isEmpty) {
+      throw Exception('Please fill in all fields');
+    }
+
+    final fullName =
+        _suffix == 'None'
+            ? '$firstName $lastName'
+            : '$firstName $lastName $_suffix';
+
+    final role = _role ?? UserRole.passenger;
+    final roleStr =
+        role == UserRole.driver
+            ? SupabaseConstants.roleDriver
+            : SupabaseConstants.rolePassenger;
+
+    await _authService.signUp(
+      email: identifier,
+      password: password,
+      fullName: fullName,
+      role: roleStr,
+    );
+
+    if (!mounted) return;
+
+    if (_authService.currentSession != null) {
+      Navigator.pushNamedAndRemoveUntil(context, role.homeRoute, (r) => false);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Account created. Please verify your email, then log in.',
+          ),
+        ),
+      );
+      Navigator.pushReplacementNamed(context, AppRoutes.login);
+    }
+  }
+
+  Future<void> _handleForgotPassword() async {
+    final identifier = _identifier.text.trim();
+
+    if (identifier.isEmpty) {
+      throw Exception('Please enter your email');
+    }
+
+    await _authService.resetPassword(identifier);
+
+    if (!mounted) return;
+
+    ScaffoldMessenger.of(context)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        const SnackBar(
+          content: Text('Password reset link sent. Please check your email.'),
+        ),
+      );
+
+    Navigator.pushReplacementNamed(context, AppRoutes.login);
+  }
+
+  Future<void> _submit() async {
     final formOk = _formKey.currentState?.validate() ?? false;
     var ok = formOk;
+
     if (mode == AuthMode.register && !_agreedToTerms) {
       setState(() => _showTermsError = true);
       ok = false;
     }
+
     if (!ok) return;
     FocusScope.of(context).unfocus();
 
-    if (mode == AuthMode.forgot) {
-      ScaffoldMessenger.of(context)
-        ..hideCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(
-            content: Text('Password reset link sent. Please check your email.'),
-          ),
-        );
-      Navigator.pop(context);
-      return;
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      switch (mode) {
+        case AuthMode.login:
+          await _handleLogin();
+          break;
+        case AuthMode.register:
+          await _handleRegister();
+          break;
+        case AuthMode.forgot:
+          await _handleForgotPassword();
+          break;
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _errorMessage = _friendlyError(e));
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
-
-    // Auth success. A real backend call would send a structured payload here,
-    // e.g. { role, firstName, lastName, suffix, identifier, password }.
-    // Register captures the chosen role; login resolves it from the account.
-    final UserRole role = mode == AuthMode.register
-        ? (_role ?? UserRole.passenger)
-        : _loginRole;
-    AppSession.instance.role = role;
-    Navigator.pushNamedAndRemoveUntil(context, role.homeRoute, (r) => false);
   }
-
-  // Login has no role gate — tapping "Register" sends users to role selection
-  // so they pick a role first. Registering users can jump straight to login.
-  void _toRegister() =>
-      Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
-  void _toLogin() => Navigator.pushReplacementNamed(context, AppRoutes.login);
 
   @override
   Widget build(BuildContext context) {
@@ -220,7 +334,6 @@ class _AuthScreenState extends State<AuthScreen> {
                       ],
                       const SizedBox(height: 28),
 
-                      // ── Name fields (register only) ──
                       if (mode == AuthMode.register) ...[
                         AppFormField(
                           label: 'First name',
@@ -252,7 +365,6 @@ class _AuthScreenState extends State<AuthScreen> {
                         const SizedBox(height: 12),
                       ],
 
-                      // ── Identifier ──
                       AppFormField(
                         label: 'Email or mobile number',
                         icon: Symbols.email_rounded,
@@ -262,7 +374,6 @@ class _AuthScreenState extends State<AuthScreen> {
                         validator: _validateIdentifier,
                       ),
 
-                      // ── Password ──
                       if (mode != AuthMode.forgot) ...[
                         const SizedBox(height: 12),
                         AppFormField(
@@ -270,9 +381,10 @@ class _AuthScreenState extends State<AuthScreen> {
                           icon: Symbols.lock_rounded,
                           obscure: true,
                           controller: _password,
-                          textInputAction: mode == AuthMode.register
-                              ? TextInputAction.next
-                              : TextInputAction.done,
+                          textInputAction:
+                              mode == AuthMode.register
+                                  ? TextInputAction.next
+                                  : TextInputAction.done,
                           validator: _validatePassword,
                           onChanged: (v) => setState(() => _password0 = v),
                           onFieldSubmitted: (_) {
@@ -281,13 +393,12 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       ],
 
-                      // ── Password strength (register only) ──
-                      if (mode == AuthMode.register && _password0.isNotEmpty) ...[
+                      if (mode == AuthMode.register &&
+                          _password0.isNotEmpty) ...[
                         const SizedBox(height: 10),
                         _PasswordStrength(password: _password0),
                       ],
 
-                      // ── Confirm password (register only) ──
                       if (mode == AuthMode.register) ...[
                         const SizedBox(height: 12),
                         AppFormField(
@@ -301,16 +412,16 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       ],
 
-                      // ── Forgot link / helper ──
                       if (mode == AuthMode.login)
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () => Navigator.pushNamed(
-                              context,
-                              AppRoutes.forgotPassword,
-                              arguments: _role,
-                            ),
+                            onPressed:
+                                () => Navigator.pushNamed(
+                                  context,
+                                  AppRoutes.forgotPassword,
+                                  arguments: _role,
+                                ),
                             child: const Text('Forgot password?'),
                           ),
                         ),
@@ -322,10 +433,27 @@ class _AuthScreenState extends State<AuthScreen> {
                         ),
                       ],
 
-                      // ── Terms (register only) ──
                       if (mode == AuthMode.register) ...[
                         const SizedBox(height: 12),
                         _buildTermsCheckbox(context),
+                      ],
+
+                      if (_errorMessage != null) ...[
+                        const SizedBox(height: 12),
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: AppColors.danger.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Text(
+                            _errorMessage!,
+                            style: const TextStyle(
+                              color: AppColors.danger,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ),
                       ],
 
                       const SizedBox(height: 20),
@@ -336,13 +464,14 @@ class _AuthScreenState extends State<AuthScreen> {
                           AuthMode.forgot => 'Send Reset Link',
                         },
                         icon: Symbols.arrow_forward_rounded,
-                        onPressed: _submit,
+                        onPressed: _isLoading ? null : _submit,
+                        isLoading: _isLoading,
                       ),
                       const SizedBox(height: 16),
                       if (mode == AuthMode.login)
                         Center(
                           child: GestureDetector(
-                            onTap: () => _toRegister(),
+                            onTap: _toRegister,
                             child: RichText(
                               text: const TextSpan(
                                 style: TextStyle(
@@ -369,7 +498,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       if (mode == AuthMode.register)
                         Center(
                           child: GestureDetector(
-                            onTap: () => _toLogin(),
+                            onTap: _toLogin,
                             child: RichText(
                               text: const TextSpan(
                                 style: TextStyle(
@@ -396,7 +525,7 @@ class _AuthScreenState extends State<AuthScreen> {
                       if (mode == AuthMode.forgot)
                         Center(
                           child: TextButton(
-                            onPressed: () => Navigator.maybePop(context),
+                            onPressed: _toLogin,
                             child: const Text('Back to login'),
                           ),
                         ),
@@ -413,7 +542,7 @@ class _AuthScreenState extends State<AuthScreen> {
 
   Widget _buildSuffixField() {
     return DropdownButtonFormField<String>(
-      initialValue: _suffix,
+      value: _suffix,
       isExpanded: true,
       icon: const Icon(
         Symbols.expand_more_rounded,
@@ -451,7 +580,10 @@ class _AuthScreenState extends State<AuthScreen> {
           color: AppColors.softInk,
           fontSize: 14,
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 12,
+          vertical: 16,
+        ),
       ),
       items: [
         for (final s in _suffixOptions)
@@ -481,19 +613,21 @@ class _AuthScreenState extends State<AuthScreen> {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                onChanged: (v) => setState(() {
-                  _agreedToTerms = v ?? false;
-                  if (_agreedToTerms) _showTermsError = false;
-                }),
+                onChanged:
+                    (v) => setState(() {
+                      _agreedToTerms = v ?? false;
+                      if (_agreedToTerms) _showTermsError = false;
+                    }),
               ),
             ),
             const SizedBox(width: 10),
             Expanded(
               child: GestureDetector(
-                onTap: () => setState(() {
-                  _agreedToTerms = !_agreedToTerms;
-                  if (_agreedToTerms) _showTermsError = false;
-                }),
+                onTap:
+                    () => setState(() {
+                      _agreedToTerms = !_agreedToTerms;
+                      if (_agreedToTerms) _showTermsError = false;
+                    }),
                 child: RichText(
                   text: TextSpan(
                     style: const TextStyle(
@@ -510,9 +644,13 @@ class _AuthScreenState extends State<AuthScreen> {
                           color: AppColors.primary,
                           fontWeight: FontWeight.w700,
                         ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () =>
-                              Navigator.pushNamed(context, AppRoutes.terms),
+                        recognizer:
+                            TapGestureRecognizer()
+                              ..onTap =
+                                  () => Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.terms,
+                                  ),
                       ),
                       const TextSpan(text: ' and '),
                       TextSpan(
@@ -521,9 +659,13 @@ class _AuthScreenState extends State<AuthScreen> {
                           color: AppColors.primary,
                           fontWeight: FontWeight.w700,
                         ),
-                        recognizer: TapGestureRecognizer()
-                          ..onTap = () =>
-                              Navigator.pushNamed(context, AppRoutes.privacy),
+                        recognizer:
+                            TapGestureRecognizer()
+                              ..onTap =
+                                  () => Navigator.pushNamed(
+                                    context,
+                                    AppRoutes.privacy,
+                                  ),
                       ),
                       const TextSpan(text: '.'),
                     ],
@@ -555,9 +697,10 @@ class _RoleBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final icon = role == UserRole.driver
-        ? Symbols.directions_bus_rounded
-        : Symbols.person_rounded;
+    final icon =
+        role == UserRole.driver
+            ? Symbols.directions_bus_rounded
+            : Symbols.person_rounded;
     return Align(
       alignment: Alignment.centerLeft,
       child: Container(
@@ -587,8 +730,7 @@ class _RoleBadge extends StatelessWidget {
   }
 }
 
-// Temporary role chooser for the login screen while there is no backend.
-// Lets you preview either shell; remove once real auth returns the role.
+// Fallback role chooser for login if an account profile has no stored role.
 class _RoleToggle extends StatelessWidget {
   const _RoleToggle({required this.selected, required this.onChanged});
   final UserRole selected;
@@ -629,7 +771,7 @@ class _RoleToggle extends StatelessWidget {
         ),
         const SizedBox(height: 6),
         Text(
-          'Preview mode — pick a role until sign-in is connected.',
+          'Used only if the account profile has no saved role.',
           style: Theme.of(
             context,
           ).textTheme.bodySmall?.copyWith(color: AppColors.muted),
@@ -650,15 +792,16 @@ class _RoleToggle extends StatelessWidget {
           decoration: BoxDecoration(
             color: isSelected ? AppColors.primary : Colors.transparent,
             borderRadius: BorderRadius.circular(10),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.25),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : null,
+            boxShadow:
+                isSelected
+                    ? [
+                      BoxShadow(
+                        color: AppColors.primary.withOpacity(0.25),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                    : null,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -9,10 +9,12 @@ class PrimaryButton extends StatelessWidget {
     required this.text,
     required this.icon,
     this.onPressed,
+    this.isLoading = false,
   });
   final String text;
   final IconData icon;
   final VoidCallback? onPressed;
+  final bool isLoading;
 
   @override
   Widget build(BuildContext context) {
@@ -20,7 +22,17 @@ class PrimaryButton extends StatelessWidget {
       onTap: onPressed ?? () {},
       child: FilledButton.icon(
         onPressed: onPressed ?? () {},
-        icon: Icon(icon, size: 18),
+        icon:
+            isLoading
+                ? const SizedBox(
+                  width: 18,
+                  height: 18,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                  ),
+                )
+                : Icon(icon, size: 18),
         label: Text(text),
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primary,

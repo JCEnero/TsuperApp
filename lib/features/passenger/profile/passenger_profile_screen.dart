@@ -2,12 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/navigation/app_routes.dart';
+import '../../../core/services/authentication_service.dart';
 import '../../../shared/widgets/hero_banner.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/menu_row.dart';
 
-class PassengerProfileScreen extends StatelessWidget {
+class PassengerProfileScreen extends StatefulWidget {
   const PassengerProfileScreen({super.key});
+
+  @override
+  State<PassengerProfileScreen> createState() => _PassengerProfileScreenState();
+}
+
+class _PassengerProfileScreenState extends State<PassengerProfileScreen> {
+  final _authService = AuthenticationService();
+
+  Future<void> _handleLogout() async {
+    await _authService.signOut();
+    if (mounted) {
+      Navigator.pushNamedAndRemoveUntil(
+        context,
+        AppRoutes.login,
+        (route) => false,
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -80,11 +99,7 @@ class PassengerProfileScreen extends StatelessWidget {
                     icon: Symbols.logout_rounded,
                     iconColor: AppColors.danger,
                     textColor: AppColors.danger,
-                    onTap:
-                        () => Navigator.pushNamed(
-                          context,
-                          AppRoutes.roleSelection,
-                        ),
+                    onTap: _handleLogout,
                   ),
                 ),
                 const SizedBox(height: 28),
