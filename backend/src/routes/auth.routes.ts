@@ -5,9 +5,14 @@ import { supabaseAdmin } from '../config/supabase';
 import { Tables, Roles, DriverStatus } from '../config/constants';
 import { validate } from '../middleware/validate';
 import { authenticate } from '../middleware/auth';
+import { authLimiter } from '../middleware/rate-limiter';
 import { AppError } from '../middleware/error-handler';
 
 const router = Router();
+
+// Apply stricter rate limiting to all auth routes
+// (10 attempts per 15 min instead of 100)
+router.use(authLimiter);
 
 // Validation schemas
 const signUpSchema = z.object({
