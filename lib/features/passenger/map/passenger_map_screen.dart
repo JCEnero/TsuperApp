@@ -286,7 +286,7 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
       final icon = await _markerService.getJeepneyMarker(
         status: j.status,
         heading: j.heading,
-        size: isSelected ? 100.0 : 80.0,
+        size: isSelected ? 52.0 : 40.0,
       );
       markers.add(
         Marker(

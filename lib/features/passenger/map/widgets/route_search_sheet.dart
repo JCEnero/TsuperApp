@@ -17,7 +17,6 @@ typedef OnDestinationSelected = void Function(PlaceSuggestion destination);
 typedef OnRouteCleared = void Function();
 typedef OnExpandedChanged = void Function(bool expanded);
 
-
 // ─── Main widget ──────────────────────────────────────────────────────────────
 
 /// Premium floating search card that handles:
@@ -67,7 +66,6 @@ class _DefaultRepo implements PlacesRepository {
   Future<List<PlaceSuggestion>> recentDestinations() =>
       MockPlacesRepository().recentDestinations();
 }
-
 
 class _RouteSearchSheetState extends State<RouteSearchSheet>
     with TickerProviderStateMixin {
@@ -131,13 +129,16 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
     super.dispose();
   }
 
-
   // ── Lifecycle helpers ────────────────────────────────────────────────────
 
   Future<void> _loadInitialData() async {
     final saved = await widget.placesRepository.savedPlaces();
     final recents = await widget.placesRepository.recentDestinations();
-    if (mounted) setState(() { _saved = saved; _recents = recents; });
+    if (mounted)
+      setState(() {
+        _saved = saved;
+        _recents = recents;
+      });
   }
 
   void _onFocusChanged() {
@@ -148,7 +149,10 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
       setState(() => _focus = _SearchFocus.destination);
       _fetchSuggestions(_destCtrl.text);
     } else {
-      setState(() { _focus = _SearchFocus.none; _suggestions = []; });
+      setState(() {
+        _focus = _SearchFocus.none;
+        _suggestions = [];
+      });
     }
   }
 
@@ -168,7 +172,10 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
     _destFocus.unfocus();
     _expandCtrl.reverse().then((_) {
       if (mounted) {
-        setState(() { _isExpanded = false; _suggestions = []; });
+        setState(() {
+          _isExpanded = false;
+          _suggestions = [];
+        });
         widget.onExpandedChanged?.call(false);
       }
     });
@@ -197,22 +204,36 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
 
   void _onOriginChanged(String v) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () => _fetchSuggestions(v));
+    _debounce = Timer(
+      const Duration(milliseconds: 300),
+      () => _fetchSuggestions(v),
+    );
   }
 
   void _onDestChanged(String v) {
     _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 300), () => _fetchSuggestions(v));
+    _debounce = Timer(
+      const Duration(milliseconds: 300),
+      () => _fetchSuggestions(v),
+    );
   }
 
   Future<void> _fetchSuggestions(String input) async {
     if (input.trim().isEmpty) {
-      if (mounted) setState(() { _suggestions = []; _loadingSuggestions = false; });
+      if (mounted)
+        setState(() {
+          _suggestions = [];
+          _loadingSuggestions = false;
+        });
       return;
     }
     if (mounted) setState(() => _loadingSuggestions = true);
     final results = await widget.placesRepository.autocomplete(input);
-    if (mounted) setState(() { _suggestions = results; _loadingSuggestions = false; });
+    if (mounted)
+      setState(() {
+        _suggestions = results;
+        _loadingSuggestions = false;
+      });
   }
 
   void _selectSuggestion(PlaceSuggestion place) {
@@ -229,6 +250,8 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
       _destFocus.unfocus();
       setState(() => _suggestions = []);
       widget.onDestinationSelected(place);
+      // Collapse sheet so the map is visible after selecting destination
+      _collapse();
     }
   }
 
@@ -245,8 +268,9 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
     _destFocus.unfocus();
     setState(() => _suggestions = []);
     widget.onDestinationSelected(_selectedDestination!);
+    // Collapse sheet so the map is visible
+    _collapse();
   }
-
 
   // ── Build ─────────────────────────────────────────────────────────────────
 
@@ -263,7 +287,9 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
               borderRadius: BorderRadius.circular(20),
               boxShadow: [
                 BoxShadow(
-                  color: AppColors.primary.withValues(alpha: 0.10 + _expandAnim.value * 0.08),
+                  color: AppColors.primary.withValues(
+                    alpha: 0.10 + _expandAnim.value * 0.08,
+                  ),
                   blurRadius: 20 + _expandAnim.value * 10,
                   spreadRadius: _expandAnim.value * 2,
                   offset: const Offset(0, 6),
@@ -279,10 +305,7 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
               borderRadius: BorderRadius.circular(20),
               child: Column(
                 mainAxisSize: MainAxisSize.min,
-                children: [
-                  _buildSearchCard(),
-                  if (_isExpanded) _buildPanel(),
-                ],
+                children: [_buildSearchCard(), if (_isExpanded) _buildPanel()],
               ),
             ),
           ),
@@ -290,7 +313,6 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
       },
     );
   }
-
 
   // ── Search card (always visible) ──────────────────────────────────────────
 
@@ -315,7 +337,11 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
               ),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Symbols.search_rounded, color: Colors.white, size: 20),
+            child: const Icon(
+              Symbols.search_rounded,
+              color: Colors.white,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -364,7 +390,6 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
     );
   }
 
-
   Widget _buildExpanded() {
     return Padding(
       padding: const EdgeInsets.fromLTRB(14, 14, 14, 10),
@@ -376,23 +401,34 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
             mainAxisSize: MainAxisSize.min,
             children: [
               Container(
-                width: 10, height: 10,
+                width: 10,
+                height: 10,
                 decoration: BoxDecoration(
                   color: AppColors.onDuty,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [BoxShadow(color: AppColors.onDuty.withValues(alpha: 0.4), blurRadius: 4)],
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.onDuty.withValues(alpha: 0.4),
+                      blurRadius: 4,
+                    ),
+                  ],
                 ),
               ),
-              Container(width: 2, height: 22,
-                color: AppColors.gray300),
+              Container(width: 2, height: 22, color: AppColors.gray300),
               Container(
-                width: 10, height: 10,
+                width: 10,
+                height: 10,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
-                  boxShadow: [BoxShadow(color: AppColors.primary.withValues(alpha: 0.4), blurRadius: 4)],
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppColors.primary.withValues(alpha: 0.4),
+                      blurRadius: 4,
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -431,13 +467,18 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
                 child: GestureDetector(
                   onTap: _swap,
                   child: Container(
-                    width: 32, height: 32,
+                    width: 32,
+                    height: 32,
                     decoration: BoxDecoration(
                       color: AppColors.gray100,
                       borderRadius: BorderRadius.circular(9),
                       border: Border.all(color: AppColors.gray200),
                     ),
-                    child: const Icon(Symbols.swap_vert_rounded, size: 18, color: AppColors.primary),
+                    child: const Icon(
+                      Symbols.swap_vert_rounded,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
                   ),
                 ),
               ),
@@ -445,13 +486,18 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
               GestureDetector(
                 onTap: _clearAll,
                 child: Container(
-                  width: 32, height: 32,
+                  width: 32,
+                  height: 32,
                   decoration: BoxDecoration(
                     color: AppColors.gray100,
                     borderRadius: BorderRadius.circular(9),
                     border: Border.all(color: AppColors.gray200),
                   ),
-                  child: const Icon(Symbols.close_rounded, size: 16, color: AppColors.gray600),
+                  child: const Icon(
+                    Symbols.close_rounded,
+                    size: 16,
+                    color: AppColors.gray600,
+                  ),
                 ),
               ),
             ],
@@ -471,10 +517,16 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       decoration: BoxDecoration(
-        color: isActive ? AppColors.primary.withValues(alpha: 0.05) : AppColors.gray100,
+        color:
+            isActive
+                ? AppColors.primary.withValues(alpha: 0.05)
+                : AppColors.gray100,
         borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: isActive ? AppColors.primary.withValues(alpha: 0.35) : Colors.transparent,
+          color:
+              isActive
+                  ? AppColors.primary.withValues(alpha: 0.35)
+                  : Colors.transparent,
           width: 1.5,
         ),
       ),
@@ -483,28 +535,42 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
         focusNode: focus,
         onChanged: onChanged,
         style: const TextStyle(
-          fontFamily: 'Poppins', fontSize: 13,
-          fontWeight: FontWeight.w500, color: AppColors.ink,
+          fontFamily: 'Poppins',
+          fontSize: 13,
+          fontWeight: FontWeight.w500,
+          color: AppColors.ink,
         ),
         decoration: InputDecoration(
           hintText: hint,
           hintStyle: const TextStyle(
-            fontFamily: 'Poppins', fontSize: 13, color: AppColors.muted,
+            fontFamily: 'Poppins',
+            fontSize: 13,
+            color: AppColors.muted,
           ),
           border: InputBorder.none,
           isDense: true,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-          suffixIcon: controller.text.isNotEmpty
-              ? GestureDetector(
-                  onTap: () { controller.clear(); onChanged(''); },
-                  child: const Icon(Symbols.close_rounded, size: 15, color: AppColors.muted),
-                )
-              : null,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 10,
+          ),
+          suffixIcon:
+              controller.text.isNotEmpty
+                  ? GestureDetector(
+                    onTap: () {
+                      controller.clear();
+                      onChanged('');
+                    },
+                    child: const Icon(
+                      Symbols.close_rounded,
+                      size: 15,
+                      color: AppColors.muted,
+                    ),
+                  )
+                  : null,
         ),
       ),
     );
   }
-
 
   // ── Dropdown panel ────────────────────────────────────────────────────────
 
@@ -530,17 +596,29 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
     if (_loadingSuggestions) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 20),
-        child: Center(child: SizedBox(
-          width: 20, height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2, color: AppColors.primary),
-        )),
+        child: Center(
+          child: SizedBox(
+            width: 20,
+            height: 20,
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+              color: AppColors.primary,
+            ),
+          ),
+        ),
       );
     }
     return Column(
       mainAxisSize: MainAxisSize.min,
-      children: _suggestions
-          .map((s) => _SuggestionTile(suggestion: s, onTap: () => _selectSuggestion(s)))
-          .toList(),
+      children:
+          _suggestions
+              .map(
+                (s) => _SuggestionTile(
+                  suggestion: s,
+                  onTap: () => _selectSuggestion(s),
+                ),
+              )
+              .toList(),
     );
   }
 
@@ -553,12 +631,20 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
           const _SectionLabel(label: 'Saved Places'),
           const SizedBox(height: 10),
           Row(
-            children: _saved.map((p) => Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: _SavedChip(place: p, onTap: () => _selectSaved(p)),
-              ),
-            )).toList(),
+            children:
+                _saved
+                    .map(
+                      (p) => Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(right: 8),
+                          child: _SavedChip(
+                            place: p,
+                            onTap: () => _selectSaved(p),
+                          ),
+                        ),
+                      ),
+                    )
+                    .toList(),
           ),
         ],
       ),
@@ -573,16 +659,17 @@ class _RouteSearchSheetState extends State<RouteSearchSheet>
         children: [
           const _SectionLabel(label: 'Recent'),
           const SizedBox(height: 4),
-          ..._recents.map((r) => _SuggestionTile(
-            suggestion: r,
-            onTap: () => _selectSuggestion(r),
-          )),
+          ..._recents.map(
+            (r) => _SuggestionTile(
+              suggestion: r,
+              onTap: () => _selectSuggestion(r),
+            ),
+          ),
         ],
       ),
     );
   }
 }
-
 
 // ─── Sub-widgets ──────────────────────────────────────────────────────────────
 
@@ -625,7 +712,8 @@ class _SavedChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Container(
-              width: 28, height: 28,
+              width: 28,
+              height: 28,
               decoration: BoxDecoration(
                 color: place.iconColor.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(8),
@@ -640,15 +728,19 @@ class _SavedChip extends StatelessWidget {
                   Text(
                     place.label,
                     style: const TextStyle(
-                      fontFamily: 'Poppins', fontSize: 12,
-                      fontWeight: FontWeight.w600, color: AppColors.ink,
+                      fontFamily: 'Poppins',
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.ink,
                     ),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Text(
                     place.address,
                     style: const TextStyle(
-                      fontFamily: 'Poppins', fontSize: 10, color: AppColors.muted,
+                      fontFamily: 'Poppins',
+                      fontSize: 10,
+                      color: AppColors.muted,
                     ),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
@@ -662,7 +754,6 @@ class _SavedChip extends StatelessWidget {
     );
   }
 }
-
 
 class _SuggestionTile extends StatelessWidget {
   const _SuggestionTile({required this.suggestion, required this.onTap});
@@ -683,7 +774,8 @@ class _SuggestionTile extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 36, height: 36,
+                width: 36,
+                height: 36,
                 decoration: BoxDecoration(
                   color: iconColor.withValues(alpha: 0.10),
                   borderRadius: BorderRadius.circular(10),
@@ -698,8 +790,10 @@ class _SuggestionTile extends StatelessWidget {
                     Text(
                       suggestion.primaryText,
                       style: const TextStyle(
-                        fontFamily: 'Poppins', fontSize: 13,
-                        fontWeight: FontWeight.w600, color: AppColors.ink,
+                        fontFamily: 'Poppins',
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.ink,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -707,7 +801,9 @@ class _SuggestionTile extends StatelessWidget {
                     Text(
                       suggestion.secondaryText,
                       style: const TextStyle(
-                        fontFamily: 'Poppins', fontSize: 11, color: AppColors.muted,
+                        fontFamily: 'Poppins',
+                        fontSize: 11,
+                        color: AppColors.muted,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
@@ -717,7 +813,10 @@ class _SuggestionTile extends StatelessWidget {
               if (suggestion.distanceLabel != null) ...[
                 const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 7,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.07),
                     borderRadius: BorderRadius.circular(6),
@@ -725,14 +824,20 @@ class _SuggestionTile extends StatelessWidget {
                   child: Text(
                     suggestion.distanceLabel!,
                     style: const TextStyle(
-                      fontFamily: 'Poppins', fontSize: 10,
-                      fontWeight: FontWeight.w600, color: AppColors.primary,
+                      fontFamily: 'Poppins',
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primary,
                     ),
                   ),
                 ),
               ],
               const SizedBox(width: 4),
-              const Icon(Symbols.arrow_forward_ios_rounded, size: 12, color: AppColors.gray300),
+              const Icon(
+                Symbols.arrow_forward_ios_rounded,
+                size: 12,
+                color: AppColors.gray300,
+              ),
             ],
           ),
         ),
