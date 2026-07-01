@@ -74,7 +74,39 @@ class _AuthScreenState extends State<AuthScreen> {
 
   String _friendlyError(Object e) {
     final raw = e.toString();
-    return raw.startsWith('Exception: ') ? raw.substring(11) : raw;
+
+    // Handle Supabase AuthApiException codes
+    if (raw.contains('email_not_confirmed') ||
+        raw.contains('Email not confirmed')) {
+      return 'Please confirm your email before logging in. Check your inbox for a verification link.';
+    }
+    if (raw.contains('invalid_credentials') ||
+        raw.contains('Invalid login credentials')) {
+      return 'Incorrect email or password. Please try again.';
+    }
+    if (raw.contains('user_already_exists') ||
+        raw.contains('User already registered')) {
+      return 'An account with this email already exists. Try logging in instead.';
+    }
+    if (raw.contains('weak_password') || raw.contains('Weak password')) {
+      return 'Password is too weak. Use at least 8 characters with letters and numbers.';
+    }
+    if (raw.contains('over_email_send_rate_limit') ||
+        raw.contains('rate limit')) {
+      return 'Too many attempts. Please wait a few minutes before trying again.';
+    }
+    if (raw.contains('network') || raw.contains('SocketException')) {
+      return 'No internet connection. Please check your network and try again.';
+    }
+
+    // Strip "Exception: " prefix from generic Flutter exceptions
+    if (raw.startsWith('Exception: ')) return raw.substring(11);
+
+    // Strip AuthApiException wrapper — just show the message part
+    final msgMatch = RegExp(r'message: ([^,)]+)').firstMatch(raw);
+    if (msgMatch != null) return msgMatch.group(1) ?? raw;
+
+    return raw;
   }
 
   // ── Validators ─────────────────────────────────────────────────────────────
@@ -188,16 +220,15 @@ class _AuthScreenState extends State<AuthScreen> {
     if (!mounted) return;
 
     if (_authService.currentSession != null) {
+      // Email confirmation is disabled in Supabase — go straight to app
       Navigator.pushNamedAndRemoveUntil(context, role.homeRoute, (r) => false);
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text(
-            'Account created. Please verify your email, then log in.',
-          ),
-        ),
+      // Email confirmation required — show dedicated confirmation screen
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.emailConfirmation,
+        arguments: identifier,
       );
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
     }
   }
 
