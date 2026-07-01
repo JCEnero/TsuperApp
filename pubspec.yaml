@@ -67,7 +67,7 @@ flutter:
 
   assets:
     - assets/
-    - .env
+    - assets/map_style.json
 
   fonts:
     - family: Poppins

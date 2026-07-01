@@ -18,35 +18,37 @@ class FilterChips extends StatelessWidget {
     return Container(
       height: 48,
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: ListView(
+      child: SingleChildScrollView(
         scrollDirection: Axis.horizontal,
-        children:
-            JeepneyFilter.values.map((filter) {
-              final isSelected = selectedFilter == filter;
-              return Padding(
-                padding: const EdgeInsets.only(right: 8),
-                child: FilterChip(
-                  label: Text(_getFilterLabel(filter)),
-                  selected: isSelected,
-                  onSelected: (_) => onFilterChanged(filter),
-                  selectedColor: AppColors.primary.withValues(alpha: 0.15),
-                  checkmarkColor: AppColors.primary,
-                  labelStyle: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 13,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-                    color: isSelected ? AppColors.primary : AppColors.gray600,
+        child: Row(
+          children:
+              JeepneyFilter.values.map((filter) {
+                final isSelected = selectedFilter == filter;
+                return Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: FilterChip(
+                    label: Text(_getFilterLabel(filter)),
+                    selected: isSelected,
+                    onSelected: (_) => onFilterChanged(filter),
+                    selectedColor: AppColors.primary.withValues(alpha: 0.15),
+                    checkmarkColor: AppColors.primary,
+                    labelStyle: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 13,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                      color: isSelected ? AppColors.primary : AppColors.gray600,
+                    ),
+                    side: BorderSide(
+                      color: isSelected ? AppColors.primary : AppColors.gray300,
+                    ),
+                    avatar:
+                        isSelected
+                            ? null
+                            : Icon(_getFilterIcon(filter), size: 18),
                   ),
-                  side: BorderSide(
-                    color: isSelected ? AppColors.primary : AppColors.gray300,
-                  ),
-                  avatar:
-                      isSelected
-                          ? null
-                          : Icon(_getFilterIcon(filter), size: 18),
-                ),
-              );
-            }).toList(),
+                );
+              }).toList(),
+        ),
       ),
     );
   }
