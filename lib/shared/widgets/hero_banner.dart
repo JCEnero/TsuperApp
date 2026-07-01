@@ -19,8 +19,15 @@ class HeroBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final top = MediaQuery.of(context).padding.top;
     return Container(
-      color: AppColors.primary,
       padding: EdgeInsets.fromLTRB(20, top + 20, 20, 28),
+      decoration: const BoxDecoration(
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.blueBright, AppColors.primary, AppColors.blueDeep],
+          stops: [0.0, 0.6, 1.0],
+        ),
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

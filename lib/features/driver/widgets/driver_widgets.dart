@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/widgets/app_card.dart';
 
-class EarningsPill extends StatelessWidget {
-  const EarningsPill({super.key, required this.label, required this.icon});
+class StatusPill extends StatelessWidget {
+  const StatusPill({super.key, required this.label, required this.icon});
   final String label;
   final IconData icon;
 
@@ -100,14 +100,25 @@ class WeeklyChartCard extends StatelessWidget {
                               width: double.infinity,
                               height: 88 * bars[i],
                               decoration: BoxDecoration(
+                                gradient:
+                                    i == 5
+                                        ? const LinearGradient(
+                                          begin: Alignment.bottomCenter,
+                                          end: Alignment.topCenter,
+                                          colors: [
+                                            AppColors.primary,
+                                            AppColors.blueBright,
+                                          ],
+                                        )
+                                        : null,
                                 color:
                                     i == 5
-                                        ? AppColors.primary
+                                        ? null
                                         : AppColors.primary.withOpacity(
-                                          0.2 + bars[i] * 0.5,
+                                          0.18 + bars[i] * 0.45,
                                         ),
                                 borderRadius: const BorderRadius.vertical(
-                                  top: Radius.circular(5),
+                                  top: Radius.circular(6),
                                 ),
                               ),
                             ),

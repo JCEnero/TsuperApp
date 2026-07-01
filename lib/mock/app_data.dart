@@ -7,22 +7,22 @@ import '../models/models.dart';
 class AppData {
   static const onboardingSlides = [
     OnboardingSlide(
-      title: 'Track jeepneys with clarity',
+      title: 'Track Nearby Jeepneys',
       subtitle:
-          'A polished commuter flow designed around route awareness, occupancy insight, and quick decisions.',
-      icon: Symbols.route_rounded,
+          'See real-time locations of jeepneys on your route. Know exactly when your ride arrives.',
+      imageAsset: 'assets/images/onboarding/tracking.png',
     ),
     OnboardingSlide(
-      title: 'Built for passengers and drivers',
+      title: 'Smart Route Planning',
       subtitle:
-          'One premium UI system, two focused experiences, both ready for backend integration in Phase 2.',
-      icon: Symbols.groups_rounded,
+          'Find the fastest routes with estimated travel times, fares, and transfer points.',
+      imageAsset: 'assets/images/onboarding/routes.png',
     ),
     OnboardingSlide(
-      title: 'Mock data, real product feel',
+      title: 'Travel with Confidence',
       subtitle:
-          'Every screen is complete, navigable, and styled to feel like a production app from day one.',
-      icon: Symbols.auto_awesome_rounded,
+          'Check occupancy levels, save favorite destinations, and enjoy better daily commutes.',
+      imageAsset: 'assets/images/onboarding/confidence.png',
     ),
   ];
 
@@ -52,19 +52,19 @@ class AppData {
     QuickActionData(
       'Track Jeepney',
       Symbols.directions_bus_rounded,
-      AppColors.gray600,
+      AppColors.primary,
       'See mock nearby units',
     ),
     QuickActionData(
       'Saved Places',
       Symbols.bookmark_rounded,
-      AppColors.warning,
+      AppColors.primary,
       'Home, work, school',
     ),
     QuickActionData(
       'Help Desk',
       Symbols.support_agent_rounded,
-      AppColors.success,
+      AppColors.primary,
       'Ride assistance',
     ),
   ];
@@ -84,7 +84,7 @@ class AppData {
       '12',
       'Moderate load',
       '7 min',
-      AppColors.gray600,
+      AppColors.primary,
     ),
     JeepneyData(
       'JEEP-311',
@@ -92,7 +92,7 @@ class AppData {
       '21',
       'Nearly full',
       '10 min',
-      AppColors.warning,
+      AppColors.primary,
     ),
   ];
 
@@ -102,7 +102,7 @@ class AppData {
       'Today • 7:25 AM',
       '₱18',
       'Completed',
-      AppColors.success,
+      AppColors.primary,
     ),
     TripData(
       'Market Stop',
@@ -132,7 +132,7 @@ class AppData {
       '18 min',
       0,
       'Moderate crowd',
-      AppColors.gray600,
+      AppColors.primary,
     ),
     RouteData(
       'Night Return',
@@ -142,7 +142,7 @@ class AppData {
       '28 min',
       1,
       'Low crowd',
-      AppColors.warning,
+      AppColors.primary,
     ),
   ];
 
@@ -159,14 +159,14 @@ class AppData {
       'Save 10% on your next commute with the morning pass mock promo.',
       '1 hour ago',
       NotificationKind.promo,
-      AppColors.warning,
+      AppColors.primary,
     ),
     NotificationData(
       'System update',
       'Passenger occupancy visuals were refreshed for Phase 1 preview.',
       'Today',
       NotificationKind.system,
-      AppColors.success,
+      AppColors.primary,
     ),
   ];
 
@@ -181,13 +181,13 @@ class AppData {
       'Office',
       'Makati CBD',
       Symbols.work_rounded,
-      AppColors.gray600,
+      AppColors.primary,
     ),
     SavedPlaceData(
       'Campus',
       'Taft Avenue',
       Symbols.school_rounded,
-      AppColors.warning,
+      AppColors.primary,
     ),
   ];
 
@@ -202,7 +202,7 @@ class AppData {
 
   static const driverStats = [
     StatData('Trips today', '24', '+8%', Symbols.directions_bus_rounded),
-    StatData('Gross earnings', '₱2,140', '+16%', Symbols.payments_rounded),
+    StatData('Distance covered', '42.7 km', '+6%', Symbols.route_rounded),
     StatData('Avg occupancy', '81%', '+5%', Symbols.groups_rounded),
   ];
 
@@ -210,7 +210,7 @@ class AppData {
     QuickActionData(
       'Start Shift',
       Symbols.play_circle_rounded,
-      AppColors.success,
+      AppColors.primary,
       'Begin the day route',
     ),
     QuickActionData(
@@ -222,14 +222,14 @@ class AppData {
     QuickActionData(
       'Report Issue',
       Symbols.warning_rounded,
-      AppColors.warning,
+      AppColors.primary,
       'Safety and route notes',
     ),
     QuickActionData(
-      'Earnings',
+      'Route Status',
       Symbols.finance_rounded,
-      AppColors.gray600,
-      'Daily summary',
+      AppColors.primary,
+      'Progress snapshot',
     ),
   ];
 
@@ -239,7 +239,7 @@ class AppData {
       '6:00 AM – 8:15 AM',
       '₱640',
       'High demand',
-      AppColors.success,
+      AppColors.primary,
     ),
     TripData(
       'Midday Run',
@@ -253,7 +253,7 @@ class AppData {
       '3:00 PM – 6:00 PM',
       '₱990',
       'Full occupancy',
-      AppColors.warning,
+      AppColors.primary,
     ),
   ];
 
@@ -263,14 +263,14 @@ class AppData {
       'Demand is rising on the afternoon corridor. Consider a short extra run.',
       '12 min ago',
       NotificationKind.alert,
-      AppColors.warning,
+      AppColors.primary,
     ),
     NotificationData(
       'System update',
       'Weekly trip charts are now available in the dashboard preview.',
       '1 hour ago',
       NotificationKind.system,
-      AppColors.success,
+      AppColors.primary,
     ),
     NotificationData(
       'Announcement',

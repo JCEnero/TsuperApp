@@ -9,6 +9,12 @@ import '../../shared/widgets/form_widgets.dart';
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
 
+  void _showInfo(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -32,19 +38,24 @@ class SettingsScreen extends StatelessWidget {
               MenuRow(
                 label: 'Account',
                 icon: Symbols.person_rounded,
-                onTap: () {},
+                onTap:
+                    () => _showInfo(context, 'Account details are up to date.'),
               ),
               const Divider(height: 1),
               MenuRow(
                 label: 'Notifications',
                 icon: Symbols.notifications_rounded,
-                onTap: () {},
+                onTap:
+                    () =>
+                        _showInfo(context, 'Notification preferences applied.'),
               ),
               const Divider(height: 1),
               MenuRow(
                 label: 'Appearance',
                 icon: Symbols.palette_rounded,
-                onTap: () {},
+                onTap:
+                    () =>
+                        _showInfo(context, 'Appearance options are available.'),
               ),
             ],
           ),

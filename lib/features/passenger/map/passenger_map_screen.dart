@@ -7,6 +7,66 @@ import '../../map_explorer/metro_manila_map_explorer.dart';
 class PassengerMapScreen extends StatelessWidget {
   const PassengerMapScreen({super.key});
 
+  void _openFilters(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      builder:
+          (context) => SafeArea(
+            child: StatefulBuilder(
+              builder: (context, setState) {
+                var showStops = true;
+                var showJeepneys = true;
+                return Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 20),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Map Filters',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      SwitchListTile.adaptive(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Show jeepneys'),
+                        value: showJeepneys,
+                        onChanged: (v) => setState(() => showJeepneys = v),
+                      ),
+                      SwitchListTile.adaptive(
+                        contentPadding: EdgeInsets.zero,
+                        title: const Text('Show stops'),
+                        value: showStops,
+                        onChanged: (v) => setState(() => showStops = v),
+                      ),
+                      const SizedBox(height: 8),
+                      SizedBox(
+                        width: double.infinity,
+                        child: FilledButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Map filters applied.'),
+                              ),
+                            );
+                          },
+                          child: const Text('Apply Filters'),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,7 +90,10 @@ class PassengerMapScreen extends StatelessWidget {
                       ),
                     ),
                   ),
-                  AppIconButton(icon: Symbols.tune_rounded, onTap: () {}),
+                  AppIconButton(
+                    icon: Symbols.tune_rounded,
+                    onTap: () => _openFilters(context),
+                  ),
                 ],
               ),
             ),

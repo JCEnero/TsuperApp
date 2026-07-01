@@ -5,9 +5,9 @@ import '../../core/constants/app_colors.dart';
 import '../../models/route_data.dart';
 
 Color trafficColor(String t) {
-  if (t.contains('Light') || t.contains('Low')) return AppColors.success;
-  if (t.contains('Heavy') || t.contains('Full')) return AppColors.danger;
-  return AppColors.warning;
+  if (t.contains('Light') || t.contains('Low')) return AppColors.primary;
+  if (t.contains('Heavy') || t.contains('Full')) return AppColors.stop;
+  return AppColors.darkNavy;
 }
 
 class RouteTag extends StatelessWidget {
@@ -51,12 +51,19 @@ class RouteTag extends StatelessWidget {
 }
 
 class RouteCard extends StatelessWidget {
-  const RouteCard({super.key, required this.data, this.showAction = false});
+  const RouteCard({
+    super.key,
+    required this.data,
+    this.showAction = false,
+    this.useNavyGradient = false,
+  });
   final RouteData data;
   final bool showAction;
+  final bool useNavyGradient;
 
   @override
   Widget build(BuildContext context) {
+    final accent = useNavyGradient ? AppColors.primary : data.color;
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -75,7 +82,7 @@ class RouteCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Container(width: 4, color: data.color),
+            Container(width: 4, color: accent),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.all(14),
@@ -89,12 +96,19 @@ class RouteCard extends StatelessWidget {
                           width: 38,
                           height: 38,
                           decoration: BoxDecoration(
-                            color: data.color,
+                            color: Colors.white,
                             shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.08),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
                           ),
                           child: const Icon(
                             Symbols.route_rounded,
-                            color: Colors.white,
+                            color: AppColors.primary,
                             size: 18,
                           ),
                         ),
@@ -184,7 +198,10 @@ class RouteCard extends StatelessWidget {
                         RouteTag(
                           label: '${data.transfers} transfer',
                           icon: Symbols.sync_alt_rounded,
-                          color: AppColors.gray600,
+                          color:
+                              useNavyGradient
+                                  ? AppColors.darkNavy
+                                  : AppColors.gray600,
                         ),
                         RouteTag(
                           label: data.traffic,

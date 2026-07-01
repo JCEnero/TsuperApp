@@ -14,6 +14,31 @@ import '../../../shared/widgets/promo_banner.dart';
 class PassengerHomeScreen extends StatelessWidget {
   const PassengerHomeScreen({super.key});
 
+  void _showInfo(BuildContext context, String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _onQuickActionTap(BuildContext context, String label) {
+    switch (label) {
+      case 'Plan Route':
+        _showInfo(context, 'Open the Routes tab to plan a trip.');
+        break;
+      case 'Track Jeepney':
+        _showInfo(context, 'Open the Map tab to track nearby jeepneys.');
+        break;
+      case 'Saved Places':
+        _showInfo(context, 'Saved places loaded.');
+        break;
+      case 'Help Desk':
+        Navigator.pushNamed(context, AppRoutes.helpCenter);
+        break;
+      default:
+        _showInfo(context, '$label ready.');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,11 +47,9 @@ class PassengerHomeScreen extends StatelessWidget {
         slivers: [
           SliverToBoxAdapter(child: _HomeHeader()),
           SliverPadding(
-            padding: const EdgeInsets.fromLTRB(20, 4, 20, 0),
+            padding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
             sliver: SliverList(
               delegate: SliverChildListDelegate([
-                const AppSearchBar(placeholder: 'Where to?'),
-                const SizedBox(height: 14),
                 SizedBox(
                   height: 36,
                   child: ListView.separated(
@@ -42,7 +65,7 @@ class PassengerHomeScreen extends StatelessWidget {
                 SectionHeader(
                   title: 'Nearby Jeepneys',
                   action: 'See all',
-                  onTap: () {},
+                  onTap: () => _showInfo(context, 'Showing all nearby units.'),
                 ),
                 const SizedBox(height: 10),
               ]),
@@ -57,7 +80,10 @@ class PassengerHomeScreen extends StatelessWidget {
                 itemCount: AppData.nearbyJeepneys.length,
                 separatorBuilder: (_, __) => const SizedBox(width: 12),
                 itemBuilder:
-                    (_, i) => JeepCard(data: AppData.nearbyJeepneys[i]),
+                    (_, i) => JeepCard(
+                      data: AppData.nearbyJeepneys[i],
+                      useNavyGradient: true,
+                    ),
               ),
             ),
           ),
@@ -81,35 +107,44 @@ class PassengerHomeScreen extends StatelessWidget {
                     crossAxisSpacing: 10,
                     childAspectRatio: 1.5,
                   ),
-                  itemBuilder:
-                      (_, i) => QuickActionCard(
-                        data: AppData.passengerQuickActions[i],
-                      ),
+                  itemBuilder: (_, i) {
+                    final action = AppData.passengerQuickActions[i];
+                    return QuickActionCard(
+                      data: action,
+                      useNavyGradient: true,
+                      onTap: () => _onQuickActionTap(context, action.label),
+                    );
+                  },
                 ),
                 const SizedBox(height: 22),
                 SectionHeader(
                   title: 'Suggested Routes',
                   action: 'All',
-                  onTap: () {},
+                  onTap:
+                      () => _showInfo(
+                        context,
+                        'Showing all suggested routes for today.',
+                      ),
                 ),
                 const SizedBox(height: 10),
                 ...AppData.recommendedRoutes.map(
                   (r) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: RouteCard(data: r),
+                    child: RouteCard(data: r, useNavyGradient: true),
                   ),
                 ),
                 const SizedBox(height: 22),
                 SectionHeader(
                   title: 'Recent Trips',
                   action: 'History',
-                  onTap: () {},
+                  onTap:
+                      () => _showInfo(context, 'Recent trip history loaded.'),
                 ),
                 const SizedBox(height: 10),
                 ...AppData.recentTrips.map(
                   (t) => Padding(
                     padding: const EdgeInsets.only(bottom: 10),
-                    child: TripTile(data: t),
+                    child: TripTile(data: t, useNavyGradient: true),
                   ),
                 ),
                 const SizedBox(height: 10),
@@ -126,65 +161,117 @@ class PassengerHomeScreen extends StatelessWidget {
 class _HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final top = MediaQuery.of(context).padding.top;
     return Container(
-      color: Colors.white,
-      padding: EdgeInsets.only(
-        top: MediaQuery.of(context).padding.top + 14,
-        left: 20,
-        right: 20,
-        bottom: 16,
-      ),
-      child: Row(
-        children: [
-          const Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Good morning 👋',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 13,
-                    color: AppColors.softInk,
-                  ),
-                ),
-                SizedBox(height: 2),
-                Text(
-                  'Ferdinand Barral',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 21,
-                    fontWeight: FontWeight.w800,
-                    color: AppColors.ink,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          GestureDetector(
-            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
-            child: Container(
-              width: 44,
-              height: 44,
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: BorderRadius.circular(14),
-              ),
-              child: const Center(
-                child: Text(
-                  'FB',
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    color: Colors.white,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 15,
-                  ),
-                ),
-              ),
-            ),
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [AppColors.blueBright, AppColors.primary, AppColors.blueDeep],
+          stops: [0.0, 0.6, 1.0],
+        ),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        boxShadow: [
+          BoxShadow(
+            color: AppColors.primary.withValues(alpha: 0.28),
+            blurRadius: 22,
+            offset: const Offset(0, 10),
           ),
         ],
+      ),
+      child: ClipRRect(
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(28)),
+        child: Stack(
+          children: [
+            Positioned(
+              top: -36,
+              right: -28,
+              child: _glow(140, Colors.white.withValues(alpha: 0.10)),
+            ),
+            Positioned(
+              bottom: -28,
+              left: -18,
+              child: _glow(120, AppColors.blueSky.withValues(alpha: 0.18)),
+            ),
+            Padding(
+              padding: EdgeInsets.fromLTRB(20, top + 16, 20, 22),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'Good morning 👋',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 13,
+                                color: Colors.white.withValues(alpha: 0.8),
+                              ),
+                            ),
+                            const SizedBox(height: 3),
+                            const Text(
+                              'Ferdinand Barral',
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                fontSize: 21,
+                                fontWeight: FontWeight.w800,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap:
+                            () => Navigator.pushNamed(
+                              context,
+                              AppRoutes.settings,
+                            ),
+                        child: Container(
+                          width: 46,
+                          height: 46,
+                          decoration: BoxDecoration(
+                            color: Colors.white.withValues(alpha: 0.18),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: Colors.white.withValues(alpha: 0.25),
+                            ),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'FB',
+                              style: TextStyle(
+                                fontFamily: 'Poppins',
+                                color: Colors.white,
+                                fontWeight: FontWeight.w800,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+                  const AppSearchBar(placeholder: 'Where to?'),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
+
+Widget _glow(double size, Color color) => Container(
+  width: size,
+  height: size,
+  decoration: BoxDecoration(shape: BoxShape.circle, color: color),
+);

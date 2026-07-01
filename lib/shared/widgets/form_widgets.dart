@@ -43,40 +43,50 @@ class RouteFilterChip extends StatelessWidget {
 }
 
 class RecentRow extends StatelessWidget {
-  const RecentRow({super.key, required this.label});
+  const RecentRow({super.key, required this.label, this.onTap});
   final String label;
+  final VoidCallback? onTap;
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      contentPadding: EdgeInsets.zero,
-      leading: Container(
-        padding: const EdgeInsets.all(7),
-        decoration: BoxDecoration(
-          color: AppColors.gray100,
-          borderRadius: BorderRadius.circular(9),
+    return Material(
+      type: MaterialType.transparency,
+      child: ListTile(
+        contentPadding: EdgeInsets.zero,
+        leading: Container(
+          padding: const EdgeInsets.all(7),
+          decoration: BoxDecoration(
+            color: AppColors.gray100,
+            borderRadius: BorderRadius.circular(9),
+          ),
+          child: const Icon(
+            Symbols.history_rounded,
+            size: 15,
+            color: AppColors.primary,
+          ),
         ),
-        child: const Icon(
-          Symbols.history_rounded,
-          size: 15,
-          color: AppColors.primary,
+        title: Text(
+          label,
+          style: const TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 13,
+            fontWeight: FontWeight.w600,
+            color: AppColors.ink,
+          ),
         ),
-      ),
-      title: Text(
-        label,
-        style: const TextStyle(
-          fontFamily: 'Poppins',
-          fontSize: 13,
-          fontWeight: FontWeight.w600,
-          color: AppColors.ink,
+        trailing: const Icon(
+          Symbols.north_east_rounded,
+          size: 14,
+          color: AppColors.muted,
         ),
+        onTap:
+            onTap ??
+            () {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(SnackBar(content: Text('Loaded $label route.')));
+            },
       ),
-      trailing: const Icon(
-        Symbols.north_east_rounded,
-        size: 14,
-        color: AppColors.muted,
-      ),
-      onTap: () {},
     );
   }
 }

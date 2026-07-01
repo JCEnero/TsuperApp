@@ -18,10 +18,17 @@ class PrimaryButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final action =
+        onPressed ??
+        () {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Action completed.')));
+        };
     return TapScale(
-      onTap: onPressed ?? () {},
+      onTap: action,
       child: FilledButton.icon(
-        onPressed: onPressed ?? () {},
+        onPressed: action,
         icon:
             isLoading
                 ? const SizedBox(
@@ -102,10 +109,17 @@ class OutlineButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final action =
+        onPressed ??
+        () {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Action completed.')));
+        };
     return TapScale(
-      onTap: onPressed ?? () {},
+      onTap: action,
       child: OutlinedButton.icon(
-        onPressed: onPressed ?? () {},
+        onPressed: action,
         icon: Icon(icon, size: 18),
         label: Text(text),
         style: OutlinedButton.styleFrom(
@@ -128,20 +142,33 @@ class OutlineButton extends StatelessWidget {
 }
 
 class DangerButton extends StatelessWidget {
-  const DangerButton({super.key, required this.text, required this.icon});
+  const DangerButton({
+    super.key,
+    required this.text,
+    required this.icon,
+    this.onPressed,
+  });
   final String text;
   final IconData icon;
+  final VoidCallback? onPressed;
 
   @override
   Widget build(BuildContext context) {
+    final action =
+        onPressed ??
+        () {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Action completed.')));
+        };
     return TapScale(
-      onTap: () {},
+      onTap: action,
       child: FilledButton.icon(
-        onPressed: () {},
+        onPressed: action,
         icon: Icon(icon, size: 18),
         label: Text(text),
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.danger,
+          backgroundColor: AppColors.stop,
           foregroundColor: Colors.white,
           minimumSize: const Size.fromHeight(52),
           padding: const EdgeInsets.symmetric(horizontal: 20),

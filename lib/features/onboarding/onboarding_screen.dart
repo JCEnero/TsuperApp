@@ -1,105 +1,130 @@
-// ignore_for_file: deprecated_member_use
 import 'package:flutter/material.dart';
-import 'package:material_symbols_icons/symbols.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/navigation/app_routes.dart';
 import '../../mock/app_data.dart';
 import '../../models/onboarding_slide.dart';
-import '../../shared/widgets/word_mark.dart';
-import '../../shared/widgets/app_buttons.dart';
+import '../../shared/widgets/onboarding_illustrations.dart';
+import '../../shared/widgets/app_logo.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
+
   @override
   State<OnboardingScreen> createState() => _OnboardingScreenState();
 }
 
-class _OnboardingScreenState extends State<OnboardingScreen> {
-  final _ctrl = PageController();
-  int _i = 0;
+class _OnboardingScreenState extends State<OnboardingScreen>
+    with SingleTickerProviderStateMixin {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+  late AnimationController _animationController;
+  late Animation<double> _fadeAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 600),
+      vsync: this,
+    );
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.easeOut),
+    );
+    _animationController.forward();
+  }
 
   @override
   void dispose() {
-    _ctrl.dispose();
+    _pageController.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
-  void _next() {
-    if (_i < AppData.onboardingSlides.length - 1) {
-      _ctrl.nextPage(
-        duration: const Duration(milliseconds: 340),
-        curve: Curves.easeOutCubic,
+  void _nextPage() {
+    if (_currentPage < AppData.onboardingSlides.length - 1) {
+      _pageController.nextPage(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeInOutCubic,
       );
     } else {
       Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
     }
   }
 
+  void _skip() {
+    Navigator.pushReplacementNamed(context, AppRoutes.roleSelection);
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isLast = _i == AppData.onboardingSlides.length - 1;
+    final isLast = _currentPage == AppData.onboardingSlides.length - 1;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           children: [
+            // Header with logo and skip button
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.06,
+                vertical: screenHeight * 0.02,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const WordMark(),
-                  TextButton(
-                    onPressed:
-                        () => Navigator.pushReplacementNamed(
-                          context,
-                          AppRoutes.roleSelection,
+                  _buildLogo(),
+                  if (!isLast)
+                    TextButton(
+                      onPressed: _skip,
+                      child: Text(
+                        'Skip',
+                        style: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                          color: AppColors.softInk,
                         ),
-                    child: const Text('Skip'),
-                  ),
+                      ),
+                    ),
                 ],
               ),
             ),
+
+            // PageView with onboarding content
             Expanded(
               child: PageView.builder(
-                controller: _ctrl,
+                controller: _pageController,
                 itemCount: AppData.onboardingSlides.length,
-                onPageChanged: (i) => setState(() => _i = i),
-                itemBuilder:
-                    (_, i) => _OnboardPage(slide: AppData.onboardingSlides[i]),
+                onPageChanged: (index) {
+                  setState(() => _currentPage = index);
+                  _animationController.reset();
+                  _animationController.forward();
+                },
+                itemBuilder: (context, index) {
+                  return _OnboardingPage(
+                    slide: AppData.onboardingSlides[index],
+                    animation: _fadeAnimation,
+                  );
+                },
               ),
             ),
+
+            // Bottom section with indicators and button
             Padding(
-              padding: const EdgeInsets.fromLTRB(20, 12, 20, 32),
+              padding: EdgeInsets.symmetric(
+                horizontal: screenWidth * 0.06,
+                vertical: screenHeight * 0.03,
+              ),
               child: Column(
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: List.generate(AppData.onboardingSlides.length, (
-                      j,
-                    ) {
-                      final active = j == _i;
-                      return AnimatedContainer(
-                        duration: const Duration(milliseconds: 260),
-                        margin: const EdgeInsets.symmetric(horizontal: 3),
-                        width: active ? 28 : 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: active ? AppColors.primary : AppColors.gray200,
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                      );
-                    }),
-                  ),
-                  const SizedBox(height: 20),
-                  PrimaryButton(
-                    text: isLast ? 'Get Started' : 'Continue',
-                    icon:
-                        isLast
-                            ? Symbols.check_rounded
-                            : Symbols.arrow_forward_rounded,
-                    onPressed: _next,
-                  ),
+                  // Page indicators
+                  _buildPageIndicators(),
+                  SizedBox(height: screenHeight * 0.03),
+                  // Primary button
+                  _buildPrimaryButton(isLast),
                 ],
               ),
             ),
@@ -108,71 +133,138 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
+
+  Widget _buildLogo() {
+    return const AppLogo(size: AppLogoSize.small);
+  }
+
+  Widget _buildPageIndicators() {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: List.generate(AppData.onboardingSlides.length, (index) {
+        final isActive = index == _currentPage;
+        return AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 6),
+          height: 8,
+          width: isActive ? 32 : 8,
+          decoration: BoxDecoration(
+            color: isActive ? AppColors.primary : AppColors.gray200,
+            borderRadius: BorderRadius.circular(4),
+            boxShadow:
+                isActive
+                    ? [
+                      BoxShadow(
+                        color: AppColors.primary.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ]
+                    : null,
+          ),
+        );
+      }),
+    );
+  }
+
+  Widget _buildPrimaryButton(bool isLast) {
+    return SizedBox(
+      width: double.infinity,
+      height: 56,
+      child: ElevatedButton(
+        onPressed: _nextPage,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          elevation: 0,
+          shadowColor: AppColors.primary.withValues(alpha: 0.4),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        child: Text(
+          isLast ? 'Get Started' : 'Continue',
+          style: TextStyle(
+            fontFamily: 'Poppins',
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
-class _OnboardPage extends StatelessWidget {
-  const _OnboardPage({required this.slide});
+class _OnboardingPage extends StatelessWidget {
+  const _OnboardingPage({required this.slide, required this.animation});
+
   final OnboardingSlide slide;
+  final Animation<double> animation;
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 12, 20, 12),
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: AppColors.gray100,
-                borderRadius: BorderRadius.circular(24),
+    final screenHeight = MediaQuery.of(context).size.height;
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    IllustrationType getIllustrationType() {
+      if (slide.imageAsset.contains('tracking')) {
+        return IllustrationType.tracking;
+      } else if (slide.imageAsset.contains('routes')) {
+        return IllustrationType.routes;
+      } else {
+        return IllustrationType.confidence;
+      }
+    }
+
+    return FadeTransition(
+      opacity: animation,
+      child: SlideTransition(
+        position: Tween<Offset>(
+          begin: const Offset(0, 0.1),
+          end: Offset.zero,
+        ).animate(CurvedAnimation(parent: animation, curve: Curves.easeOut)),
+        child: Padding(
+          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.06),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              // Illustration
+              SizedBox(
+                height: screenHeight * 0.35,
+                child: OnboardingIllustration(type: getIllustrationType()),
               ),
-              child: Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 90,
-                      height: 90,
-                      decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(26),
-                      ),
-                      child: Icon(
-                        slide.icon,
-                        size: 46,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      'Illustration Placeholder',
-                      style: TextStyle(
-                        fontFamily: 'Poppins',
-                        fontSize: 10,
-                        color: AppColors.muted.withOpacity(0.6),
-                      ),
-                    ),
-                  ],
+              SizedBox(height: screenHeight * 0.05),
+
+              // Title
+              Text(
+                slide.title,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: screenWidth < 400 ? 24 : 28,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.ink,
+                  height: 1.3,
                 ),
               ),
-            ),
+              SizedBox(height: screenHeight * 0.02),
+
+              // Subtitle
+              Text(
+                slide.subtitle,
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontFamily: 'Poppins',
+                  fontSize: screenWidth < 400 ? 14 : 16,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.softInk,
+                  height: 1.6,
+                ),
+              ),
+            ],
           ),
-          const SizedBox(height: 24),
-          Text(
-            slide.title,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.headlineSmall,
-          ),
-          const SizedBox(height: 10),
-          Text(
-            slide.subtitle,
-            textAlign: TextAlign.center,
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.softInk,
-              height: 1.6,
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }

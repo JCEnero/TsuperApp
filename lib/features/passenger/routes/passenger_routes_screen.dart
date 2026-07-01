@@ -20,6 +20,46 @@ class PassengerRoutesScreen extends StatefulWidget {
 class _PassengerRoutesScreenState extends State<PassengerRoutesScreen> {
   int _filter = 0;
   static const _filters = ['Fastest', 'Cheapest', 'Least Crowded'];
+  bool _savedCurrentRoute = false;
+  final List<String> _recentSearches = [
+    'Makati CBD',
+    'Quezon Memorial Circle',
+    'Quiapo Market',
+  ];
+
+  void _showInfo(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
+  }
+
+  void _openHistory() {
+    showModalBottomSheet<void>(
+      context: context,
+      builder:
+          (context) => SafeArea(
+            child: ListView(
+              shrinkWrap: true,
+              children: [
+                const ListTile(
+                  title: Text('Recent route plans'),
+                  subtitle: Text('Local session history'),
+                ),
+                ..._recentSearches.map(
+                  (item) => ListTile(
+                    leading: const Icon(Symbols.history_rounded),
+                    title: Text(item),
+                    onTap: () {
+                      Navigator.pop(context);
+                      _showInfo('Loaded $item from recent routes.');
+                    },
+                  ),
+                ),
+              ],
+            ),
+          ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +67,9 @@ class _PassengerRoutesScreenState extends State<PassengerRoutesScreen> {
       backgroundColor: AppColors.surface,
       appBar: AppBar(
         title: const Text('Route Planner'),
-        actions: [AppIconButton(icon: Symbols.history_rounded, onTap: () {})],
+        actions: [
+          AppIconButton(icon: Symbols.history_rounded, onTap: _openHistory),
+        ],
       ),
       body: ListView(
         padding: const EdgeInsets.fromLTRB(20, 8, 20, 32),
@@ -52,7 +94,10 @@ class _PassengerRoutesScreenState extends State<PassengerRoutesScreen> {
           SectionHeader(
             title: 'Suggested Routes',
             action: 'Filter',
-            onTap: () {},
+            onTap:
+                () => _showInfo(
+                  'Filter set to ${_filters[_filter].toLowerCase()}.',
+                ),
           ),
           const SizedBox(height: 10),
           ...AppData.recommendedRoutes.map(
@@ -73,9 +118,16 @@ class _PassengerRoutesScreenState extends State<PassengerRoutesScreen> {
               const SizedBox(width: 12),
               Expanded(
                 child: OutlineButton(
-                  text: 'Save Route',
+                  text: _savedCurrentRoute ? 'Saved' : 'Save Route',
                   icon: Symbols.bookmark_rounded,
-                  onPressed: () {},
+                  onPressed: () {
+                    setState(() => _savedCurrentRoute = !_savedCurrentRoute);
+                    _showInfo(
+                      _savedCurrentRoute
+                          ? 'Route saved to local favorites.'
+                          : 'Route removed from local favorites.',
+                    );
+                  },
                 ),
               ),
             ],
@@ -84,22 +136,52 @@ class _PassengerRoutesScreenState extends State<PassengerRoutesScreen> {
           SectionHeader(
             title: 'Recent Searches',
             action: 'Clear',
-            onTap: () {},
+            onTap: () {
+              if (_recentSearches.isEmpty) {
+                _showInfo('No recent searches to clear.');
+                return;
+              }
+              setState(_recentSearches.clear);
+              _showInfo('Recent searches cleared.');
+            },
           ),
           const SizedBox(height: 8),
           AppCard(
-            child: const Column(
+            child: Column(
               children: [
-                RecentRow(label: 'Makati CBD'),
-                Divider(height: 1),
-                RecentRow(label: 'Quezon Memorial Circle'),
-                Divider(height: 1),
-                RecentRow(label: 'Quiapo Market'),
+                if (_recentSearches.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.symmetric(vertical: 18),
+                    child: Text(
+                      'No recent searches',
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 13,
+                        color: AppColors.softInk,
+                      ),
+                    ),
+                  ),
+                ..._recentSearches.asMap().entries.map(
+                  (entry) => Column(
+                    children: [
+                      RecentRow(
+                        label: entry.value,
+                        onTap: () => _showInfo('Loaded ${entry.value} route.'),
+                      ),
+                      if (entry.key < _recentSearches.length - 1)
+                        const Divider(height: 1),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
           const SizedBox(height: 16),
-          SectionHeader(title: 'Saved Places', action: 'Edit', onTap: () {}),
+          SectionHeader(
+            title: 'Saved Places',
+            action: 'Edit',
+            onTap: () => _showInfo('Saved places are editable in Profile.'),
+          ),
           const SizedBox(height: 10),
           Wrap(
             spacing: 8,

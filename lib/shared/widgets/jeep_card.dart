@@ -5,12 +5,14 @@ import '../../core/constants/app_colors.dart';
 import '../../models/jeepney_data.dart';
 
 class JeepCard extends StatelessWidget {
-  const JeepCard({super.key, required this.data});
+  const JeepCard({super.key, required this.data, this.useNavyGradient = false});
   final JeepneyData data;
+  final bool useNavyGradient;
 
   @override
   Widget build(BuildContext context) {
     final occ = (int.tryParse(data.occupancy) ?? 0) / 22.0;
+    final accent = useNavyGradient ? AppColors.primary : data.color;
     return Container(
       width: 204,
       decoration: BoxDecoration(
@@ -19,7 +21,7 @@ class JeepCard extends StatelessWidget {
         border: Border.all(color: AppColors.gray200),
         boxShadow: [
           BoxShadow(
-            color: data.color.withOpacity(0.08),
+            color: accent.withOpacity(0.08),
             blurRadius: 14,
             offset: const Offset(0, 5),
           ),
@@ -31,7 +33,21 @@ class JeepCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 11),
             decoration: BoxDecoration(
-              color: data.color,
+              gradient: LinearGradient(
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+                colors:
+                    useNavyGradient
+                        ? const [
+                          AppColors.blueBright,
+                          AppColors.primary,
+                          AppColors.blueDeep,
+                        ]
+                        : [
+                          Color.lerp(data.color, Colors.white, 0.18)!,
+                          data.color,
+                        ],
+              ),
               borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(15),
               ),
@@ -128,7 +144,7 @@ class JeepCard extends StatelessWidget {
                     value: occ.clamp(0.0, 1.0),
                     minHeight: 5,
                     backgroundColor: AppColors.gray200,
-                    valueColor: AlwaysStoppedAnimation(data.color),
+                    valueColor: AlwaysStoppedAnimation(accent),
                   ),
                 ),
               ],
