@@ -458,7 +458,10 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
           // ── Full-screen map ────────────────────────────────────────────────
           Positioned.fill(
             child: GoogleMapWidget(
-              initialCameraPosition: null,
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(14.6760, 121.0437), // Quezon City center
+                zoom: 13.0,
+              ),
               markers: _markers,
               polylines: allPolylines,
               mapType: _mapLayer.toGoogleMapType(),

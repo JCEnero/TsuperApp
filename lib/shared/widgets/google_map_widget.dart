@@ -75,13 +75,36 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
       print('[GoogleMapWidget] initState called');
     }
     _loadMapStyle();
-    _initializeLocation();
+    // Don't request GPS on init — map shows immediately centered on QC.
+    // GPS is fetched lazily when the user taps the locate button.
+    setState(() => _isLoading = false);
+    _tryGetLocationSilently();
   }
 
   @override
   void dispose() {
     _mapController?.dispose();
     super.dispose();
+  }
+
+  /// Tries to get location silently in the background without blocking the map.
+  /// If it succeeds, the parent gets notified via onPositionAcquired.
+  /// No loading state, no error shown to user — fully silent.
+  Future<void> _tryGetLocationSilently() async {
+    try {
+      final permissionStatus = await _locationService.checkLocationPermission();
+      if (permissionStatus != LocationPermissionStatus.granted) return;
+
+      final position = await _locationService.getCurrentPosition().timeout(
+        const Duration(seconds: 10),
+      );
+
+      if (!mounted) return;
+      setState(() => _currentPosition = position);
+      widget.onPositionAcquired?.call(position);
+    } catch (_) {
+      // Silent — user can tap locate button to explicitly request GPS
+    }
   }
 
   Future<void> _initializeLocation() async {
@@ -240,7 +263,9 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
 
   Future<void> _loadMapStyle() async {
     try {
-      final String styleString = await rootBundle.loadString('assets/map_style.json');
+      final String styleString = await rootBundle.loadString(
+        'assets/map_style.json',
+      );
       setState(() {
         _mapStyle = styleString;
       });
