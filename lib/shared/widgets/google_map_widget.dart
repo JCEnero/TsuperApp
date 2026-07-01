@@ -13,6 +13,7 @@ class GoogleMapWidget extends StatefulWidget {
     this.initialCameraPosition,
     this.onMapCreated,
     this.onCameraMove,
+    this.onPositionAcquired,
     this.myLocationEnabled = true,
     this.myLocationButtonEnabled = false,
     this.zoomControlsEnabled = false,
@@ -30,6 +31,7 @@ class GoogleMapWidget extends StatefulWidget {
   final CameraPosition? initialCameraPosition;
   final Function(GoogleMapController)? onMapCreated;
   final Function(CameraPosition)? onCameraMove;
+  final Function(Position)? onPositionAcquired;
   final bool myLocationEnabled;
   final bool myLocationButtonEnabled;
   final bool zoomControlsEnabled;
@@ -58,6 +60,9 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
   @override
   void initState() {
     super.initState();
+    if (kDebugMode) {
+      print('[GoogleMapWidget] initState called');
+    }
     _initializeLocation();
   }
 
@@ -147,6 +152,11 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
         _currentPosition = position;
         _isLoading = false;
       });
+
+      // Notify parent widget that position was acquired
+      if (widget.onPositionAcquired != null) {
+        widget.onPositionAcquired!(position);
+      }
 
       // Move camera to user location
       if (_mapController != null) {

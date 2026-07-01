@@ -1,13 +1,10 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:uuid/uuid.dart';
 import '../config/supabase/supabase_client.dart';
 import '../config/supabase/supabase_constants.dart';
 import '../config/supabase/supabase_service.dart';
 import '../models/user_model.dart';
 
 class AuthenticationService {
-  static const _uuid = Uuid();
-
   void _ensureInitialized() {
     if (!SupabaseService.isInitialized) {
       throw Exception(
@@ -41,13 +38,11 @@ class AuthenticationService {
   }) async {
     _ensureInitialized();
 
-    final now = DateTime.now().toIso8601String();
     final response = await SupabaseManager.auth.signUp(
       email: email,
       password: password,
       data: {'full_name': fullName, 'role': role},
     );
-
 
     return response;
   }

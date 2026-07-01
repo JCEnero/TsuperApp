@@ -1,8 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/services/location_service.dart';
 import '../../../shared/widgets/google_map_widget.dart';
 import 'models/jeepney.dart';
 import 'services/jeepney_service.dart';
@@ -20,7 +20,6 @@ class PassengerMapScreen extends StatefulWidget {
 
 class _PassengerMapScreenState extends State<PassengerMapScreen> {
   final JeepneyService _jeepneyService = JeepneyService();
-  final LocationService _locationService = LocationService();
 
   GoogleMapController? _mapController;
   Position? _userPosition;
@@ -30,8 +29,10 @@ class _PassengerMapScreenState extends State<PassengerMapScreen> {
   @override
   void initState() {
     super.initState();
+    if (kDebugMode) {
+      print('[PassengerMapScreen] initState called');
+    }
     _jeepneyService.initializeMockData();
-    _initializeLocation();
   }
 
   @override
@@ -40,17 +41,15 @@ class _PassengerMapScreenState extends State<PassengerMapScreen> {
     super.dispose();
   }
 
-  Future<void> _initializeLocation() async {
-    try {
-      final position = await _locationService.getCurrentPosition();
-      if (mounted) {
-        setState(() {
-          _userPosition = position;
-        });
-        _updateMarkers();
-      }
-    } catch (e) {
-      // Handle location error
+  void _onPositionAcquired(Position position) {
+    if (kDebugMode) {
+      print('[PassengerMapScreen] Position acquired: ${position.latitude}, ${position.longitude}');
+    }
+    if (mounted) {
+      setState(() {
+        _userPosition = position;
+      });
+      _updateMarkers();
     }
   }
 
@@ -132,7 +131,7 @@ class _PassengerMapScreenState extends State<PassengerMapScreen> {
   double? _calculateDistance(Jeepney jeepney) {
     if (_userPosition == null) return null;
 
-    return _locationService.distanceBetween(
+    return Geolocator.distanceBetween(
           _userPosition!.latitude,
           _userPosition!.longitude,
           jeepney.latitude,
@@ -174,22 +173,14 @@ class _PassengerMapScreenState extends State<PassengerMapScreen> {
         children: [
           // Google Map
           GoogleMapWidget(
-            initialCameraPosition:
-                _userPosition != null
-                    ? CameraPosition(
-                      target: LatLng(
-                        _userPosition!.latitude,
-                        _userPosition!.longitude,
-                      ),
-                      zoom: 16.0,
-                    )
-                    : null,
+            initialCameraPosition: null,
             markers: _markers,
             onMapCreated: (controller) {
               setState(() {
                 _mapController = controller;
               });
             },
+            onPositionAcquired: _onPositionAcquired,
             showMyLocationFab: false,
           ),
 
