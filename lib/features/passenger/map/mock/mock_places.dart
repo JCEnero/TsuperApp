@@ -9,20 +9,12 @@ class MockPlacesRepository implements PlacesRepository {
   // ── Master place catalog ────────────────────────────────────────────────
   static const List<PlaceSuggestion> _catalog = [
     PlaceSuggestion(
-      placeId: 'qcu',
-      primaryText: 'Quezon City University',
-      secondaryText: 'Batangas St, Novaliches, Quezon City',
-      icon: Symbols.school_rounded,
-      iconColor: AppColors.primary,
-      distanceLabel: '0.3 km',
-    ),
-    PlaceSuggestion(
-      placeId: 'cubao',
-      primaryText: 'Cubao (Araneta Center)',
-      secondaryText: 'EDSA, Cubao, Quezon City',
+      placeId: 'sm-north',
+      primaryText: 'SM North EDSA',
+      secondaryText: 'EDSA, North Triangle, Quezon City',
       icon: Symbols.shopping_bag_rounded,
       iconColor: AppColors.primary,
-      distanceLabel: '4.2 km',
+      distanceLabel: '5.2 km',
     ),
     PlaceSuggestion(
       placeId: 'sm-fairview',
@@ -33,12 +25,36 @@ class MockPlacesRepository implements PlacesRepository {
       distanceLabel: '3.8 km',
     ),
     PlaceSuggestion(
+      placeId: 'nova-bayan',
+      primaryText: 'Nova Bayan Terminal',
+      secondaryText: 'Zabarte Road, Novaliches, Quezon City',
+      icon: Symbols.directions_bus_rounded,
+      iconColor: AppColors.primary,
+      distanceLabel: '7.1 km',
+    ),
+    PlaceSuggestion(
+      placeId: 'cubao',
+      primaryText: 'Araneta Cubao',
+      secondaryText: 'EDSA, Cubao, Quezon City',
+      icon: Symbols.shopping_bag_rounded,
+      iconColor: AppColors.primary,
+      distanceLabel: '4.2 km',
+    ),
+    PlaceSuggestion(
+      placeId: 'qcu',
+      primaryText: 'Quezon City University',
+      secondaryText: 'Batangas St, Novaliches, Quezon City',
+      icon: Symbols.school_rounded,
+      iconColor: AppColors.primary,
+      distanceLabel: '0.3 km',
+    ),
+    PlaceSuggestion(
       placeId: 'trinoma',
       primaryText: 'TriNoma Mall',
       secondaryText: 'EDSA, North Triangle, Quezon City',
       icon: Symbols.storefront_rounded,
       iconColor: AppColors.primary,
-      distanceLabel: '7.1 km',
+      distanceLabel: '5.4 km',
     ),
     PlaceSuggestion(
       placeId: 'up-diliman',
@@ -71,14 +87,6 @@ class MockPlacesRepository implements PlacesRepository {
       icon: Symbols.location_city_rounded,
       iconColor: AppColors.softInk,
       distanceLabel: '2.1 km',
-    ),
-    PlaceSuggestion(
-      placeId: 'holy-spirit',
-      primaryText: 'Holy Spirit Drive',
-      secondaryText: 'Holy Spirit, Quezon City',
-      icon: Symbols.signpost_rounded,
-      iconColor: AppColors.softInk,
-      distanceLabel: '4.0 km',
     ),
     PlaceSuggestion(
       placeId: 'batasan',
@@ -118,22 +126,22 @@ class MockPlacesRepository implements PlacesRepository {
   // ── Recent destinations ─────────────────────────────────────────────────
   static const List<PlaceSuggestion> _recents = [
     PlaceSuggestion(
-      placeId: 'cubao',
-      primaryText: 'Cubao (Araneta Center)',
-      secondaryText: 'Yesterday, 5:30 PM',
+      placeId: 'sm-north',
+      primaryText: 'SM North EDSA',
+      secondaryText: 'Today, 8:00 AM',
       icon: Symbols.history_rounded,
       iconColor: AppColors.softInk,
     ),
     PlaceSuggestion(
       placeId: 'sm-fairview',
       primaryText: 'SM City Fairview',
-      secondaryText: 'Today, 8:00 AM',
+      secondaryText: 'Yesterday, 5:30 PM',
       icon: Symbols.history_rounded,
       iconColor: AppColors.softInk,
     ),
     PlaceSuggestion(
-      placeId: 'trinoma',
-      primaryText: 'TriNoma Mall',
+      placeId: 'cubao',
+      primaryText: 'Araneta Cubao',
       secondaryText: 'Monday, 2:15 PM',
       icon: Symbols.history_rounded,
       iconColor: AppColors.softInk,
