@@ -18,7 +18,7 @@ class GoogleMapWidget extends StatefulWidget {
     this.myLocationEnabled = true,
     this.myLocationButtonEnabled = false,
     this.zoomControlsEnabled = false,
-    this.compassEnabled = true,
+    this.compassEnabled = false,
     this.mapToolbarEnabled = false,
     this.padding = EdgeInsets.zero,
     this.markers = const {},
@@ -27,6 +27,8 @@ class GoogleMapWidget extends StatefulWidget {
     this.circles = const {},
     this.minMaxZoomPreference = const MinMaxZoomPreference(2.0, 22.0),
     this.showMyLocationFab = true,
+    this.mapType = MapType.normal,
+    this.suppressCustomStyle = false,
   });
 
   final CameraPosition? initialCameraPosition;
@@ -45,6 +47,13 @@ class GoogleMapWidget extends StatefulWidget {
   final Set<Circle> circles;
   final MinMaxZoomPreference minMaxZoomPreference;
   final bool showMyLocationFab;
+
+  /// Controls the Google Maps base layer (normal / satellite / terrain / hybrid).
+  final MapType mapType;
+
+  /// When true, the custom map style JSON is not applied so Google's native
+  /// POI / establishment labels are fully visible (used by Landmarks mode).
+  final bool suppressCustomStyle;
 
   @override
   State<GoogleMapWidget> createState() => _GoogleMapWidgetState();
@@ -264,6 +273,7 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
                 ),
                 zoom: 16.0,
               ),
+          mapType: widget.mapType,
           onMapCreated: (controller) {
             _mapController = controller;
             if (widget.onMapCreated != null) {
@@ -279,13 +289,14 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
           zoomControlsEnabled: widget.zoomControlsEnabled,
           compassEnabled: widget.compassEnabled,
           mapToolbarEnabled: widget.mapToolbarEnabled,
+          indoorViewEnabled: false,
           padding: widget.padding,
           markers: widget.markers,
           polygons: widget.polygons,
           polylines: widget.polylines,
           circles: widget.circles,
           minMaxZoomPreference: widget.minMaxZoomPreference,
-          style: _mapStyle,
+          style: widget.suppressCustomStyle ? null : _mapStyle,
           rotateGesturesEnabled: true,
           tiltGesturesEnabled: true,
           scrollGesturesEnabled: true,
