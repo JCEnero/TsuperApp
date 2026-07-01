@@ -125,6 +125,7 @@ class JeepneyService {
         driverName: 'Juan Dela Cruz',
         status: JeepneyStatus.onRoute,
         lastUpdated: now,
+        eta: 4,
       ),
       Jeepney(
         id: 'j2',
@@ -136,6 +137,7 @@ class JeepneyService {
         driverName: 'Maria Santos',
         status: JeepneyStatus.available,
         lastUpdated: now,
+        eta: 2,
       ),
       Jeepney(
         id: 'j3',
@@ -147,6 +149,7 @@ class JeepneyService {
         driverName: 'Pedro Reyes',
         status: JeepneyStatus.onRoute,
         lastUpdated: now,
+        eta: 7,
       ),
       Jeepney(
         id: 'j4',
@@ -158,6 +161,7 @@ class JeepneyService {
         driverName: 'Ana Garcia',
         status: JeepneyStatus.available,
         lastUpdated: now,
+        eta: 1,
       ),
       Jeepney(
         id: 'j5',
@@ -169,6 +173,7 @@ class JeepneyService {
         driverName: 'Carlos Mendoza',
         status: JeepneyStatus.full,
         lastUpdated: now,
+        eta: 10,
       ),
       Jeepney(
         id: 'j6',
@@ -180,6 +185,7 @@ class JeepneyService {
         driverName: 'Elena Rodriguez',
         status: JeepneyStatus.onRoute,
         lastUpdated: now,
+        eta: 5,
       ),
       Jeepney(
         id: 'j7',
@@ -191,6 +197,7 @@ class JeepneyService {
         driverName: 'Miguel Torres',
         status: JeepneyStatus.available,
         lastUpdated: now,
+        eta: 3,
       ),
       Jeepney(
         id: 'j8',
@@ -202,6 +209,7 @@ class JeepneyService {
         driverName: 'Sofia Hernandez',
         status: JeepneyStatus.full,
         lastUpdated: now,
+        eta: 12,
       ),
       Jeepney(
         id: 'j9',
@@ -224,6 +232,7 @@ class JeepneyService {
         driverName: 'Luz Bautista',
         status: JeepneyStatus.onRoute,
         lastUpdated: now,
+        eta: 6,
       ),
     ];
   }

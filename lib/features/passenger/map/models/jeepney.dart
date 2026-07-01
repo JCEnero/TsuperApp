@@ -9,6 +9,7 @@ class Jeepney {
     required this.driverName,
     required this.status,
     required this.lastUpdated,
+    this.eta,
   });
 
   final String id;
@@ -21,6 +22,9 @@ class Jeepney {
   final JeepneyStatus status;
   final DateTime lastUpdated;
 
+  /// Estimated time of arrival in minutes (null = unknown)
+  final int? eta;
+
   Jeepney copyWith({
     String? id,
     String? routeName,
@@ -31,6 +35,7 @@ class Jeepney {
     String? driverName,
     JeepneyStatus? status,
     DateTime? lastUpdated,
+    int? eta,
   }) {
     return Jeepney(
       id: id ?? this.id,
@@ -42,6 +47,7 @@ class Jeepney {
       driverName: driverName ?? this.driverName,
       status: status ?? this.status,
       lastUpdated: lastUpdated ?? this.lastUpdated,
+      eta: eta ?? this.eta,
     );
   }
 

@@ -5,13 +5,20 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../shared/widgets/google_map_widget.dart';
+import 'mock/mock_routes.dart';
 import 'models/jeepney.dart';
+import 'models/place_suggestion.dart';
+import 'models/route_info.dart';
 import 'services/jeepney_service.dart';
 import 'services/jeepney_socket_service.dart';
-import 'widgets/filter_chips.dart';
+import 'services/marker_service.dart';
+import 'services/route_repository.dart';
+import 'widgets/filter_sheet.dart';
+import 'widgets/floating_action_button_group.dart';
 import 'widgets/jeepney_bottom_sheet.dart';
+import 'widgets/layer_selector_sheet.dart';
 import 'widgets/map_legend.dart';
-import 'widgets/search_bar.dart' as custom_widgets;
+import 'widgets/route_search_sheet.dart';
 
 class PassengerMapScreen extends StatefulWidget {
   const PassengerMapScreen({super.key});
@@ -22,9 +29,13 @@ class PassengerMapScreen extends StatefulWidget {
 
 class _PassengerMapScreenState extends State<PassengerMapScreen>
     with TickerProviderStateMixin {
+  // ── Services ───────────────────────────────────────────────────────────────
   final JeepneyService _jeepneyService = JeepneyService();
+  final MarkerService _markerService = MarkerService();
   final JeepneySocketService _socketService = JeepneySocketService();
+  final RouteRepository _routeRepository = MockRouteRepository();
 
+  // ── Map state ──────────────────────────────────────────────────────────────
   GoogleMapController? _mapController;
   Position? _userPosition;
   Jeepney? _selectedJeepney;
@@ -32,17 +43,30 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
   Set<Polyline> _polylines = {};
   bool _isConnected = false;
 
-  // Track current animated positions per jeepney id
+  // ── Live tracking animation state ──────────────────────────────────────────
   final Map<String, LatLng> _animatedPositions = {};
-
-  // Animation controllers per jeepney
   final Map<String, AnimationController> _animControllers = {};
   final Map<String, Animation<double>> _latAnims = {};
   final Map<String, Animation<double>> _lngAnims = {};
 
+  // ── Route state ────────────────────────────────────────────────────────────
+  RouteInfo? _activeRoute;
+  Set<Polyline> _liveRoutePolylines = {}; // OSRM route polylines from backend
+
+  // ── UI state ───────────────────────────────────────────────────────────────
+  bool _searchExpanded = false;
+  MapLayerType _mapLayer = MapLayerType.normal;
+
+  // ── Zoom limits ────────────────────────────────────────────────────────────
+  static const double _kMinZoom = 8.0;
+  static const double _kMaxZoom = 20.0;
+  static const double _kZoomStep = 1.5;
+  double _currentZoom = 16.0;
+
   @override
   void initState() {
     super.initState();
+    if (kDebugMode) print('[PassengerMapScreen] initState');
     _initializeSocketService();
   }
 
@@ -56,23 +80,21 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
     super.dispose();
   }
 
-  // ─── Socket.IO Setup ────────────────────────────────────────────────────────
+  // ── Socket.IO live tracking ────────────────────────────────────────────────
 
   void _initializeSocketService() {
     _socketService.onConnectionChanged = (connected) {
-      if (mounted) {
-        setState(() => _isConnected = connected);
-      }
+      if (mounted) setState(() => _isConnected = connected);
 
-      // If connection fails, fall back to mock data
+      // Fall back to mock data if backend is unreachable
       if (!connected && _jeepneyService.jeepneys.isEmpty) {
         if (kDebugMode) print('[Map] Falling back to mock data');
         _jeepneyService.initializeMockData();
-        _updateMarkersFromService();
+        _updateMarkers();
       }
     };
 
-    // Initial snapshot — all jeepneys at once
+    // Initial snapshot — populate map immediately on connect
     _socketService.onSnapshot = (jeepneys) {
       if (!mounted) return;
       for (final jeepney in jeepneys) {
@@ -82,38 +104,37 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
           jeepney.longitude,
         );
       }
-      _updateMarkersFromService();
+      _updateMarkers();
     };
 
-    // Individual update — animate marker to new position
+    // Per-jeepney update — animate to new position
     _socketService.onJeepneyUpdate = (jeepney) {
       if (!mounted) return;
       _jeepneyService.updateJeepneyFromLive(jeepney);
-      _animateMarker(jeepney);
+      _animateLiveMarker(jeepney);
     };
 
-    // Route polylines — draw on map
+    // OSRM route polylines from backend — draw on map
     _socketService.onRoutesReceived = (routes) {
       if (!mounted) return;
-      _buildPolylines(routes);
+      _buildLivePolylines(routes);
     };
 
     _socketService.connect();
   }
 
-  // ─── Marker Animation ───────────────────────────────────────────────────────
+  // ── Live marker animation ──────────────────────────────────────────────────
 
-  void _animateMarker(Jeepney jeepney) {
+  void _animateLiveMarker(Jeepney jeepney) {
     final currentPos =
         _animatedPositions[jeepney.id] ??
         LatLng(jeepney.latitude, jeepney.longitude);
     final targetPos = LatLng(jeepney.latitude, jeepney.longitude);
 
-    // Skip if barely moved (avoids unnecessary animation)
-    final distance = _distance(currentPos, targetPos);
-    if (distance < 0.00005) return;
+    final dLat = currentPos.latitude - targetPos.latitude;
+    final dLng = currentPos.longitude - targetPos.longitude;
+    if (sqrt(dLat * dLat + dLng * dLng) < 0.00005) return;
 
-    // Dispose old controller if exists
     _animControllers[jeepney.id]?.dispose();
 
     final controller = AnimationController(
@@ -141,7 +162,7 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
         _latAnims[jeepney.id]!.value,
         _lngAnims[jeepney.id]!.value,
       );
-      _rebuildMarkers();
+      _updateMarkers();
     });
 
     controller.addStatusListener((status) {
@@ -153,38 +174,26 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
     controller.forward();
   }
 
-  double _distance(LatLng a, LatLng b) {
-    final dLat = a.latitude - b.latitude;
-    final dLng = a.longitude - b.longitude;
-    return sqrt(dLat * dLat + dLng * dLng);
-  }
+  // ── OSRM live route polylines ──────────────────────────────────────────────
 
-  // ─── Polyline Drawing ───────────────────────────────────────────────────────
-
-  void _buildPolylines(List<RouteData> routes) {
+  void _buildLivePolylines(List<RouteData> routes) {
     final polylines = <Polyline>{};
-
     for (final route in routes) {
       final color = _hexToColor(route.color);
       final points = route.waypoints.map((wp) => LatLng(wp[0], wp[1])).toList();
-
       polylines.add(
         Polyline(
-          polylineId: PolylineId(route.id),
+          polylineId: PolylineId('live_${route.id}'),
           points: points,
-          color: color.withValues(alpha: 0.7),
+          color: color.withValues(alpha: 0.6),
           width: 4,
-          patterns: [],
           startCap: Cap.roundCap,
           endCap: Cap.roundCap,
           jointType: JointType.round,
         ),
       );
     }
-
-    if (mounted) {
-      setState(() => _polylines = polylines);
-    }
+    if (mounted) setState(() => _liveRoutePolylines = polylines);
   }
 
   Color _hexToColor(String hex) {
@@ -192,197 +201,300 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
     return Color(int.parse('FF$h', radix: 16));
   }
 
-  // ─── Markers ────────────────────────────────────────────────────────────────
+  // ── Location / camera ──────────────────────────────────────────────────────
 
-  void _updateMarkersFromService() {
-    _rebuildMarkers();
+  void _onPositionAcquired(Position position) {
+    if (!mounted) return;
+    setState(() => _userPosition = position);
+    _updateMarkers();
   }
 
-  void _rebuildMarkers() {
+  void _onCameraMove(CameraPosition pos) {
+    _currentZoom = pos.zoom;
+  }
+
+  void _locateMe() {
+    if (_userPosition == null || _mapController == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Location not available yet. Please wait…'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      return;
+    }
+    _mapController!.animateCamera(
+      CameraUpdate.newCameraPosition(
+        CameraPosition(
+          target: LatLng(_userPosition!.latitude, _userPosition!.longitude),
+          zoom: 16.0,
+          tilt: 0,
+          bearing: 0,
+        ),
+      ),
+    );
+  }
+
+  void _zoomIn() {
+    if (_mapController == null) return;
+    if (_currentZoom >= _kMaxZoom) return;
+    _mapController!.animateCamera(CameraUpdate.zoomBy(_kZoomStep));
+  }
+
+  void _zoomOut() {
+    if (_mapController == null) return;
+    if (_currentZoom <= _kMinZoom) return;
+    _mapController!.animateCamera(CameraUpdate.zoomBy(-_kZoomStep));
+  }
+
+  // ── Layer selector ─────────────────────────────────────────────────────────
+
+  void _openLayers() {
+    showLayerSelectorSheet(
+      context: context,
+      current: _mapLayer,
+      onSelected: (layer) => setState(() => _mapLayer = layer),
+    );
+  }
+
+  // ── Filter ─────────────────────────────────────────────────────────────────
+
+  void _openFilter() {
+    showFilterSheet(
+      context: context,
+      current: _jeepneyService.currentFilter,
+      onChanged: (f) {
+        setState(() => _jeepneyService.setFilter(f));
+        _updateMarkers();
+      },
+    );
+  }
+
+  int get _activeFilterCount =>
+      _jeepneyService.currentFilter == JeepneyFilter.all ? 0 : 1;
+
+  // ── Markers ────────────────────────────────────────────────────────────────
+
+  Future<void> _updateMarkers() async {
     if (!mounted) return;
     final jeepneys = _jeepneyService.jeepneys;
     final markers = <Marker>{};
 
-    for (final jeepney in jeepneys) {
-      final isSelected = _selectedJeepney?.id == jeepney.id;
-      final pos =
-          _animatedPositions[jeepney.id] ??
-          LatLng(jeepney.latitude, jeepney.longitude);
-
+    for (final j in jeepneys) {
+      final isSelected = _selectedJeepney?.id == j.id;
+      final pos = _animatedPositions[j.id] ?? LatLng(j.latitude, j.longitude);
+      final icon = await _markerService.getJeepneyMarker(
+        status: j.status,
+        heading: j.heading,
+        size: isSelected ? 100.0 : 80.0,
+      );
       markers.add(
         Marker(
-          markerId: MarkerId(jeepney.id),
+          markerId: MarkerId(j.id),
           position: pos,
-          rotation: jeepney.heading,
+          rotation: j.heading,
           anchor: const Offset(0.5, 0.5),
-          onTap: () => _onJeepneyTapped(jeepney),
-          icon:
-              isSelected
-                  ? BitmapDescriptor.defaultMarkerWithHue(
-                    BitmapDescriptor.hueAzure,
-                  )
-                  : BitmapDescriptor.defaultMarkerWithHue(
-                    _getStatusHue(jeepney.status),
-                  ),
+          onTap: () => _onJeepneyTapped(j),
+          icon: icon,
           infoWindow: InfoWindow(
-            title: jeepney.routeName,
-            snippet: '${jeepney.occupancy}/20 • ${jeepney.status.displayName}',
+            title: j.routeName,
+            snippet: '${j.occupancy}/20 • ${j.status.displayName}',
           ),
         ),
       );
     }
-
-    setState(() => _markers = markers);
+    if (mounted) setState(() => _markers = markers);
   }
 
-  double _getStatusHue(JeepneyStatus status) {
-    switch (status) {
-      case JeepneyStatus.available:
-        return BitmapDescriptor.hueGreen;
-      case JeepneyStatus.onRoute:
-        return BitmapDescriptor.hueBlue;
-      case JeepneyStatus.full:
-        return BitmapDescriptor.hueRed;
-      case JeepneyStatus.onBreak:
-        return BitmapDescriptor.hueOrange;
-      case JeepneyStatus.maintenance:
-        return BitmapDescriptor.hueViolet;
-    }
-  }
+  // ── Jeepney tap ────────────────────────────────────────────────────────────
 
   void _onJeepneyTapped(Jeepney jeepney) {
     setState(() => _selectedJeepney = jeepney);
-
     _mapController?.animateCamera(
       CameraUpdate.newLatLngZoom(
         LatLng(jeepney.latitude, jeepney.longitude),
-        17.0,
+        17,
       ),
     );
-
-    showModalBottomSheet<void>(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder:
-          (context) => JeepneyBottomSheet(
-            jeepney: jeepney,
-            distanceFromUser: _calculateDistance(jeepney),
-            onClose: () {
-              setState(() => _selectedJeepney = null);
-              _rebuildMarkers();
-            },
-          ),
+    JeepneyBottomSheet.show(
+      context,
+      jeepney: jeepney,
+      distanceFromUser: _calculateDistance(jeepney),
+      onClose: () {
+        setState(() => _selectedJeepney = null);
+        _updateMarkers();
+      },
     );
   }
 
-  double? _calculateDistance(Jeepney jeepney) {
+  double? _calculateDistance(Jeepney j) {
     if (_userPosition == null) return null;
     return Geolocator.distanceBetween(
           _userPosition!.latitude,
           _userPosition!.longitude,
-          jeepney.latitude,
-          jeepney.longitude,
+          j.latitude,
+          j.longitude,
         ) /
         1000;
   }
 
-  void _onPositionAcquired(Position position) {
-    if (mounted) setState(() => _userPosition = position);
+  // ── Route visualisation ────────────────────────────────────────────────────
+
+  void _onDestinationSelected(PlaceSuggestion dest) =>
+      _resolveAndDrawRoute(dest.primaryText);
+
+  Future<void> _resolveAndDrawRoute(String query) async {
+    final route = await _routeRepository.findRoute(query);
+    if (!mounted) return;
+    if (route == null) {
+      _clearRoute();
+      return;
+    }
+    _applyRoute(route);
   }
 
-  void _onFilterChanged(JeepneyFilter filter) {
-    setState(() => _jeepneyService.setFilter(filter));
-    _rebuildMarkers();
-  }
-
-  void _onSearchChanged(String query) {
-    setState(() => _jeepneyService.setSearchQuery(query));
-    _rebuildMarkers();
-  }
-
-  void _recenterToUser() {
-    if (_userPosition != null && _mapController != null) {
-      _mapController!.animateCamera(
-        CameraUpdate.newLatLngZoom(
-          LatLng(_userPosition!.latitude, _userPosition!.longitude),
-          16.0,
-        ),
-      );
+  void _applyRoute(RouteInfo route) {
+    setState(() {
+      _activeRoute = route;
+      _polylines = _buildRoutePolylines(route);
+    });
+    final bounds = route.bounds;
+    if (bounds != null && _mapController != null) {
+      _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 72));
     }
   }
 
-  // ─── Build ──────────────────────────────────────────────────────────────────
+  Set<Polyline> _buildRoutePolylines(RouteInfo route) => {
+    Polyline(
+      polylineId: PolylineId('${route.id}_halo'),
+      points: route.points,
+      color: AppColors.primary.withValues(alpha: 0.22),
+      width: 18,
+      startCap: Cap.roundCap,
+      endCap: Cap.roundCap,
+      jointType: JointType.round,
+      zIndex: 1,
+    ),
+    Polyline(
+      polylineId: PolylineId('${route.id}_line'),
+      points: route.points,
+      color: AppColors.primary,
+      width: 7,
+      startCap: Cap.roundCap,
+      endCap: Cap.roundCap,
+      jointType: JointType.round,
+      zIndex: 2,
+    ),
+  };
+
+  void _clearRoute() {
+    if (_activeRoute == null && _polylines.isEmpty) return;
+    setState(() {
+      _activeRoute = null;
+      _polylines = {};
+    });
+  }
+
+  // ── Build ──────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
+    final mq = MediaQuery.of(context);
+    final topPad = mq.padding.top;
+    final bottomPad = mq.padding.bottom;
+
+    // Combine user-selected route polylines + live OSRM route polylines
+    final allPolylines = {..._liveRoutePolylines, ..._polylines};
+
     return Scaffold(
       backgroundColor: AppColors.surface,
       body: Stack(
         children: [
-          // Google Map with live markers + route polylines
-          GoogleMapWidget(
-            initialCameraPosition: const CameraPosition(
-              target: LatLng(14.6937, 121.0200), // Quezon City center
-              zoom: 13.0,
+          // ── Full-screen map ────────────────────────────────────────────────
+          Positioned.fill(
+            child: GoogleMapWidget(
+              initialCameraPosition: null,
+              markers: _markers,
+              polylines: allPolylines,
+              mapType: _mapLayer.toGoogleMapType(),
+              suppressCustomStyle: _mapLayer.showNativePOIs,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: false,
+              zoomControlsEnabled: false,
+              compassEnabled: false,
+              mapToolbarEnabled: false,
+              onCameraMove: _onCameraMove,
+              onMapCreated: (c) => setState(() => _mapController = c),
+              onPositionAcquired: _onPositionAcquired,
+              showMyLocationFab: false,
             ),
-            markers: _markers,
-            polylines: _polylines,
-            onMapCreated: (controller) {
-              setState(() => _mapController = controller);
-            },
-            onPositionAcquired: _onPositionAcquired,
-            showMyLocationFab: false,
           ),
 
-          // Search Bar
+          // ── Top overlay: search card + legend ─────────────────────────────
           Positioned(
-            top: MediaQuery.of(context).padding.top + 8,
-            left: 16,
-            right: 16,
-            child: custom_widgets.RouteSearchBar(onChanged: _onSearchChanged),
-          ),
-
-          // Filter Chips
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 72,
+            top: topPad + 8,
             left: 0,
             right: 0,
-            child: FilterChips(
-              selectedFilter: _jeepneyService.currentFilter,
-              onFilterChanged: _onFilterChanged,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: RouteSearchSheet(
+                    onDestinationSelected: _onDestinationSelected,
+                    onRouteCleared: _clearRoute,
+                    onExpandedChanged:
+                        (v) => setState(() => _searchExpanded = v),
+                    currentLocationLabel:
+                        _userPosition != null
+                            ? 'Your current location'
+                            : 'Locating…',
+                  ),
+                ),
+                const SizedBox(height: 10),
+                AnimatedSwitcher(
+                  duration: const Duration(milliseconds: 220),
+                  child:
+                      _searchExpanded
+                          ? const SizedBox.shrink()
+                          : const Padding(
+                            key: ValueKey('legend'),
+                            padding: EdgeInsets.only(left: 16, top: 4),
+                            child: MapLegend(),
+                          ),
+                ),
+              ],
             ),
           ),
 
-          // Legend
+          // ── Live connection badge ──────────────────────────────────────────
           Positioned(
-            top: MediaQuery.of(context).padding.top + 128,
-            left: 16,
-            child: const MapLegend(),
-          ),
-
-          // Connection status indicator
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 128,
+            top: topPad + 8,
             right: 16,
             child: _buildConnectionBadge(),
           ),
 
-          // Recenter Button
+          // ── Right-side vertical control group ──────────────────────────────
           Positioned(
             right: 16,
-            bottom: 80,
-            child: FloatingActionButton(
-              heroTag: 'recenter_fab',
-              mini: true,
-              onPressed: _recenterToUser,
-              backgroundColor: Colors.white,
-              elevation: 4,
-              child: const Icon(
-                Icons.center_focus_strong_rounded,
-                color: AppColors.primary,
-                size: 24,
-              ),
+            bottom: bottomPad + 90,
+            child: MapControlGroup(
+              onLocate: _locateMe,
+              onZoomIn: _zoomIn,
+              onZoomOut: _zoomOut,
+              onLayers: _openLayers,
+              locateEnabled: _userPosition != null,
+            ),
+          ),
+
+          // ── Bottom-left filter pill ────────────────────────────────────────
+          Positioned(
+            left: 16,
+            bottom: bottomPad + 90,
+            child: MapFilterButton(
+              onTap: _openFilter,
+              activeCount: _activeFilterCount,
             ),
           ),
         ],
