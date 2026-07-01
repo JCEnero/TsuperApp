@@ -97,9 +97,11 @@ class JeepneySocketService {
   Function(bool)? onConnectionChanged;
 
   // Backend URL — update this when deploying
-  // For local dev: http://10.0.2.2:3000 (Android emulator)
+  // For web (local): http://localhost:3000
+  // For Android emulator: http://10.0.2.2:3000
   // For physical device: http://YOUR_LOCAL_IP:3000
-  static const String _serverUrl = 'http://10.0.2.2:3000';
+  static const String _serverUrl =
+      kIsWeb ? 'http://localhost:3000' : 'http://10.0.2.2:3000';
 
   bool get isConnected => _isConnected;
 
@@ -113,7 +115,8 @@ class JeepneySocketService {
     _socket = io.io(
       _serverUrl,
       io.OptionBuilder()
-          .setTransports(['websocket'])
+          // Web needs polling + websocket, native can use websocket only
+          .setTransports(kIsWeb ? ['polling', 'websocket'] : ['websocket'])
           .disableAutoConnect()
           .setTimeout(10000)
           .setReconnectionAttempts(5)
