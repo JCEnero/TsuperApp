@@ -14,6 +14,7 @@ import { passengerRoutes } from './routes/passenger.routes';
 import { routeRoutes } from './routes/route.routes';
 import { tripRoutes } from './routes/trip.routes';
 import { notificationRoutes } from './routes/notification.routes';
+import { jeepneyRoutes } from './routes/jeepney.routes';
 
 const app = express();
 
@@ -86,6 +87,7 @@ app.use('/api/passengers', passengerRoutes);
 app.use('/api/routes', routeRoutes);
 app.use('/api/trips', tripRoutes);
 app.use('/api/notifications', notificationRoutes);
+app.use('/api/jeepneys', jeepneyRoutes);
 
 // ─────────────────────────────────────────────────────────────────
 // 404 HANDLER — Catches requests to undefined routes

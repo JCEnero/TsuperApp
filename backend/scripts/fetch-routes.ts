@@ -1,0 +1,194 @@
+/**
+ * STEP 1 — Route Fetcher Script
+ *
+ * Queries OSRM for real Quezon City road routes and saves the decoded
+ * coordinate arrays as a TypeScript data file.
+ *
+ * Run once with: npx ts-node scripts/fetch-routes.ts
+ * Output: src/data/qc-routes.ts
+ */
+
+import https from 'https';
+import fs from 'fs';
+import path from 'path';
+
+// ─── QC Landmarks (lng, lat format for OSRM) ───────────────────────────────
+const LANDMARKS = {
+  nova_bayan:   { name: 'Nova Bayan Terminal',  lng: 121.0437, lat: 14.7567 },
+  sm_fairview:  { name: 'SM Fairview',          lng: 121.0156, lat: 14.7244 },
+  sm_north:     { name: 'SM North EDSA',        lng: 121.0322, lat: 14.6560 },
+  cubao:        { name: 'Araneta Cubao',        lng: 121.0502, lat: 14.6231 },
+  qcu:          { name: 'QC Circle / Elliptical', lng: 121.0440, lat: 14.6520 },
+};
+
+// ─── Routes to fetch ───────────────────────────────────────────────────────
+const ROUTES_TO_FETCH = [
+  {
+    id: 'NOVA_BAYAN_TO_SM_FAIRVIEW',
+    name: 'Nova Bayan → SM Fairview',
+    color: '#1E88E5',  // blue
+    from: LANDMARKS.nova_bayan,
+    to: LANDMARKS.sm_fairview,
+  },
+  {
+    id: 'SM_FAIRVIEW_TO_SM_NORTH',
+    name: 'SM Fairview → SM North EDSA',
+    color: '#43A047',  // green
+    from: LANDMARKS.sm_fairview,
+    to: LANDMARKS.sm_north,
+  },
+  {
+    id: 'SM_NORTH_TO_CUBAO',
+    name: 'SM North EDSA → Cubao',
+    color: '#FB8C00',  // orange
+    from: LANDMARKS.sm_north,
+    to: LANDMARKS.cubao,
+  },
+  {
+    id: 'CUBAO_TO_NOVA_BAYAN',
+    name: 'Cubao → Nova Bayan (return)',
+    color: '#E53935',  // red
+    from: LANDMARKS.cubao,
+    to: LANDMARKS.nova_bayan,
+  },
+];
+
+// ─── Polyline decoder (Google/OSRM encoded polyline format) ────────────────
+function decodePolyline(encoded: string): [number, number][] {
+  const coords: [number, number][] = [];
+  let index = 0;
+  let lat = 0;
+  let lng = 0;
+
+  while (index < encoded.length) {
+    let shift = 0;
+    let result = 0;
+    let byte: number;
+
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+
+    const dlat = result & 1 ? ~(result >> 1) : result >> 1;
+    lat += dlat;
+
+    shift = 0;
+    result = 0;
+
+    do {
+      byte = encoded.charCodeAt(index++) - 63;
+      result |= (byte & 0x1f) << shift;
+      shift += 5;
+    } while (byte >= 0x20);
+
+    const dlng = result & 1 ? ~(result >> 1) : result >> 1;
+    lng += dlng;
+
+    // OSRM returns [lat, lng] — we store as [lat, lng]
+    coords.push([lat / 1e5, lng / 1e5]);
+  }
+
+  return coords;
+}
+
+// ─── OSRM HTTP fetch ───────────────────────────────────────────────────────
+function fetchRoute(from: typeof LANDMARKS.nova_bayan, to: typeof LANDMARKS.sm_fairview): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const url = `https://router.project-osrm.org/route/v1/driving/${from.lng},${from.lat};${to.lng},${to.lat}?overview=full&geometries=polyline`;
+
+    https.get(url, (res) => {
+      let data = '';
+      res.on('data', (chunk) => (data += chunk));
+      res.on('end', () => resolve(data));
+      res.on('error', reject);
+    }).on('error', reject);
+  });
+}
+
+// ─── Main ──────────────────────────────────────────────────────────────────
+async function main() {
+  console.log('🗺️  Fetching QC jeepney routes from OSRM...\n');
+
+  const results: Record<string, {
+    id: string;
+    name: string;
+    color: string;
+    waypoints: [number, number][];
+    distanceKm: number;
+    durationMin: number;
+  }> = {};
+
+  for (const route of ROUTES_TO_FETCH) {
+    try {
+      console.log(`  Fetching: ${route.name}...`);
+      const raw = await fetchRoute(route.from, route.to);
+      const json = JSON.parse(raw);
+
+      if (json.code !== 'Ok') {
+        console.error(`  ❌ OSRM error for ${route.name}:`, json.message);
+        continue;
+      }
+
+      const geometry = json.routes[0].geometry;
+      const waypoints = decodePolyline(geometry);
+      const distanceKm = (json.routes[0].distance / 1000).toFixed(2);
+      const durationMin = (json.routes[0].duration / 60).toFixed(1);
+
+      results[route.id] = {
+        id: route.id,
+        name: route.name,
+        color: route.color,
+        waypoints,
+        distanceKm: parseFloat(distanceKm as string),
+        durationMin: parseFloat(durationMin as string),
+      };
+
+      console.log(`  ✅ ${route.name} — ${waypoints.length} waypoints, ${distanceKm}km, ~${durationMin}min`);
+
+      // Small delay to be respectful to OSRM's free server
+      await new Promise((r) => setTimeout(r, 500));
+    } catch (err) {
+      console.error(`  ❌ Failed to fetch ${route.name}:`, err);
+    }
+  }
+
+  // ─── Generate TypeScript file ────────────────────────────────────────────
+  const outputPath = path.join(__dirname, '../src/data/qc-routes.ts');
+  const output = `/**
+ * QC Jeepney Routes — Auto-generated by scripts/fetch-routes.ts
+ * Source: OSRM (OpenStreetMap road network data)
+ * Generated: ${new Date().toISOString()}
+ *
+ * DO NOT EDIT MANUALLY — Re-run fetch-routes.ts to regenerate.
+ *
+ * Each route contains:
+ * - waypoints: [lat, lng][] array of road-following coordinates
+ * - color: hex color for the polyline drawn on the map
+ * - distanceKm / durationMin: for display in the UI
+ */
+
+export interface QcRoute {
+  id: string;
+  name: string;
+  color: string;
+  waypoints: [number, number][]; // [lat, lng]
+  distanceKm: number;
+  durationMin: number;
+}
+
+export const QC_ROUTES: Record<string, QcRoute> = ${JSON.stringify(results, null, 2)};
+
+export const QC_ROUTE_IDS = Object.keys(QC_ROUTES);
+`;
+
+  fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+  fs.writeFileSync(outputPath, output, 'utf-8');
+
+  console.log(`\n✅ Generated: src/data/qc-routes.ts`);
+  console.log(`📍 Total routes: ${Object.keys(results).length}`);
+  console.log(`📍 Total waypoints: ${Object.values(results).reduce((sum, r) => sum + r.waypoints.length, 0)}`);
+}
+
+main().catch(console.error);
