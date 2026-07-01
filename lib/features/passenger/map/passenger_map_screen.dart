@@ -354,14 +354,41 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
   }
 
   void _applyRoute(RouteInfo route) {
+    // Filter jeepneys to only show ones on this route
+    _jeepneyService.setActiveRoute(route.id);
+
+    // Highlight matching live polyline, dim others
+    _highlightLiveRoute(route.id);
+
     setState(() {
       _activeRoute = route;
       _polylines = _buildRoutePolylines(route);
     });
+
     final bounds = route.bounds;
     if (bounds != null && _mapController != null) {
       _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 72));
     }
+
+    _updateMarkers();
+  }
+
+  /// Dims all live route polylines except the selected one.
+  void _highlightLiveRoute(String selectedRouteId) {
+    final updated = <Polyline>{};
+    for (final polyline in _liveRoutePolylines) {
+      final isSelected = polyline.polylineId.value == 'live_$selectedRouteId';
+      updated.add(
+        polyline.copyWith(
+          colorParam:
+              isSelected
+                  ? polyline.color.withValues(alpha: 0.9)
+                  : polyline.color.withValues(alpha: 0.15),
+          widthParam: isSelected ? 6 : 2,
+        ),
+      );
+    }
+    if (mounted) setState(() => _liveRoutePolylines = updated);
   }
 
   Set<Polyline> _buildRoutePolylines(RouteInfo route) => {
@@ -389,10 +416,28 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
 
   void _clearRoute() {
     if (_activeRoute == null && _polylines.isEmpty) return;
+
+    // Restore all live polylines to full opacity
+    final restored = <Polyline>{};
+    for (final polyline in _liveRoutePolylines) {
+      restored.add(
+        polyline.copyWith(
+          colorParam: polyline.color.withValues(alpha: 0.6),
+          widthParam: 4,
+        ),
+      );
+    }
+
+    // Clear jeepney route filter — show all jeepneys again
+    _jeepneyService.clearRouteFilter();
+
     setState(() {
       _activeRoute = null;
       _polylines = {};
+      _liveRoutePolylines = restored;
     });
+
+    _updateMarkers();
   }
 
   // ── Build ──────────────────────────────────────────────────────────────────
