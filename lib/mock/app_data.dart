@@ -1,6 +1,4 @@
-// ignore_for_file: deprecated_member_use
 import 'package:material_symbols_icons/symbols.dart';
-import 'package:latlong2/latlong.dart';
 import '../core/constants/app_colors.dart';
 import '../models/models.dart';
 
@@ -50,415 +48,200 @@ class AppData {
       'Fastest jeepney path',
     ),
     QuickActionData(
-      'Track Jeepney',
-      Symbols.directions_bus_rounded,
-      AppColors.primary,
-      'See mock nearby units',
-    ),
-    QuickActionData(
       'Saved Places',
-      Symbols.bookmark_rounded,
-      AppColors.primary,
-      'Home, work, school',
+      Symbols.place_rounded,
+      AppColors.secondary,
+      'Quick access to favorites',
     ),
     QuickActionData(
-      'Help Desk',
-      Symbols.support_agent_rounded,
+      'Recent Trips',
+      Symbols.history_rounded,
+      AppColors.accent,
+      'View travel history',
+    ),
+    QuickActionData(
+      'Alerts',
+      Symbols.notifications_rounded,
+      AppColors.warning,
+      'Route updates',
+    ),
+  ];
+
+  static const driverQuickActions = [
+    QuickActionData(
+      'Start Trip',
+      Symbols.play_arrow_rounded,
+      AppColors.onDuty,
+      'Begin your route',
+    ),
+    QuickActionData(
+      'End Trip',
+      Symbols.stop_rounded,
+      AppColors.danger,
+      'Complete journey',
+    ),
+    QuickActionData(
+      'Break',
+      Symbols.coffee_rounded,
+      AppColors.secondary,
+      'Take a rest',
+    ),
+    QuickActionData(
+      'Report Issue',
+      Symbols.error_rounded,
+      AppColors.warning,
+      'Road conditions',
+    ),
+  ];
+
+  static const notifications = [
+    NotificationData(
+      'Route 2 Delayed',
+      'Heavy traffic on EDSA. Expect 15-min delay.',
+      '5 min ago',
+      NotificationKind.alert,
+      AppColors.warning,
+    ),
+    NotificationData(
+      'New Route Available',
+      'QCU to SM Fairview via Commonwealth.',
+      '1 hour ago',
+      NotificationKind.route,
       AppColors.primary,
-      'Ride assistance',
+    ),
+    NotificationData(
+      'Fare Update',
+      'Minimum fare increased to ₱13.00.',
+      '2 hours ago',
+      NotificationKind.announcement,
+      AppColors.secondary,
+    ),
+  ];
+
+  static const trips = [
+    TripData(
+      'QCU - Cubao',
+      'Today, 8:30 AM',
+      '₱156.00',
+      'Completed',
+      AppColors.primary,
+    ),
+    TripData(
+      'Cubao - QCU',
+      'Today, 10:15 AM',
+      '₱104.00',
+      'Completed',
+      AppColors.secondary,
+    ),
+    TripData(
+      'QCU - SM Fairview',
+      'Yesterday, 3:45 PM',
+      '₱195.00',
+      'Completed',
+      AppColors.accent,
+    ),
+  ];
+
+  static const routes = [
+    RouteData(
+      'QCU - Cubao',
+      'Quezon City University',
+      'Cubao',
+      '₱13.00',
+      '45 min',
+      0,
+      'Moderate',
+      AppColors.primary,
+    ),
+    RouteData(
+      'QCU - SM Fairview',
+      'Quezon City University',
+      'SM Fairview',
+      '₱11.00',
+      '30 min',
+      0,
+      'Light',
+      AppColors.secondary,
+    ),
+    RouteData(
+      'Cubao - QCU',
+      'Cubao',
+      'Quezon City University',
+      '₱13.00',
+      '45 min',
+      0,
+      'Moderate',
+      AppColors.accent,
+    ),
+    RouteData(
+      'SM Fairview - QCU',
+      'SM Fairview',
+      'Quezon City University',
+      '₱11.00',
+      '30 min',
+      0,
+      'Light',
+      AppColors.primary,
+    ),
+  ];
+
+  // Additional data for passenger screens
+  static const passengerSavedPlaces = [
+    SavedPlaceData(
+      'Home',
+      '123 Main St',
+      Symbols.home_rounded,
+      AppColors.primary,
+    ),
+    SavedPlaceData(
+      'Work',
+      '456 Office Ave',
+      Symbols.work_rounded,
+      AppColors.secondary,
+    ),
+    SavedPlaceData(
+      'School',
+      '789 Campus Rd',
+      Symbols.school_rounded,
+      AppColors.accent,
     ),
   ];
 
   static const nearbyJeepneys = [
     JeepneyData(
-      'JEEP-104',
-      'Baclaran – Quiapo',
-      '18',
-      'Arriving in 4 min',
-      '4 min',
+      'J-123',
+      'QCU - Cubao',
+      '12/20',
+      'On Route',
+      '5 min',
       AppColors.primary,
     ),
     JeepneyData(
-      'JEEP-217',
-      'Makati Loop',
-      '12',
-      'Moderate load',
-      '7 min',
-      AppColors.primary,
-    ),
-    JeepneyData(
-      'JEEP-311',
-      'Cubao – Fairview',
-      '21',
-      'Nearly full',
-      '10 min',
-      AppColors.primary,
+      'J-456',
+      'QCU - SM Fairview',
+      '8/20',
+      'On Route',
+      '8 min',
+      AppColors.secondary,
     ),
   ];
 
-  static const recentTrips = [
-    TripData(
-      'Campus Run',
-      'Today • 7:25 AM',
-      '₱18',
-      'Completed',
-      AppColors.primary,
-    ),
-    TripData(
-      'Market Stop',
-      'Yesterday • 4:15 PM',
-      '₱14',
-      'Completed',
-      AppColors.primary,
-    ),
-  ];
+  static const recommendedRoutes = routes;
 
-  static const recommendedRoutes = [
-    RouteData(
-      'Via EDSA Express',
-      'Quezon City',
-      'Makati CBD',
-      '₱38',
-      '34 min',
-      1,
-      'Light crowd',
-      AppColors.primary,
-    ),
-    RouteData(
-      'Via Ortigas Connector',
-      'Pasig',
-      'Ortigas Center',
-      '₱24',
-      '18 min',
-      0,
-      'Moderate crowd',
-      AppColors.primary,
-    ),
-    RouteData(
-      'Night Return',
-      'BGC',
-      'Pasay',
-      '₱32',
-      '28 min',
-      1,
-      'Low crowd',
-      AppColors.primary,
-    ),
-  ];
+  static const recentTrips = trips;
 
-  static const passengerNotifications = [
-    NotificationData(
-      'Route Advisory',
-      'Quiapo corridor has a short delay. Consider the alternative route shown in your planner.',
-      '8 min ago',
-      NotificationKind.route,
-      AppColors.primary,
-    ),
-    NotificationData(
-      'Promo unlocked',
-      'Save 10% on your next commute with the morning pass mock promo.',
-      '1 hour ago',
-      NotificationKind.promo,
-      AppColors.primary,
-    ),
-    NotificationData(
-      'System update',
-      'Passenger occupancy visuals were refreshed for Phase 1 preview.',
-      'Today',
-      NotificationKind.system,
-      AppColors.primary,
-    ),
-  ];
+  static const passengerNotifications = notifications;
 
-  static const passengerSavedPlaces = [
-    SavedPlaceData(
-      'Home',
-      'Mandaluyong',
-      Symbols.home_rounded,
-      AppColors.primary,
-    ),
-    SavedPlaceData(
-      'Office',
-      'Makati CBD',
-      Symbols.work_rounded,
-      AppColors.primary,
-    ),
-    SavedPlaceData(
-      'Campus',
-      'Taft Avenue',
-      Symbols.school_rounded,
-      AppColors.primary,
-    ),
-  ];
-
-  static const passengerStats = [
-    StatData('Trips this month', '18', '+24%', Symbols.trending_up_rounded),
-    StatData('Money saved', '₱214', '+12%', Symbols.savings_rounded),
-    StatData('Favorite routes', '7', '2 new', Symbols.route_rounded),
-  ];
-
-  static const driverVehicle = 'Jeepney 02 • ZXG-421';
-  static const driverRoute = 'Cubao – Fairview Line';
+  // Additional data for driver screens
+  static const driverTrips = trips;
 
   static const driverStats = [
-    StatData('Trips today', '24', '+8%', Symbols.directions_bus_rounded),
-    StatData('Distance covered', '42.7 km', '+6%', Symbols.route_rounded),
-    StatData('Avg occupancy', '81%', '+5%', Symbols.groups_rounded),
+    StatData('Total Trips', '45', '+12%', Symbols.directions_bus_rounded),
+    StatData('Earnings', '₱5,850', '+8%', Symbols.payments_rounded),
+    StatData('Rating', '4.8', '+0.2', Symbols.star_rounded),
   ];
 
-  static const driverQuickActions = [
-    QuickActionData(
-      'Start Shift',
-      Symbols.play_circle_rounded,
-      AppColors.primary,
-      'Begin the day route',
-    ),
-    QuickActionData(
-      'Passenger Log',
-      Symbols.note_alt_rounded,
-      AppColors.primary,
-      'Mock trip record',
-    ),
-    QuickActionData(
-      'Report Issue',
-      Symbols.warning_rounded,
-      AppColors.primary,
-      'Safety and route notes',
-    ),
-    QuickActionData(
-      'Route Status',
-      Symbols.finance_rounded,
-      AppColors.primary,
-      'Progress snapshot',
-    ),
-  ];
+  static const driverRoute = 'QCU - Cubao';
 
-  static const driverTrips = [
-    TripData(
-      'Morning Loop',
-      '6:00 AM – 8:15 AM',
-      '₱640',
-      'High demand',
-      AppColors.primary,
-    ),
-    TripData(
-      'Midday Run',
-      '10:00 AM – 12:30 PM',
-      '₱510',
-      'Steady load',
-      AppColors.primary,
-    ),
-    TripData(
-      'Afternoon Peak',
-      '3:00 PM – 6:00 PM',
-      '₱990',
-      'Full occupancy',
-      AppColors.primary,
-    ),
-  ];
-
-  static const driverNotifications = [
-    NotificationData(
-      'Passenger alert',
-      'Demand is rising on the afternoon corridor. Consider a short extra run.',
-      '12 min ago',
-      NotificationKind.alert,
-      AppColors.primary,
-    ),
-    NotificationData(
-      'System update',
-      'Weekly trip charts are now available in the dashboard preview.',
-      '1 hour ago',
-      NotificationKind.system,
-      AppColors.primary,
-    ),
-    NotificationData(
-      'Announcement',
-      'Vehicle maintenance reminder is scheduled for Friday evening.',
-      'Today',
-      NotificationKind.announcement,
-      AppColors.primary,
-    ),
-  ];
-
-  static const driverProfileItems = [
-    ProfileMenuItemData('Vehicle Details', Symbols.directions_bus_rounded),
-    ProfileMenuItemData('Assigned Route', Symbols.route_rounded),
-    ProfileMenuItemData('Settings', Symbols.settings_rounded),
-    ProfileMenuItemData('Help', Symbols.help_rounded),
-    ProfileMenuItemData('Logout', Symbols.logout_rounded),
-  ];
-
-  static const commonInfoSections = [
-    InfoSection('Preview scope', [
-      'This Phase 1 build uses only local mock data.',
-      'No GPS, permissions, backend integrations, or network calls are active.',
-      'Future backend features can be wired in without changing the navigation shell.',
-    ]),
-  ];
-
-  static const metroManilaRoutes = [
-    MetroManilaRoute(
-      id: 'qcu-sm-fairview',
-      title: 'QCU → SM Fairview',
-      fromLabel: 'QCU',
-      toLabel: 'SM Fairview',
-      routeName: 'Commonwealth Loop',
-      estimatedTravelTime: '16 min',
-      estimatedFare: '₱18',
-      center: LatLng(14.7048, 121.0495),
-      zoom: 13.4,
-      path: [
-        LatLng(14.6592, 121.0313),
-        LatLng(14.6730, 121.0372),
-        LatLng(14.6878, 121.0442),
-        LatLng(14.7019, 121.0496),
-        LatLng(14.7179, 121.0552),
-        LatLng(14.7328, 121.0579),
-      ],
-      markers: [
-        MetroManilaMapMarkerSpec(
-          id: 'qcu',
-          label: 'QCU',
-          point: LatLng(14.6592, 121.0313),
-          kind: MetroManilaMapMarkerKind.currentLocation,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'jeepney-1',
-          label: 'Jeepney 14',
-          point: LatLng(14.6878, 121.0442),
-          kind: MetroManilaMapMarkerKind.jeepney,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'stop-1',
-          label: 'Bus Stop',
-          point: LatLng(14.7019, 121.0496),
-          kind: MetroManilaMapMarkerKind.busStop,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'terminal-1',
-          label: 'SM Fairview',
-          point: LatLng(14.7328, 121.0579),
-          kind: MetroManilaMapMarkerKind.destination,
-        ),
-      ],
-    ),
-    MetroManilaRoute(
-      id: 'qcu-sm-north',
-      title: 'QCU → SM North EDSA',
-      fromLabel: 'QCU',
-      toLabel: 'SM North EDSA',
-      routeName: 'North Avenue Link',
-      estimatedTravelTime: '14 min',
-      estimatedFare: '₱16',
-      center: LatLng(14.6546, 121.0310),
-      zoom: 13.7,
-      path: [
-        LatLng(14.6592, 121.0313),
-        LatLng(14.6568, 121.0326),
-        LatLng(14.6539, 121.0319),
-        LatLng(14.6512, 121.0308),
-        LatLng(14.6489, 121.0298),
-        LatLng(14.6467, 121.0292),
-      ],
-      markers: [
-        MetroManilaMapMarkerSpec(
-          id: 'qcu',
-          label: 'QCU',
-          point: LatLng(14.6592, 121.0313),
-          kind: MetroManilaMapMarkerKind.currentLocation,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'jeepney-2',
-          label: 'Jeepney 08',
-          point: LatLng(14.6539, 121.0319),
-          kind: MetroManilaMapMarkerKind.jeepney,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'terminal-2',
-          label: 'SM North',
-          point: LatLng(14.6467, 121.0292),
-          kind: MetroManilaMapMarkerKind.destination,
-        ),
-      ],
-    ),
-    MetroManilaRoute(
-      id: 'qcu-cubao',
-      title: 'QCU → Cubao',
-      fromLabel: 'QCU',
-      toLabel: 'Cubao',
-      routeName: 'Cubao Shuttle',
-      estimatedTravelTime: '19 min',
-      estimatedFare: '₱22',
-      center: LatLng(14.6402, 121.0421),
-      zoom: 13.5,
-      path: [
-        LatLng(14.6592, 121.0313),
-        LatLng(14.6518, 121.0361),
-        LatLng(14.6451, 121.0417),
-        LatLng(14.6388, 121.0459),
-        LatLng(14.6324, 121.0487),
-        LatLng(14.6255, 121.0510),
-      ],
-      markers: [
-        MetroManilaMapMarkerSpec(
-          id: 'qcu',
-          label: 'QCU',
-          point: LatLng(14.6592, 121.0313),
-          kind: MetroManilaMapMarkerKind.currentLocation,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'jeepney-3',
-          label: 'Jeepney 21',
-          point: LatLng(14.6451, 121.0417),
-          kind: MetroManilaMapMarkerKind.jeepney,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'terminal-3',
-          label: 'Cubao',
-          point: LatLng(14.6255, 121.0510),
-          kind: MetroManilaMapMarkerKind.destination,
-        ),
-      ],
-    ),
-    MetroManilaRoute(
-      id: 'qcu-novaliches',
-      title: 'QCU → Novaliches',
-      fromLabel: 'QCU',
-      toLabel: 'Novaliches',
-      routeName: 'Novaliches Connector',
-      estimatedTravelTime: '18 min',
-      estimatedFare: '₱20',
-      center: LatLng(14.6956, 121.0387),
-      zoom: 13.4,
-      path: [
-        LatLng(14.6592, 121.0313),
-        LatLng(14.6702, 121.0331),
-        LatLng(14.6826, 121.0352),
-        LatLng(14.6941, 121.0378),
-        LatLng(14.7069, 121.0409),
-        LatLng(14.7195, 121.0438),
-      ],
-      markers: [
-        MetroManilaMapMarkerSpec(
-          id: 'qcu',
-          label: 'QCU',
-          point: LatLng(14.6592, 121.0313),
-          kind: MetroManilaMapMarkerKind.currentLocation,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'terminal-4',
-          label: 'Novaliches',
-          point: LatLng(14.7195, 121.0438),
-          kind: MetroManilaMapMarkerKind.destination,
-        ),
-        MetroManilaMapMarkerSpec(
-          id: 'stop-4',
-          label: 'Terminal Stop',
-          point: LatLng(14.6941, 121.0378),
-          kind: MetroManilaMapMarkerKind.terminal,
-        ),
-      ],
-    ),
-  ];
+  static const driverNotifications = notifications;
 }

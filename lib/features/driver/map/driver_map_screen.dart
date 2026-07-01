@@ -5,7 +5,7 @@ import '../../../core/navigation/app_routes.dart';
 import '../../../shared/widgets/app_card.dart';
 import '../../../shared/widgets/app_icon_button.dart';
 import '../../../shared/widgets/app_buttons.dart';
-import '../../map_explorer/metro_manila_map_explorer.dart';
+import '../../../shared/widgets/google_map_widget.dart';
 
 class DriverMapScreen extends StatelessWidget {
   const DriverMapScreen({super.key});
@@ -82,12 +82,7 @@ class DriverMapScreen extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              const Expanded(
-                child: MetroManilaMapExplorer(
-                  initialRouteId: 'qcu-cubao',
-                  showDriverActions: true,
-                ),
-              ),
+              const Expanded(child: GoogleMapWidget(showMyLocationFab: true)),
               const SizedBox(height: 10),
               const Row(
                 children: [
