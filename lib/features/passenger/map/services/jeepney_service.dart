@@ -94,6 +94,16 @@ class JeepneyService {
     }
   }
 
+  /// Updates or adds a jeepney from live Socket.IO data.
+  void updateJeepneyFromLive(Jeepney jeepney) {
+    final index = _jeepneys.indexWhere((j) => j.id == jeepney.id);
+    if (index != -1) {
+      _jeepneys[index] = jeepney;
+    } else {
+      _jeepneys.add(jeepney);
+    }
+  }
+
   Jeepney? getJeepneyById(String id) {
     try {
       return _jeepneys.firstWhere((j) => j.id == id);
