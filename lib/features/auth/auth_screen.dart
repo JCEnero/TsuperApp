@@ -141,8 +141,8 @@ class _AuthScreenState extends State<AuthScreen> {
     var role = _loginRole;
     final user = _authService.currentUser;
     if (user != null) {
-      final profile = await _authService.getUserProfile(user.id);
-      final roleStr = profile?.role;
+      final metadata = user.userMetadata;
+      final roleStr = metadata?['role'] as String?;
       if (roleStr == SupabaseConstants.roleDriver) {
         role = UserRole.driver;
       } else if (roleStr == SupabaseConstants.rolePassenger) {
