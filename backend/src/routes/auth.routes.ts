@@ -101,9 +101,29 @@ router.post(
         );
       }
 
+      // Generate a session so the user is logged in immediately after signup
+      const { data: signInData, error: signInError } =
+        await supabaseAdmin.auth.signInWithPassword({ email, password });
+
+      if (signInError || !signInData.session) {
+        // User was created but session generation failed — still return success
+        return res.status(201).json({
+          success: true,
+          data: {
+            session: null,
+            user: { id: userId, email, fullName, role },
+          },
+        });
+      }
+
       res.status(201).json({
         success: true,
         data: {
+          session: {
+            accessToken: signInData.session.access_token,
+            refreshToken: signInData.session.refresh_token,
+            expiresAt: signInData.session.expires_at,
+          },
           user: {
             id: userId,
             email,
@@ -170,11 +190,15 @@ router.post(
   authenticate,
   async (req: Request, res: Response, next: NextFunction) => {
     try {
-      // Invalidate session server-side
-      const authHeader = req.headers.authorization!;
-      const token = authHeader.split(' ')[1];
+      // Revoke all sessions for the user (signs them out everywhere)
+      const { error } = await supabaseAdmin.auth.admin.signOut(
+        req.headers.authorization!.split(' ')[1],
+        'global'
+      );
 
-      await supabaseAdmin.auth.admin.signOut(token);
+      if (error) {
+        throw new AppError(error.message, 400);
+      }
 
       res.json({ success: true, message: 'Signed out successfully' });
     } catch (err) {
