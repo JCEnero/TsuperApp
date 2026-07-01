@@ -9,6 +9,7 @@ import 'features/role_selection/role_selection_screen.dart';
 import 'features/passenger/shell/passenger_shell.dart';
 import 'features/driver/shell/driver_shell.dart';
 import 'features/auth/auth_screen.dart';
+import 'features/auth/email_confirmation_screen.dart';
 import 'features/settings/settings_screen.dart';
 import 'features/info/info_screen.dart';
 
@@ -44,6 +45,7 @@ class TsuperApp extends StatelessWidget {
         AppRoutes.register: (_) => const AuthScreen(mode: AuthMode.register),
         AppRoutes.forgotPassword:
             (_) => const AuthScreen(mode: AuthMode.forgot),
+        AppRoutes.emailConfirmation: (_) => const EmailConfirmationScreen(),
         AppRoutes.settings: (_) => const SettingsScreen(),
         AppRoutes.about:
             (_) => const InfoScreen(

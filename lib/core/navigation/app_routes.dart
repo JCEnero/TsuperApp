@@ -27,6 +27,7 @@ class AppRoutes {
   static const login = '/login';
   static const register = '/register';
   static const forgotPassword = '/forgot-password';
+  static const emailConfirmation = '/email-confirmation';
   static const settings = '/settings';
   static const about = '/about';
   static const helpCenter = '/help-center';
