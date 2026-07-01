@@ -48,53 +48,6 @@ class AuthenticationService {
       data: {'full_name': fullName, 'role': role},
     );
 
-    if (response.user != null) {
-      final userId = response.user!.id;
-
-      // Ensure user profile exists (idempotent).
-      await SupabaseManager.client.from(SupabaseConstants.usersTable).upsert({
-        'id': userId,
-        'email': email,
-        'full_name': fullName,
-        'role': role,
-        'updated_at': now,
-      }, onConflict: 'id');
-
-      if (role == SupabaseConstants.rolePassenger) {
-        // Ensure passenger profile exists (idempotent).
-        await SupabaseManager.client
-            .from(SupabaseConstants.passengersTable)
-            .upsert(
-              {
-                'id': _uuid.v4(),
-                'user_id': userId,
-                'favorite_places': <String>[],
-                'recent_routes': <String>[],
-                'created_at': now,
-              },
-              onConflict: 'user_id',
-              ignoreDuplicates: true,
-            );
-      } else if (role == SupabaseConstants.roleDriver) {
-        // Ensure driver profile exists (idempotent).
-        await SupabaseManager.client
-            .from(SupabaseConstants.driversTable)
-            .upsert(
-              {
-                'id': _uuid.v4(),
-                'user_id': userId,
-                'plate_number': 'TBD',
-                'vehicle_number': 'TBD',
-                'assigned_route': null,
-                'status': SupabaseConstants.statusInactive,
-                'occupancy': 0,
-                'created_at': now,
-              },
-              onConflict: 'user_id',
-              ignoreDuplicates: true,
-            );
-      }
-    }
 
     return response;
   }
