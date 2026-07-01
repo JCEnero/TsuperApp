@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:material_symbols_icons/symbols.dart';
@@ -56,6 +57,7 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
   bool _isLoading = true;
   String? _errorMessage;
   bool _isMovingToLocation = false;
+  String? _mapStyle;
 
   @override
   void initState() {
@@ -63,6 +65,7 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
     if (kDebugMode) {
       print('[GoogleMapWidget] initState called');
     }
+    _loadMapStyle();
     _initializeLocation();
   }
 
@@ -226,6 +229,19 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
     await _locationService.openAppSettings();
   }
 
+  Future<void> _loadMapStyle() async {
+    try {
+      final String styleString = await rootBundle.loadString('assets/map_style.json');
+      setState(() {
+        _mapStyle = styleString;
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('[GoogleMapWidget] Error loading map style: $e');
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     if (_isLoading) {
@@ -269,6 +285,11 @@ class _GoogleMapWidgetState extends State<GoogleMapWidget> {
           polylines: widget.polylines,
           circles: widget.circles,
           minMaxZoomPreference: widget.minMaxZoomPreference,
+          style: _mapStyle,
+          rotateGesturesEnabled: true,
+          tiltGesturesEnabled: true,
+          scrollGesturesEnabled: true,
+          zoomGesturesEnabled: true,
         ),
         if (widget.showMyLocationFab)
           Positioned(
