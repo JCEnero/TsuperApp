@@ -13,6 +13,7 @@ class JeepneyService {
   List<String> _activeRouteIds = []; // Multiple routes for destination search
 
   List<Jeepney> get jeepneys => _getFilteredJeepneys();
+  List<Jeepney> get allJeepneys => List.unmodifiable(_jeepneys);
   JeepneyFilter get currentFilter => _currentFilter;
   String get searchQuery => _searchQuery;
   String? get activeRouteId =>

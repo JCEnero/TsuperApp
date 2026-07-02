@@ -17,6 +17,7 @@ import 'widgets/floating_action_button_group.dart';
 import 'widgets/jeepney_bottom_sheet.dart';
 import 'widgets/layer_selector_sheet.dart';
 import 'widgets/map_legend.dart';
+import 'widgets/route_info_banner.dart';
 import 'widgets/route_search_sheet.dart';
 
 class PassengerMapScreen extends StatefulWidget {
@@ -50,6 +51,7 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
 
   // ── Route state ────────────────────────────────────────────────────────────
   RouteInfo? _activeRoute;
+  List<String> _activeRouteIds = [];
   Set<Polyline> _liveRoutePolylines = {}; // OSRM route polylines from backend
 
   // ── UI state ───────────────────────────────────────────────────────────────
@@ -401,19 +403,17 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
   }
 
   void _applyRoute(RouteInfo route) {
-    // Get all route IDs for this destination (e.g. SM North = both routes passing through it)
     final routeIds = MockRouteRepository().findRouteIds(
       route.destination?.toLowerCase() ?? route.displayName.toLowerCase(),
     );
-    _jeepneyService.setActiveRoutes(
-      routeIds.isNotEmpty ? routeIds : [route.id],
-    );
+    final ids = routeIds.isNotEmpty ? routeIds : [route.id];
 
-    // Highlight matching live polylines, dim others
-    _highlightLiveRoutes(routeIds.isNotEmpty ? routeIds : [route.id]);
+    _jeepneyService.setActiveRoutes(ids);
+    _highlightLiveRoutes(ids);
 
     setState(() {
       _activeRoute = route;
+      _activeRouteIds = ids;
       _polylines = _buildRoutePolylines(route);
     });
 
@@ -421,7 +421,6 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
     if (bounds != null && _mapController != null) {
       _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 72));
     }
-
     _updateMarkers();
   }
 
@@ -482,11 +481,11 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
       );
     }
 
-    // Clear jeepney route filter — show all jeepneys again
     _jeepneyService.clearRouteFilter();
 
     setState(() {
       _activeRoute = null;
+      _activeRouteIds = [];
       _polylines = {};
       _liveRoutePolylines = restored;
     });
@@ -599,6 +598,21 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
               activeCount: _activeFilterCount,
             ),
           ),
+
+          // ── Route info banner (shown after destination search) ─────────────
+          if (_activeRoute != null && _activeRouteIds.isNotEmpty)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: bottomPad + 90,
+              child: RouteInfoBanner(
+                destination:
+                    _activeRoute!.destination ?? _activeRoute!.displayName,
+                activeRouteIds: _activeRouteIds,
+                jeepneyService: _jeepneyService,
+                onClose: _clearRoute,
+              ),
+            ),
         ],
       ),
     );
