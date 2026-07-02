@@ -10,12 +10,13 @@ class JeepneyService {
   List<Jeepney> _jeepneys = [];
   JeepneyFilter _currentFilter = JeepneyFilter.all;
   String _searchQuery = '';
-  String? _activeRouteId; // When set, only show jeepneys on this route
+  List<String> _activeRouteIds = []; // Multiple routes for destination search
 
   List<Jeepney> get jeepneys => _getFilteredJeepneys();
   JeepneyFilter get currentFilter => _currentFilter;
   String get searchQuery => _searchQuery;
-  String? get activeRouteId => _activeRouteId;
+  String? get activeRouteId =>
+      _activeRouteIds.isEmpty ? null : _activeRouteIds.first;
 
   void initializeMockData() {
     // Mock coordinates removed — live data comes from Socket.IO backend.
@@ -29,9 +30,14 @@ class JeepneyService {
   List<Jeepney> _getFilteredJeepneys() {
     var filtered = _jeepneys;
 
-    // Route filter — only show jeepneys on the selected route
-    if (_activeRouteId != null) {
-      filtered = filtered.where((j) => j.routeId == _activeRouteId).toList();
+    // Route filter — show jeepneys on any of the active routes
+    if (_activeRouteIds.isNotEmpty) {
+      filtered =
+          filtered
+              .where(
+                (j) => j.routeId != null && _activeRouteIds.contains(j.routeId),
+              )
+              .toList();
     }
 
     // Search filter on route name
@@ -75,14 +81,18 @@ class JeepneyService {
     _searchQuery = query;
   }
 
-  /// Filter map to only show jeepneys on a specific route.
-  /// Pass null to show all routes again.
+  /// Filter map to show jeepneys on one or more routes.
+  /// Pass empty list to show all jeepneys again.
   void setActiveRoute(String? routeId) {
-    _activeRouteId = routeId;
+    _activeRouteIds = routeId != null ? [routeId] : [];
+  }
+
+  void setActiveRoutes(List<String> routeIds) {
+    _activeRouteIds = routeIds;
   }
 
   void clearRouteFilter() {
-    _activeRouteId = null;
+    _activeRouteIds = [];
   }
 
   void updateJeepneyLocation(String id, double latitude, double longitude) {

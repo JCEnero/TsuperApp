@@ -69,17 +69,18 @@ class MockRouteRepository implements RouteRepository {
     ),
   ];
 
-  // Alias map so passengers can search naturally
-  static const Map<String, String> _aliases = {
-    'nova bayan': 'NOVA_BAYAN_TO_SM_FAIRVIEW',
-    'nova bayan to sm fairview': 'NOVA_BAYAN_TO_SM_FAIRVIEW',
-    'sm fairview to sm north': 'SM_FAIRVIEW_TO_SM_NORTH',
-    'sm fairview': 'SM_FAIRVIEW_TO_SM_NORTH',
-    'sm north to cubao': 'SM_NORTH_TO_CUBAO',
-    'sm north': 'SM_NORTH_TO_CUBAO',
-    'cubao to nova bayan': 'CUBAO_TO_NOVA_BAYAN',
-    'cubao': 'CUBAO_TO_NOVA_BAYAN',
-    'fairview': 'SM_FAIRVIEW_TO_SM_NORTH',
+  // Alias map — maps search terms to one or more route IDs
+  static const Map<String, List<String>> _aliases = {
+    'nova bayan': ['NOVA_BAYAN_TO_SM_FAIRVIEW', 'CUBAO_TO_NOVA_BAYAN'],
+    'sm fairview': ['NOVA_BAYAN_TO_SM_FAIRVIEW', 'SM_FAIRVIEW_TO_SM_NORTH'],
+    'sm north': ['SM_FAIRVIEW_TO_SM_NORTH', 'SM_NORTH_TO_CUBAO'],
+    'cubao': ['SM_NORTH_TO_CUBAO', 'CUBAO_TO_NOVA_BAYAN'],
+    'sm north edsa': ['SM_FAIRVIEW_TO_SM_NORTH', 'SM_NORTH_TO_CUBAO'],
+    'sm city fairview': [
+      'NOVA_BAYAN_TO_SM_FAIRVIEW',
+      'SM_FAIRVIEW_TO_SM_NORTH',
+    ],
+    'araneta cubao': ['SM_NORTH_TO_CUBAO', 'CUBAO_TO_NOVA_BAYAN'],
   };
 
   @override
@@ -87,13 +88,14 @@ class MockRouteRepository implements RouteRepository {
     if (query.trim().isEmpty) return null;
     final q = query.trim().toLowerCase();
 
-    // 1. Alias match
-    final aliasId = _aliases[q];
-    if (aliasId != null) {
-      return _routes.firstWhere((r) => r.id == aliasId);
+    // Return first matching route for map display
+    // (JeepneyService will filter by all matching IDs)
+    final aliasIds = _aliases[q];
+    if (aliasIds != null && aliasIds.isNotEmpty) {
+      return _routes.firstWhere((r) => r.id == aliasIds.first);
     }
 
-    // 2. Partial match on id, displayName, origin, destination
+    // Partial match on displayName, origin, destination
     try {
       return _routes.firstWhere(
         (r) =>
@@ -105,6 +107,30 @@ class MockRouteRepository implements RouteRepository {
     } catch (_) {
       return null;
     }
+  }
+
+  /// Returns ALL route IDs matching the search query.
+  /// Used to filter jeepneys from multiple related routes.
+  List<String> findRouteIds(String query) {
+    if (query.trim().isEmpty) return [];
+    final q = query.trim().toLowerCase();
+
+    final aliasIds = _aliases[q];
+    if (aliasIds != null) return aliasIds;
+
+    // Fall back to single route match
+    final route =
+        _routes
+            .where(
+              (r) =>
+                  r.id.toLowerCase().contains(q) ||
+                  r.displayName.toLowerCase().contains(q) ||
+                  (r.origin?.toLowerCase().contains(q) ?? false) ||
+                  (r.destination?.toLowerCase().contains(q) ?? false),
+            )
+            .toList();
+
+    return route.map((r) => r.id).toList();
   }
 
   @override
