@@ -350,7 +350,7 @@ notifications  — id, user_id, title, message, type, is_read
 
 ## 👥 Team
 
-Built with ❤️ by the TSUPER team for QCU students and Quezon City commuters.
+Built with ❤️ by the 404 team for QCU students and Quezon City commuters.
 
 ---
 
