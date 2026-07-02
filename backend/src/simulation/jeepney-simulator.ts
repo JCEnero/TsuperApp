@@ -77,12 +77,13 @@ export class JeepneySimulator {
   private timer: ReturnType<typeof setInterval> | null = null;
   private updateCallback: ((jeepney: SimulatedJeepney) => void) | null = null;
 
-  // How many waypoints to skip per tick (controls speed)
-  // Higher = faster movement along route
-  private readonly WAYPOINTS_PER_TICK = 3;
+  // How many waypoints to advance per tick.
+  // 1 = smoothest movement, stays close to road.
+  // Higher values = faster but jumpy.
+  private readonly WAYPOINTS_PER_TICK = 1;
 
-  // Interval between ticks in milliseconds
-  private readonly TICK_INTERVAL_MS = 2000;
+  // Broadcast interval — 1.5 seconds balances smoothness vs network load
+  private readonly TICK_INTERVAL_MS = 1500;
 
   constructor() {
     this.initializeJeepneys();

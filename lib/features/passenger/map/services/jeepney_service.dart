@@ -10,19 +10,38 @@ class JeepneyService {
   List<Jeepney> _jeepneys = [];
   JeepneyFilter _currentFilter = JeepneyFilter.all;
   String _searchQuery = '';
+  List<String> _activeRouteIds = []; // Multiple routes for destination search
 
   List<Jeepney> get jeepneys => _getFilteredJeepneys();
+  List<Jeepney> get allJeepneys => List.unmodifiable(_jeepneys);
   JeepneyFilter get currentFilter => _currentFilter;
   String get searchQuery => _searchQuery;
+  String? get activeRouteId =>
+      _activeRouteIds.isEmpty ? null : _activeRouteIds.first;
 
   void initializeMockData() {
-    _jeepneys = _getMockJeepneys();
+    // Mock coordinates removed — live data comes from Socket.IO backend.
+    // The backend simulator provides real OSRM-based QC coordinates.
+    // This method is kept as a no-op fallback in case the connection fails
+    // and _jeepneys is empty — the map will simply show nothing until
+    // the backend connects.
+    _jeepneys = [];
   }
 
   List<Jeepney> _getFilteredJeepneys() {
     var filtered = _jeepneys;
 
-    // Apply search filter
+    // Route filter — show jeepneys on any of the active routes
+    if (_activeRouteIds.isNotEmpty) {
+      filtered =
+          filtered
+              .where(
+                (j) => j.routeId != null && _activeRouteIds.contains(j.routeId),
+              )
+              .toList();
+    }
+
+    // Search filter on route name
     if (_searchQuery.isNotEmpty) {
       filtered =
           filtered
@@ -34,7 +53,7 @@ class JeepneyService {
               .toList();
     }
 
-    // Apply category filter
+    // Status filter
     switch (_currentFilter) {
       case JeepneyFilter.all:
         break;
@@ -61,6 +80,20 @@ class JeepneyService {
 
   void setSearchQuery(String query) {
     _searchQuery = query;
+  }
+
+  /// Filter map to show jeepneys on one or more routes.
+  /// Pass empty list to show all jeepneys again.
+  void setActiveRoute(String? routeId) {
+    _activeRouteIds = routeId != null ? [routeId] : [];
+  }
+
+  void setActiveRoutes(List<String> routeIds) {
+    _activeRouteIds = routeIds;
+  }
+
+  void clearRouteFilter() {
+    _activeRouteIds = [];
   }
 
   void updateJeepneyLocation(String id, double latitude, double longitude) {
@@ -110,130 +143,5 @@ class JeepneyService {
     } catch (e) {
       return null;
     }
-  }
-
-  List<Jeepney> _getMockJeepneys() {
-    final now = DateTime.now();
-    return [
-      Jeepney(
-        id: 'j1',
-        routeName: 'QCU - Cubao',
-        latitude: 14.5995,
-        longitude: 120.9842,
-        heading: 45.0,
-        occupancy: 12,
-        driverName: 'Juan Dela Cruz',
-        status: JeepneyStatus.onRoute,
-        lastUpdated: now,
-        eta: 4,
-      ),
-      Jeepney(
-        id: 'j2',
-        routeName: 'QCU - SM Fairview',
-        latitude: 14.6020,
-        longitude: 120.9870,
-        heading: 90.0,
-        occupancy: 8,
-        driverName: 'Maria Santos',
-        status: JeepneyStatus.available,
-        lastUpdated: now,
-        eta: 2,
-      ),
-      Jeepney(
-        id: 'j3',
-        routeName: 'Cubao - QCU',
-        latitude: 14.5970,
-        longitude: 120.9810,
-        heading: 180.0,
-        occupancy: 18,
-        driverName: 'Pedro Reyes',
-        status: JeepneyStatus.onRoute,
-        lastUpdated: now,
-        eta: 7,
-      ),
-      Jeepney(
-        id: 'j4',
-        routeName: 'SM Fairview - QCU',
-        latitude: 14.6050,
-        longitude: 120.9900,
-        heading: 270.0,
-        occupancy: 5,
-        driverName: 'Ana Garcia',
-        status: JeepneyStatus.available,
-        lastUpdated: now,
-        eta: 1,
-      ),
-      Jeepney(
-        id: 'j5',
-        routeName: 'QCU - Cubao',
-        latitude: 14.5960,
-        longitude: 120.9860,
-        heading: 135.0,
-        occupancy: 20,
-        driverName: 'Carlos Mendoza',
-        status: JeepneyStatus.full,
-        lastUpdated: now,
-        eta: 10,
-      ),
-      Jeepney(
-        id: 'j6',
-        routeName: 'QCU - SM Fairview',
-        latitude: 14.6030,
-        longitude: 120.9830,
-        heading: 315.0,
-        occupancy: 15,
-        driverName: 'Elena Rodriguez',
-        status: JeepneyStatus.onRoute,
-        lastUpdated: now,
-        eta: 5,
-      ),
-      Jeepney(
-        id: 'j7',
-        routeName: 'Cubao - QCU',
-        latitude: 14.5985,
-        longitude: 120.9885,
-        heading: 0.0,
-        occupancy: 3,
-        driverName: 'Miguel Torres',
-        status: JeepneyStatus.available,
-        lastUpdated: now,
-        eta: 3,
-      ),
-      Jeepney(
-        id: 'j8',
-        routeName: 'SM Fairview - QCU',
-        latitude: 14.6005,
-        longitude: 120.9795,
-        heading: 225.0,
-        occupancy: 19,
-        driverName: 'Sofia Hernandez',
-        status: JeepneyStatus.full,
-        lastUpdated: now,
-        eta: 12,
-      ),
-      Jeepney(
-        id: 'j9',
-        routeName: 'QCU - Cubao',
-        latitude: 14.5945,
-        longitude: 120.9895,
-        heading: 60.0,
-        occupancy: 7,
-        driverName: 'Ramon Villanueva',
-        status: JeepneyStatus.onBreak,
-        lastUpdated: now,
-      ),
-      Jeepney(
-        id: 'j10',
-        routeName: 'QCU - SM Fairview',
-        latitude: 14.6015,
-        longitude: 120.9765,
-        heading: 300.0,
-        occupancy: 11,
-        driverName: 'Luz Bautista',
-        status: JeepneyStatus.onRoute,
-        lastUpdated: now,
-        eta: 6,
-      ),
-    ];
   }
 }

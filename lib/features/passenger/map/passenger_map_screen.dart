@@ -1,4 +1,3 @@
-import 'dart:math';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -18,6 +17,7 @@ import 'widgets/floating_action_button_group.dart';
 import 'widgets/jeepney_bottom_sheet.dart';
 import 'widgets/layer_selector_sheet.dart';
 import 'widgets/map_legend.dart';
+import 'widgets/route_info_banner.dart';
 import 'widgets/route_search_sheet.dart';
 
 class PassengerMapScreen extends StatefulWidget {
@@ -51,6 +51,7 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
 
   // ── Route state ────────────────────────────────────────────────────────────
   RouteInfo? _activeRoute;
+  List<String> _activeRouteIds = [];
   Set<Polyline> _liveRoutePolylines = {}; // OSRM route polylines from backend
 
   // ── UI state ───────────────────────────────────────────────────────────────
@@ -67,7 +68,10 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
   void initState() {
     super.initState();
     if (kDebugMode) print('[PassengerMapScreen] initState');
-    _initializeSocketService();
+    // Pre-warm marker cache so updates are instant
+    _markerService.prewarmCache(size: 40.0).then((_) {
+      _initializeSocketService();
+    });
   }
 
   @override
@@ -133,12 +137,13 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
 
     final dLat = currentPos.latitude - targetPos.latitude;
     final dLng = currentPos.longitude - targetPos.longitude;
-    if (sqrt(dLat * dLat + dLng * dLng) < 0.00005) return;
+    // Skip micro-movements — avoids unnecessary renders
+    if (dLat.abs() < 0.00001 && dLng.abs() < 0.00001) return;
 
     _animControllers[jeepney.id]?.dispose();
 
     final controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: 1400),
       vsync: this,
     );
 
@@ -156,18 +161,26 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
     _latAnims[jeepney.id] = latAnim;
     _lngAnims[jeepney.id] = lngAnim;
 
+    // Throttle marker rebuilds to max every 100ms during animation
+    DateTime lastRebuild = DateTime.now();
+
     controller.addListener(() {
       if (!mounted) return;
       _animatedPositions[jeepney.id] = LatLng(
         _latAnims[jeepney.id]!.value,
         _lngAnims[jeepney.id]!.value,
       );
-      _updateMarkers();
+      final now = DateTime.now();
+      if (now.difference(lastRebuild).inMilliseconds >= 100) {
+        lastRebuild = now;
+        _rebuildMarkersSync();
+      }
     });
 
     controller.addStatusListener((status) {
       if (status == AnimationStatus.completed) {
         _animatedPositions[jeepney.id] = targetPos;
+        _rebuildMarkersSync();
       }
     });
 
@@ -275,6 +288,7 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
 
   // ── Markers ────────────────────────────────────────────────────────────────
 
+  /// Full async marker rebuild — used on first load and filter changes.
   Future<void> _updateMarkers() async {
     if (!mounted) return;
     final jeepneys = _jeepneyService.jeepneys;
@@ -286,7 +300,7 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
       final icon = await _markerService.getJeepneyMarker(
         status: j.status,
         heading: j.heading,
-        size: isSelected ? 100.0 : 80.0,
+        size: isSelected ? 52.0 : 40.0,
       );
       markers.add(
         Marker(
@@ -306,7 +320,42 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
     if (mounted) setState(() => _markers = markers);
   }
 
-  // ── Jeepney tap ────────────────────────────────────────────────────────────
+  /// Synchronous marker rebuild using pre-cached bitmaps.
+  /// Called during animation ticks — no async, no await, instant.
+  void _rebuildMarkersSync() {
+    if (!mounted) return;
+    final jeepneys = _jeepneyService.jeepneys;
+    final markers = <Marker>{};
+
+    for (final j in jeepneys) {
+      final isSelected = _selectedJeepney?.id == j.id;
+      final pos = _animatedPositions[j.id] ?? LatLng(j.latitude, j.longitude);
+
+      // Use cached icon synchronously — cache was pre-warmed on init
+      final quantizedHeading = (j.heading / 45.0).round() * 45.0 % 360.0;
+      final cacheKey =
+          '${j.status.name}_${quantizedHeading.toStringAsFixed(0)}_${isSelected ? '52' : '40'}';
+      final cachedIcon = _markerService.getCached(cacheKey);
+      if (cachedIcon == null) continue; // Skip if not cached yet
+
+      markers.add(
+        Marker(
+          markerId: MarkerId(j.id),
+          position: pos,
+          rotation: j.heading,
+          anchor: const Offset(0.5, 0.5),
+          onTap: () => _onJeepneyTapped(j),
+          icon: cachedIcon,
+          infoWindow: InfoWindow(
+            title: j.routeName,
+            snippet: '${j.occupancy}/20 • ${j.status.displayName}',
+          ),
+        ),
+      );
+    }
+
+    if (mounted) setState(() => _markers = markers);
+  }
 
   void _onJeepneyTapped(Jeepney jeepney) {
     setState(() => _selectedJeepney = jeepney);
@@ -354,14 +403,45 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
   }
 
   void _applyRoute(RouteInfo route) {
+    final routeIds = MockRouteRepository().findRouteIds(
+      route.destination?.toLowerCase() ?? route.displayName.toLowerCase(),
+    );
+    final ids = routeIds.isNotEmpty ? routeIds : [route.id];
+
+    _jeepneyService.setActiveRoutes(ids);
+    _highlightLiveRoutes(ids);
+
     setState(() {
       _activeRoute = route;
+      _activeRouteIds = ids;
       _polylines = _buildRoutePolylines(route);
     });
+
     final bounds = route.bounds;
     if (bounds != null && _mapController != null) {
       _mapController!.animateCamera(CameraUpdate.newLatLngBounds(bounds, 72));
     }
+    _updateMarkers();
+  }
+
+  /// Dims all live route polylines except the selected ones.
+  void _highlightLiveRoutes(List<String> selectedRouteIds) {
+    final updated = <Polyline>{};
+    for (final polyline in _liveRoutePolylines) {
+      final isSelected = selectedRouteIds.any(
+        (id) => polyline.polylineId.value == 'live_$id',
+      );
+      updated.add(
+        polyline.copyWith(
+          colorParam:
+              isSelected
+                  ? polyline.color.withValues(alpha: 0.9)
+                  : polyline.color.withValues(alpha: 0.15),
+          widthParam: isSelected ? 6 : 2,
+        ),
+      );
+    }
+    if (mounted) setState(() => _liveRoutePolylines = updated);
   }
 
   Set<Polyline> _buildRoutePolylines(RouteInfo route) => {
@@ -389,10 +469,28 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
 
   void _clearRoute() {
     if (_activeRoute == null && _polylines.isEmpty) return;
+
+    // Restore all live polylines to full opacity
+    final restored = <Polyline>{};
+    for (final polyline in _liveRoutePolylines) {
+      restored.add(
+        polyline.copyWith(
+          colorParam: polyline.color.withValues(alpha: 0.6),
+          widthParam: 4,
+        ),
+      );
+    }
+
+    _jeepneyService.clearRouteFilter();
+
     setState(() {
       _activeRoute = null;
+      _activeRouteIds = [];
       _polylines = {};
+      _liveRoutePolylines = restored;
     });
+
+    _updateMarkers();
   }
 
   // ── Build ──────────────────────────────────────────────────────────────────
@@ -413,7 +511,10 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
           // ── Full-screen map ────────────────────────────────────────────────
           Positioned.fill(
             child: GoogleMapWidget(
-              initialCameraPosition: null,
+              initialCameraPosition: const CameraPosition(
+                target: LatLng(14.6760, 121.0437), // Quezon City center
+                zoom: 13.0,
+              ),
               markers: _markers,
               polylines: allPolylines,
               mapType: _mapLayer.toGoogleMapType(),
@@ -497,6 +598,21 @@ class _PassengerMapScreenState extends State<PassengerMapScreen>
               activeCount: _activeFilterCount,
             ),
           ),
+
+          // ── Route info banner (shown after destination search) ─────────────
+          if (_activeRoute != null && _activeRouteIds.isNotEmpty)
+            Positioned(
+              left: 0,
+              right: 0,
+              bottom: bottomPad + 90,
+              child: RouteInfoBanner(
+                destination:
+                    _activeRoute!.destination ?? _activeRoute!.displayName,
+                activeRouteIds: _activeRouteIds,
+                jeepneyService: _jeepneyService,
+                onClose: _clearRoute,
+              ),
+            ),
         ],
       ),
     );

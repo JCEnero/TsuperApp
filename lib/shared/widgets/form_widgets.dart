@@ -207,6 +207,10 @@ class _AppFormFieldState extends State<AppFormField> {
         fontSize: 14,
         color: AppColors.ink,
       ),
+      // Disable browser's native password reveal button on web
+      // to avoid duplicate eye icons alongside our custom one.
+      enableSuggestions: !widget.obscure,
+      autocorrect: !widget.obscure,
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hint,

@@ -9,11 +9,17 @@ class Jeepney {
     required this.driverName,
     required this.status,
     required this.lastUpdated,
+    this.routeId,
     this.eta,
   });
 
   final String id;
   final String routeName;
+
+  /// Backend route ID (e.g. 'NOVA_BAYAN_TO_SM_FAIRVIEW').
+  /// Used to filter jeepneys by selected route.
+  final String? routeId;
+
   final double latitude;
   final double longitude;
   final double heading;
@@ -28,6 +34,7 @@ class Jeepney {
   Jeepney copyWith({
     String? id,
     String? routeName,
+    String? routeId,
     double? latitude,
     double? longitude,
     double? heading,
@@ -40,6 +47,7 @@ class Jeepney {
     return Jeepney(
       id: id ?? this.id,
       routeName: routeName ?? this.routeName,
+      routeId: routeId ?? this.routeId,
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       heading: heading ?? this.heading,
@@ -55,7 +63,7 @@ class Jeepney {
 
   bool get isAvailable => status == JeepneyStatus.available;
   bool get isFull => occupancy >= 20;
-  bool get isNearby => false; // Will be calculated based on user location
+  bool get isNearby => false;
 }
 
 enum JeepneyStatus { available, onRoute, full, onBreak, maintenance }

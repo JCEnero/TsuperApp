@@ -45,6 +45,7 @@ Jeepney _jeepneyFromJson(Map<String, dynamic> json) {
   return Jeepney(
     id: json['id'] as String,
     routeName: json['routeName'] as String,
+    routeId: json['routeId'] as String?,
     latitude: (json['latitude'] as num).toDouble(),
     longitude: (json['longitude'] as num).toDouble(),
     heading: (json['heading'] as num).toDouble(),
